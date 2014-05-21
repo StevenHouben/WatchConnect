@@ -1,0 +1,19 @@
+﻿<Window x:Class="Watch.OutputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:surface="http://schemas.microsoft.com/surface/2008"  
+        Title="OutputWindow" Height="825" Width="1024">
+    <Grid>
+        <Border x:Name="Border" BorderBrush="Yellow" BorderThickness="10" Grid.ColumnSpan="2">
+            <Grid>
+                <surface:SurfaceScrollViewer  HorizontalScrollBarVisibility="Hidden" Background="Black"
+                                 VerticalScrollBarVisibility="Hidden"
+                                 SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical"
+                                 PanningMode="VerticalOnly" VerticalContentAlignment="Stretch"
+                                              HorizontalContentAlignment="Stretch">
+                    <StackPanel x:Name="Body" Orientation="Vertical"/>
+                </surface:SurfaceScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
