@@ -2,7 +2,7 @@
 
 namespace Watch.Input.Sensors
 {
-    public class LightSensor : Sensor
+    public class LightSensor : ProximitySensor
     {
         double _maximumMeasuredLightIntensity;
         bool _inRange;
@@ -10,7 +10,7 @@ namespace Watch.Input.Sensors
         {
             Id = id;
         }
-        public override bool CalculateRange()
+        protected override bool CalculateRange()
         {
             return Value < Treshold;
         }
@@ -29,7 +29,7 @@ namespace Watch.Input.Sensors
             OnRangeChanged(new RangeChangedEventArgs(this, _inRange, DateTime.UtcNow));
         }
 
-        public override void ProcessSensorData()
+        protected override void ProcessSensorData()
         {
             CalculateLightTreshold();
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Timers;
 using Phidgets;
 using Phidgets.Events;
+using Watch.Input.Recognizers;
 using Watch.Input.Sensors;
 
 namespace Watch.Input
@@ -10,7 +11,7 @@ namespace Watch.Input
     public class GestureManager
     {
         public event EventHandler<GestureDetectedEventArgs> GestureDetected;
-        public event EventHandler<RawDataReceivedEventArgs> RawDataReceived;
+        public event EventHandler<RawSensorDataReceivedEventArgs> RawDataReceived;
 
         public event EventHandler<GestureDetectedEventArgs> SwipeLeft;
         public event EventHandler<GestureDetectedEventArgs> SwipeRight;
@@ -19,17 +20,14 @@ namespace Watch.Input
         public event EventHandler<GestureDetectedEventArgs> Glance;
         public event EventHandler<GestureDetectedEventArgs> Cover;
 
-        InterfaceKit _kit;
-
         private const int InfraRedDistanceTheshold = 300;
 
-        readonly Sensor _frontSensor = new InfraredSensor(0,InfraRedDistanceTheshold) { Name = "front-sensor" };
-        readonly Sensor _topLeftSensor = new InfraredSensor(1,InfraRedDistanceTheshold) { Name = "top-left-sensor" };
-        readonly Sensor _topRightSensor = new InfraredSensor(2,InfraRedDistanceTheshold) { Name = "top-right-sensor" };
-        readonly Sensor _lightSensor = new LightSensor(3) { Name = "light-sensor" };
+        readonly ProximitySensor _frontSensor = new InfraredSensor(0,InfraRedDistanceTheshold) { Name = "front-sensor" };
+        readonly ProximitySensor _topLeftSensor = new InfraredSensor(1,InfraRedDistanceTheshold) { Name = "top-left-sensor" };
+        readonly ProximitySensor _topRightSensor = new InfraredSensor(2,InfraRedDistanceTheshold) { Name = "top-right-sensor" };
+        readonly ProximitySensor _lightSensor = new LightSensor(3) { Name = "light-sensor" };
 
         Gesture _lastDetectedGesture;
-
 
         readonly Queue<int> _detectedGestures = new Queue<int>();
 
@@ -39,11 +37,12 @@ namespace Watch.Input
         private readonly Timer _topLeftTimer = new Timer(1000);
         private readonly Timer _lightTimer = new Timer(500);
 
+        private InterfaceKit _kit;
         public void Start()
         {
-            _kit = new InterfaceKit();
+            _kit = Hardware.InterfaceKit;
             _kit.SensorChange += kit_SensorChange;
-            _kit.open();
+            _kit.open(157002);
 
             _kit.waitForAttachment();
 
@@ -208,7 +207,7 @@ namespace Watch.Input
                     break;
             }
 
-            OnRawDataHandler(new RawDataReceivedEventArgs(_frontSensor,_topLeftSensor,_topRightSensor,_lightSensor));
+            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor,_topLeftSensor,_topRightSensor,_lightSensor));
         }
       
         protected void OnGestureHandler(GestureDetectedEventArgs ge)
@@ -248,7 +247,7 @@ namespace Watch.Input
                 Glance(this, ge);
         }
 
-        protected void OnRawDataHandler(RawDataReceivedEventArgs e)
+        protected void OnRawDataHandler(RawSensorDataReceivedEventArgs e)
         {
             if (RawDataReceived != null)
                 RawDataReceived(this, e);
@@ -263,16 +262,16 @@ namespace Watch.Input
             Gesture = detectedGesture;
         }
     }
-    public class RawDataReceivedEventArgs : EventArgs
+    public class RawSensorDataReceivedEventArgs : EventArgs
     {
-        public Sensor FrontSensor { get; set; }
+        public ProximitySensor FrontSensor { get; set; }
 
-        public Sensor TopLeftSensor { get; set; }
+        public ProximitySensor TopLeftSensor { get; set; }
 
-        public Sensor TopRightSensor { get; set; }
-        public Sensor LightSensor { get; set; }
+        public ProximitySensor TopRightSensor { get; set; }
+        public ProximitySensor LightSensor { get; set; }
 
-        public RawDataReceivedEventArgs(Sensor frontSensor, Sensor topLeftSensor, Sensor topRightSensor, Sensor lightSensor)
+        public RawSensorDataReceivedEventArgs(ProximitySensor frontSensor, ProximitySensor topLeftSensor, ProximitySensor topRightSensor, ProximitySensor lightSensor)
         {
             FrontSensor = frontSensor;
             TopLeftSensor = topLeftSensor;

@@ -2,9 +2,9 @@
 
 namespace Watch.Input.Sensors
 {
-    public abstract class Sensor
+    public abstract class ProximitySensor:ISensor
     {
-        public event EventHandler<RangeChangedEventArgs> RangeChanged; 
+        public event EventHandler<RangeChangedEventArgs> RangeChanged;
         public string Name { get; set; }
 
         public int Id { get; set; }
@@ -32,17 +32,17 @@ namespace Watch.Input.Sensors
             if (RangeChanged != null)
                 RangeChanged(this, e);
         }
-        public abstract bool CalculateRange();
-        public abstract void ProcessSensorData();
+        protected abstract bool CalculateRange();
+        protected abstract void ProcessSensorData();
     }
 
     public class RangeChangedEventArgs : EventArgs
     {
-        public Sensor Sensor { get; set; }
+        public ProximitySensor Sensor { get; set; }
         public bool InRange { get; set; }
         public DateTime TimeStamp { get; set; }
 
-        public RangeChangedEventArgs(Sensor sensor, bool inRange, DateTime timeStamp)
+        public RangeChangedEventArgs(ProximitySensor sensor, bool inRange, DateTime timeStamp)
         {
             Sensor = sensor;
             TimeStamp = timeStamp;

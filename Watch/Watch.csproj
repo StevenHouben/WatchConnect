@@ -40,6 +40,15 @@
     <Reference Include="Microsoft.Surface, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Surface.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Surface.Presentation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="OxyPlot">
+      <HintPath>..\packages\OxyPlot.Core.2014.1.308.1\lib\portable-net4+sl4+wp71+win8\OxyPlot.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Wpf">
+      <HintPath>..\packages\OxyPlot.Wpf.2014.1.308.1\lib\NET45\OxyPlot.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Xps">
+      <HintPath>..\packages\OxyPlot.Wpf.2014.1.308.1\lib\NET45\OxyPlot.Xps.dll</HintPath>
+    </Reference>
     <Reference Include="Phidget21.NET, Version=2.1.8.185, Culture=neutral, PublicKeyToken=c2b1f2a3594bce52, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Program Files\Phidgets\Phidget21.NET.dll</HintPath>
@@ -72,9 +81,24 @@
     <Compile Include="Examples\SensorVisualizer.xaml.cs">
       <DependentUpon>SensorVisualizer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Input\Recognizers\DtwRecognizer.cs" />
+    <Compile Include="Input\Recognizers\HmqRecognizer.cs" />
+    <Compile Include="Input\Sensors\Dtw\DistanceMeasure.cs" />
+    <Compile Include="Input\Sensors\Dtw\Dtw.cs" />
+    <Compile Include="Input\Sensors\Dtw\IDtw.cs" />
+    <Compile Include="Input\Sensors\Dtw\Preprocessing\CentralizationPreprocessor.cs" />
+    <Compile Include="Input\Sensors\Dtw\Preprocessing\IPreprocessor.cs" />
+    <Compile Include="Input\Sensors\Dtw\Preprocessing\NonePreprocessor.cs" />
+    <Compile Include="Input\Sensors\Dtw\Preprocessing\NormalizationPreprocessor.cs" />
+    <Compile Include="Input\Sensors\Dtw\Preprocessing\StandardizationPreprocessor.cs" />
+    <Compile Include="Input\Sensors\Dtw\SeriesVariable.cs" />
+    <Compile Include="Input\Sensors\Hardware.cs" />
     <Compile Include="Input\Sensors\InfraredSensor.cs" />
     <Compile Include="Input\Sensors\LightSensor.cs" />
-    <Compile Include="Input\Sensors\Sensor.cs" />
+    <Compile Include="Input\Sensors\LinearTouchSensor.cs" />
+    <Compile Include="Input\Sensors\ISensor.cs" />
+    <Compile Include="Input\Sensors\ProximitySensor.cs" />
+    <Compile Include="Input\Sensors\TouchSensor.cs" />
     <Compile Include="OutputWindow.xaml.cs">
       <DependentUpon>OutputWindow.xaml</DependentUpon>
     </Compile>
@@ -128,6 +152,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -2,7 +2,7 @@
 
 namespace Watch.Input.Sensors
 {
-    public class InfraredSensor : Sensor
+    public class InfraredSensor : ProximitySensor
     {
         private bool _inRange;
         public InfraredSensor(int id, int treshold)
@@ -20,12 +20,12 @@ namespace Watch.Input.Sensors
             return -1;
         }
 
-        public override bool CalculateRange()
+        protected override bool CalculateRange()
         {
             return Value > Treshold;
         }
 
-        public override void ProcessSensorData()
+        protected override void ProcessSensorData()
         {
             var localRange = CalculateRange();
             if (localRange == _inRange) return;
