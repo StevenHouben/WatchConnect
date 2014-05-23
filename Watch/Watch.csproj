@@ -78,58 +78,28 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Examples\SensorVisualizer.xaml.cs">
+    <Compile Include="Faces\SensorVisualizer.xaml.cs">
       <DependentUpon>SensorVisualizer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Input\Recognizers\DtwRecognizer.cs" />
-    <Compile Include="Input\Recognizers\HmqRecognizer.cs" />
-    <Compile Include="Input\Sensors\Dtw\DistanceMeasure.cs" />
-    <Compile Include="Input\Sensors\Dtw\Dtw.cs" />
-    <Compile Include="Input\Sensors\Dtw\IDtw.cs" />
-    <Compile Include="Input\Sensors\Dtw\Preprocessing\CentralizationPreprocessor.cs" />
-    <Compile Include="Input\Sensors\Dtw\Preprocessing\IPreprocessor.cs" />
-    <Compile Include="Input\Sensors\Dtw\Preprocessing\NonePreprocessor.cs" />
-    <Compile Include="Input\Sensors\Dtw\Preprocessing\NormalizationPreprocessor.cs" />
-    <Compile Include="Input\Sensors\Dtw\Preprocessing\StandardizationPreprocessor.cs" />
-    <Compile Include="Input\Sensors\Dtw\SeriesVariable.cs" />
-    <Compile Include="Input\Sensors\Hardware.cs" />
-    <Compile Include="Input\Sensors\InfraredSensor.cs" />
-    <Compile Include="Input\Sensors\LightSensor.cs" />
-    <Compile Include="Input\Sensors\LinearTouchSensor.cs" />
-    <Compile Include="Input\Sensors\ISensor.cs" />
-    <Compile Include="Input\Sensors\ProximitySensor.cs" />
-    <Compile Include="Input\Sensors\TouchSensor.cs" />
-    <Compile Include="OutputWindow.xaml.cs">
-      <DependentUpon>OutputWindow.xaml</DependentUpon>
+    <Compile Include="WatchFace.xaml.cs">
+      <DependentUpon>WatchFace.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Input\Sensors\Filters\Kalman.cs" />
-    <Compile Include="Input\GestureManager.cs" />
-    <Compile Include="Input\TouchManager.cs" />
-    <Compile Include="Interface\Simulator\WatchSimulator.xaml.cs">
-      <DependentUpon>WatchSimulator.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Interface\IWatchFace.cs" />
-    <Compile Include="Examples\Clock.xaml.cs">
+    <Compile Include="Faces\Clock.xaml.cs">
       <DependentUpon>Clock.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\WatchFaceManager.cs" />
-    <Page Include="Examples\SensorVisualizer.xaml">
+    <Page Include="Faces\SensorVisualizer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="OutputWindow.xaml">
+    <Page Include="WatchFace.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Interface\Simulator\WatchSimulator.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Examples\Clock.xaml">
+    <Page Include="Faces\Clock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -162,9 +132,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Resource Include="Interface\Simulator\watchface.png" />
+    <ProjectReference Include="..\Watch.Toolkit\Watch.Toolkit.csproj">
+      <Project>{eec7f4e2-8fad-4cc6-acba-58c0c6a182be}</Project>
+      <Name>Watch.Toolkit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

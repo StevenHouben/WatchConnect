@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EEC7F4E2-8FAD-4CC6-ACBA-58C0C6A182BE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Watch.Toolkit</RootNamespace>
+    <AssemblyName>Watch.Toolkit</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Phidget21.NET, Version=2.1.8.185, Culture=neutral, PublicKeyToken=c2b1f2a3594bce52, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Phidgets\Phidget21.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Hardware\IHardwarePlatform.cs" />
+    <Compile Include="Helper.cs" />
+    <Compile Include="Input\AdvancedGestureManager.cs" />
+    <Compile Include="Input\GestureManager.cs" />
+    <Compile Include="Input\Recognizers\DtwRecognizer.cs" />
+    <Compile Include="Input\Recognizers\HMQRecognizer.cs" />
+    <Compile Include="Input\Recognizers\MultiDtwRecoginizer.cs" />
+    <Compile Include="Sensors\AbstractGestureManager.cs" />
+    <Compile Include="Sensors\Dtw\DistanceMeasure.cs" />
+    <Compile Include="Sensors\Dtw\Dtw.cs" />
+    <Compile Include="Sensors\Dtw\IDtw.cs" />
+    <Compile Include="Sensors\Dtw\Preprocessing\CentralizationPreprocessor.cs" />
+    <Compile Include="Sensors\Dtw\Preprocessing\IPreprocessor.cs" />
+    <Compile Include="Sensors\Dtw\Preprocessing\NonePreprocessor.cs" />
+    <Compile Include="Sensors\Dtw\Preprocessing\NormalizationPreprocessor.cs" />
+    <Compile Include="Sensors\Dtw\Preprocessing\StandardizationPreprocessor.cs" />
+    <Compile Include="Sensors\Dtw\SeriesVariable.cs" />
+    <Compile Include="Sensors\Filters\Kalman.cs" />
+    <Compile Include="Hardware\Hardware.cs" />
+    <Compile Include="Sensors\InfraredSensor.cs" />
+    <Compile Include="Sensors\ISensor.cs" />
+    <Compile Include="Sensors\LightSensor.cs" />
+    <Compile Include="Sensors\LinearTouchSensor.cs" />
+    <Compile Include="Sensors\ProximitySensor.cs" />
+    <Compile Include="Sensors\TouchSensor.cs" />
+    <Compile Include="Input\TemplateData.cs" />
+    <Compile Include="Input\TouchManager.cs" />
+    <Compile Include="Interface\IWatchFace.cs" />
+    <Compile Include="Interface\WatchFaceManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
