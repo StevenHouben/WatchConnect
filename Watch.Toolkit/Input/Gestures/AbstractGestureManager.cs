@@ -1,9 +1,9 @@
 ﻿using System;
-using Watch.Toolkit.Input;
+using Watch.Toolkit.Sensors;
 
-namespace Watch.Toolkit.Sensors
+namespace Watch.Toolkit.Input.Gestures
 {
-    public abstract class AbstractGestureManager
+    public abstract class AbstractGestureManager : IInputManager
     {
         public event EventHandler<GestureDetectedEventArgs> GestureDetected;
         public event EventHandler<RawSensorDataReceivedEventArgs> RawDataReceived;
@@ -14,8 +14,8 @@ namespace Watch.Toolkit.Sensors
         public event EventHandler<GestureDetectedEventArgs> Glance;
         public event EventHandler<GestureDetectedEventArgs> Cover;
 
-
         public abstract void Start();
+        public abstract void Stop();
 
         protected void OnRawDataHandler(RawSensorDataReceivedEventArgs e)
         {
@@ -58,6 +58,5 @@ namespace Watch.Toolkit.Sensors
             if (Glance != null)
                 Glance(this, ge);
         }
-
     }
 }

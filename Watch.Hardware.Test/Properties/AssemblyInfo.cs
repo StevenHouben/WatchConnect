@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Hardware")]
+[assembly: AssemblyTitle("Watch.Hardware.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Hardware")]
+[assembly: AssemblyProduct("Watch.Hardware.Test")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b8a52eb9-ac0c-448d-a77e-11a77fb12a7e")]
+[assembly: Guid("13fc874d-88e1-482e-adc4-03ce61e8e832")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch", "Watch\Watch.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit", "Watch.Toolkit\Watch.Toolkit.csproj", "{EEC7F4E2-8FAD-4CC6-ACBA-58C0C6A182BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit.Hardware", "Watch.Toolkit.Hardware\Watch.Toolkit.Hardware.csproj", "{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Hardware.Test", "Watch.Hardware.Test\Watch.Hardware.Test.csproj", "{97C92770-6DC7-419D-84C4-94DC83BB0C53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{EEC7F4E2-8FAD-4CC6-ACBA-58C0C6A182BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEC7F4E2-8FAD-4CC6-ACBA-58C0C6A182BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEC7F4E2-8FAD-4CC6-ACBA-58C0C6A182BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

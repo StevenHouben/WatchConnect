@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Phidgets;
+using System.Text;using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Input.Recognizers;
 using Watch.Toolkit.Sensors;
 
-namespace Watch.Toolkit.Input
+namespace Watch.Toolkit.Input.Gestures
 {
     public class AdvancedGestureManager:AbstractGestureManager
     {
@@ -36,24 +35,24 @@ namespace Watch.Toolkit.Input
         private readonly List<double> _dataLightSensor = new List<double>();
 
         private bool _recording;
-        private InterfaceKit _kit;
         private int _frameSize = 6;
         private int _counter = 0;
 
-        private DtwRecognizer _leftMatcher = new DtwRecognizer();
-        private DtwRecognizer _rightMatcher = new DtwRecognizer();
-        private DtwRecognizer _frontMatcher = new DtwRecognizer();
-        private DtwRecognizer _lightMatcher = new DtwRecognizer();
+        private readonly DtwRecognizer _leftMatcher = new DtwRecognizer();
+        private readonly DtwRecognizer _rightMatcher = new DtwRecognizer();
+        private readonly DtwRecognizer _frontMatcher = new DtwRecognizer();
+        private readonly DtwRecognizer _lightMatcher = new DtwRecognizer();
 
-        private DtwRecognizer _vecMatcher = new DtwRecognizer();
+        private readonly DtwRecognizer _vecMatcher = new DtwRecognizer();
+
+        private Phidget _manager;
 
         public override void Start()
         {
-            _kit = Hardware.Hardware.InterfaceKit;
-            _kit.SensorChange += _kit_SensorChange;
-            _kit.open(157002);
+            _manager = new Phidget();
+            _manager.Start(157002);
 
-            _kit.waitForAttachment();
+            _manager.AnalogDataReceived += _manager_AnalogDataReceived;
 
             _topLeftSensor.RangeChanged += _sensor_RangeChanged;
             _topRightSensor.RangeChanged += _sensor_RangeChanged;
@@ -84,6 +83,33 @@ namespace Watch.Toolkit.Input
             _lightMatcher.AddTemplate("rightToLeft", TemplateData.RightToLeft.Light);
             _lightMatcher.AddTemplate("topToBottom", TemplateData.TopToBottom.Light);
             _lightMatcher.AddTemplate("bottomToTop", TemplateData.BottomToTop.Light);
+        }
+
+        public override void Stop()
+        {
+            if(_manager.IsRunning)
+                _manager.Stop();
+        }
+
+        void _manager_AnalogDataReceived(object sender, Hardware.AnalogDataReceivedEventArgs e)
+        {
+            switch (e.Id)
+            {
+                case 0:
+                    _frontSensor.Value = e.Value;
+                    break;
+                case 1:
+                    _topLeftSensor.Value = e.Value;
+                    break;
+                case 2:
+                    _lightSensor.Value = e.Value;
+                    break;
+                case 3:
+                    _topRightSensor.Value = e.Value;
+                    break;
+            }
+
+            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
         }
 
         void _sensor_RangeChanged(object sender, RangeChangedEventArgs e)
@@ -136,7 +162,6 @@ namespace Watch.Toolkit.Input
                     
                     var output = _vecMatcher.FindClosestLabelAndCost(recordedTemplate.Vector);
 
-                    Console.WriteLine(output);
                     //var li = new List<string>();
                     //li.Add(_leftMatcher.FindClosestLabel(_dataLeftSensor.ToArray()));
                     //li.Add(_rightMatcher.FindClosestLabel(_dataLightSensor.ToArray()));
@@ -161,26 +186,6 @@ namespace Watch.Toolkit.Input
             }
         }
 
-        void _kit_SensorChange(object sender, Phidgets.Events.SensorChangeEventArgs e)
-        {
-            switch (e.Index)
-            {
-                case 0:
-                    _frontSensor.Value = e.Value;
-                    break;
-                case 1:
-                    _topLeftSensor.Value = e.Value;
-                    break;
-                case 2:
-                    _lightSensor.Value = e.Value;
-                    break;
-                case 3:
-                    _topRightSensor.Value = e.Value;
-                    break;
-            }
-
-            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
-        }
         public void PrintCollection<T>(IEnumerable<T> col)
         {
             foreach (var item in col)

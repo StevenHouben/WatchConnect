@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Windows.Media;
+using Watch.Toolkit.Input.Touch;
 using Watch.Toolkit.Sensors;
 
-namespace Watch.Examples
+namespace Watch.Faces
 {
     public partial class SensorVisualizer 
     {
-        private static readonly Random Random = new Random();
         public SensorVisualizer()
         {
             InitializeComponent();
-
         }
         public void UpdateVisualization(ProximitySensor topLeft,ProximitySensor topRight, ProximitySensor front, ProximitySensor light)
         {
@@ -32,7 +32,18 @@ namespace Watch.Examples
 
         private int count = 0;
 
-      
+
+        public void UpdateBevels(BevelState state)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                BevelRight.Fill = state.BevelRight ? Brushes.Red : Brushes.White;
+                BevelLeft.Fill = state.BevelLeft ? Brushes.Red : Brushes.White;
+                BevelTop.Fill = state.BevelTop ? Brushes.Red : Brushes.White;
+                BevelBottom.Fill = state.BevelBottom ? Brushes.Red : Brushes.White;
+            });
+            
+        }
 
         public void UpdateDetection(string name)
         {

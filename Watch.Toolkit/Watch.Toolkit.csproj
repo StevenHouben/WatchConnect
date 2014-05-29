@@ -30,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Phidget21.NET, Version=2.1.8.185, Culture=neutral, PublicKeyToken=c2b1f2a3594bce52, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Phidgets\Phidget21.NET.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,14 +39,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Hardware\IHardwarePlatform.cs" />
     <Compile Include="Helper.cs" />
-    <Compile Include="Input\AdvancedGestureManager.cs" />
-    <Compile Include="Input\GestureManager.cs" />
+    <Compile Include="Input\Gestures\AdvancedGestureManager.cs" />
+    <Compile Include="Input\IInputManager.cs" />
+    <Compile Include="Input\EventMonitor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Input\Touch\MultiBevelTouchEventArgs.cs" />
+    <Compile Include="Input\Touch\BevelSide.cs" />
+    <Compile Include="Input\Gestures\Gesture.cs" />
+    <Compile Include="Input\Gestures\GestureDetectedEventArgs.cs" />
+    <Compile Include="Input\Gestures\GestureManager.cs" />
+    <Compile Include="Input\Touch\BevelState.cs" />
+    <Compile Include="Interface\IVisualSharer.cs" />
+    <Compile Include="Sensors\RawSensorDataReceivedEventArgs.cs" />
+    <Compile Include="Input\Touch\RawTouchDataReceivedEventArgs.cs" />
+    <Compile Include="Input\Touch\BevelTouchEventArgs.cs" />
     <Compile Include="Input\Recognizers\DtwRecognizer.cs" />
     <Compile Include="Input\Recognizers\HMQRecognizer.cs" />
     <Compile Include="Input\Recognizers\MultiDtwRecoginizer.cs" />
-    <Compile Include="Sensors\AbstractGestureManager.cs" />
+    <Compile Include="Input\Touch\SliderTouchEventArgs.cs" />
+    <Compile Include="Input\Gestures\AbstractGestureManager.cs" />
     <Compile Include="Sensors\Dtw\DistanceMeasure.cs" />
     <Compile Include="Sensors\Dtw\Dtw.cs" />
     <Compile Include="Sensors\Dtw\IDtw.cs" />
@@ -61,18 +70,24 @@
     <Compile Include="Sensors\Dtw\Preprocessing\StandardizationPreprocessor.cs" />
     <Compile Include="Sensors\Dtw\SeriesVariable.cs" />
     <Compile Include="Sensors\Filters\Kalman.cs" />
-    <Compile Include="Hardware\Hardware.cs" />
     <Compile Include="Sensors\InfraredSensor.cs" />
     <Compile Include="Sensors\ISensor.cs" />
     <Compile Include="Sensors\LightSensor.cs" />
     <Compile Include="Sensors\LinearTouchSensor.cs" />
     <Compile Include="Sensors\ProximitySensor.cs" />
+    <Compile Include="Sensors\RangeChangedEventArgs.cs" />
     <Compile Include="Sensors\TouchSensor.cs" />
-    <Compile Include="Input\TemplateData.cs" />
-    <Compile Include="Input\TouchManager.cs" />
+    <Compile Include="Input\Recognizers\TemplateData.cs" />
+    <Compile Include="Input\Touch\TouchManager.cs" />
     <Compile Include="Interface\IWatchFace.cs" />
     <Compile Include="Interface\WatchFaceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Watch.Toolkit.Hardware\Watch.Toolkit.Hardware.csproj">
+      <Project>{67be83b9-ee89-4ec2-8b57-aafe1af46699}</Project>
+      <Name>Watch.Toolkit.Hardware</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,0 +1,10 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Faces="clr-namespace:Watch.Faces" x:Class="Watch.SimpleWatchFace"
+        Title="SimpleWatchFace" Height="300" Width="300">
+        <Border x:Name="Content" BorderThickness="0,0,0,0" BorderBrush="Transparent">
+        <Faces:WatchVisual x:Name="VisualContent" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+    </Border>
+
+</Window>

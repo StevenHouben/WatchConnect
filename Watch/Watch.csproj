@@ -78,11 +78,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="WindowExt.cs" />
     <Compile Include="Faces\SensorVisualizer.xaml.cs">
       <DependentUpon>SensorVisualizer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WatchFace.xaml.cs">
-      <DependentUpon>WatchFace.xaml</DependentUpon>
+    <Compile Include="Faces\WatchVisual.xaml.cs">
+      <DependentUpon>WatchVisual.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LaptopWindow.xaml.cs">
+      <DependentUpon>LaptopWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DebugWatchFace.xaml.cs">
+      <DependentUpon>DebugWatchFace.xaml</DependentUpon>
     </Compile>
     <Compile Include="Faces\Clock.xaml.cs">
       <DependentUpon>Clock.xaml</DependentUpon>
@@ -91,15 +98,30 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SimpleWatchFace.xaml.cs">
+      <DependentUpon>SimpleWatchFace.xaml</DependentUpon>
+    </Compile>
     <Page Include="Faces\SensorVisualizer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WatchFace.xaml">
+    <Page Include="Faces\WatchVisual.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LaptopWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DebugWatchFace.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Faces\Clock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SimpleWatchFace.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

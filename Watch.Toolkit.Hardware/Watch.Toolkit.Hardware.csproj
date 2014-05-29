@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LibUsbDotNet">
+      <HintPath>..\..\NooSphere\NooSphere\NooSphere.Infrastructure\Libs\LibUsbDotNet.dll</HintPath>
+    </Reference>
     <Reference Include="Phidget21.NET, Version=2.1.8.185, Culture=neutral, PublicKeyToken=c2b1f2a3594bce52, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\Phidgets\Phidget21.NET.dll</HintPath>
@@ -43,10 +46,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Hardware.cs" />
-    <Compile Include="IHardwarePlatform.cs" />
+    <Compile Include="Arduino\Arduino.cs" />
+    <Compile Include="Arduino\SafeSerial.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DigitalDataReceivedEventArgs.cs" />
+    <Compile Include="AnalogDataReceivedEventArgs.cs" />
+    <Compile Include="MessagesReceivedEventArgs.cs" />
+    <Compile Include="Phidget\Phidget.cs" />
+    <Compile Include="Phidget\PhidgetManager.cs" />
+    <Compile Include="AbstractHardwarePlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

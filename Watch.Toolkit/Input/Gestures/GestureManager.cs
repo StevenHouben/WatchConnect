@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
-using Phidgets;
-using Phidgets.Events;
+
+using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Input.Recognizers;
 using Watch.Toolkit.Sensors;
-using Timer = System.Timers.Timer;
 
-namespace Watch.Toolkit.Input
+namespace Watch.Toolkit.Input.Gestures
 {
     public class GestureManager:AbstractGestureManager
     {
@@ -46,16 +45,15 @@ namespace Watch.Toolkit.Input
         private readonly Timer _lightTimer = new Timer(500);
         
         private readonly List<double> _dataRight = new List<double>();
-        private readonly List<double> _dataLeft = new List<double>(); 
+        private readonly List<double> _dataLeft = new List<double>();
 
-        private InterfaceKit _kit;
+
+        private Phidget _phidget;
         public override void Start()
         {
-            _kit = Hardware.Hardware.InterfaceKit;
-            _kit.SensorChange += kit_SensorChange;
-            _kit.open(157002);
-
-            _kit.waitForAttachment();
+            _phidget = new Phidget();
+            _phidget.Start(157002);
+            _phidget.AnalogDataReceived += _manager_AnalogDataReceived;
 
             _topLeftSensor.RangeChanged += _topLeftSensor_RangeChanged;
             _topRightSensor.RangeChanged +=_topRightSensor_RangeChanged;
@@ -68,6 +66,33 @@ namespace Watch.Toolkit.Input
 
             _gestureRecognizer.AddTemplate("left",data[0]);
             _gestureRecognizer.AddTemplate("right", data[1]);
+        }
+
+        public override void Stop()
+        {
+            if (_phidget.IsRunning)
+                _phidget.Stop();
+        }
+
+        void _manager_AnalogDataReceived(object sender, Hardware.AnalogDataReceivedEventArgs e)
+        {
+            switch (e.Id)
+            {
+                case 0:
+                    _frontSensor.Value = e.Value;
+                    break;
+                case 1:
+                    _topLeftSensor.Value = e.Value;
+                    break;
+                case 2:
+                    _lightSensor.Value = e.Value;
+                    break;
+                case 3:
+                    _topRightSensor.Value = e.Value;
+                    break;
+            }
+
+            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
         }
 
         void _lightSensor_RangeChanged(object sender, RangeChangedEventArgs e)
@@ -215,8 +240,8 @@ namespace Watch.Toolkit.Input
             if (_detectedSideGestures.Count != 4) return;
             _swipeSideTimer.Stop();
 
-            PrintRow(_dataLeft.ToArray());
-            PrintRow(_dataRight.ToArray());
+            //PrintRow(_dataLeft.ToArray());
+            //PrintRow(_dataRight.ToArray());
 
             var output = _gestureRecognizer.FindClosestLabel(_dataLeft.ToArray());
 
@@ -241,123 +266,5 @@ namespace Watch.Toolkit.Input
             else
                 OnSwipeRightHandler(new GestureDetectedEventArgs(Gesture.SwipeRight));
         }
-
-        void kit_SensorChange(object sender, SensorChangeEventArgs e)
-        {
-            switch (e.Index)
-            {
-                case 0:
-                    _frontSensor.Value = e.Value;
-                    break;
-                case 1:
-                    _topLeftSensor.Value = e.Value;
-                    break;
-                case 2:
-                    _lightSensor.Value = e.Value;
-                    break;
-                case 3:
-                    _topRightSensor.Value = e.Value;
-                    break;
-            }
-
-            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor,_topLeftSensor,_topRightSensor,_lightSensor));
-        }
-    
     }
-    public class GestureDetectedEventArgs:EventArgs
-    {
-        public Gesture Gesture{get;set;}
-
-        public GestureDetectedEventArgs(Gesture detectedGesture)
-        {
-            Gesture = detectedGesture;
-        }
-    }
-    public class RawSensorDataReceivedEventArgs : EventArgs
-    {
-        public ProximitySensor FrontSensor { get; set; }
-
-        public ProximitySensor TopLeftSensor { get; set; }
-
-        public ProximitySensor TopRightSensor { get; set; }
-        public ProximitySensor LightSensor { get; set; }
-
-        public RawSensorDataReceivedEventArgs(ProximitySensor frontSensor, ProximitySensor topLeftSensor, ProximitySensor topRightSensor, ProximitySensor lightSensor)
-        {
-            FrontSensor = frontSensor;
-            TopLeftSensor = topLeftSensor;
-            TopRightSensor = topRightSensor;
-            LightSensor = lightSensor;
-
-        }
-    }
-
-    public enum Gesture
-    {
-        Glance,
-        HoverLeft,
-        HoverRight,
-        SwipeRight,
-        SwipeLeft,
-        Cover,
-        Neutral
-    }
-    public static class MyListExtensions
-    {
-        public static double Mean(this List<double> values)
-        {
-            return values.Count == 0 ? 0 : values.Mean(0, values.Count);
-        }
-
-        public static double Mean(this List<double> values, int start, int end)
-        {
-            double s = 0;
-
-            for (var i = start; i < end; i++)
-            {
-                s += values[i];
-            }
-
-            return s / (end - start);
-        }
-
-        public static double Variance(this List<double> values)
-        {
-            return values.Variance(values.Mean(), 0, values.Count);
-        }
-
-        public static double Variance(this List<double> values, double mean)
-        {
-            return values.Variance(mean, 0, values.Count);
-        }
-
-        public static double Variance(this List<double> values, double mean, int start, int end)
-        {
-            double variance = 0;
-
-            for (var i = start; i < end; i++)
-            {
-                variance += Math.Pow((values[i] - mean), 2);
-            }
-
-            var n = end - start;
-            if (start > 0) n -= 1;
-
-            return variance / (n);
-        }
-
-        public static double StandardDeviation(this List<double> values)
-        {
-            return values.Count == 0 ? 0 : values.StandardDeviation(0, values.Count);
-        }
-
-        public static double StandardDeviation(this List<double> values, int start, int end)
-        {
-            var mean = values.Mean(start, end);
-            var variance = values.Variance(mean, start, end);
-
-            return Math.Sqrt(variance);
-        }
-    }
-
 }

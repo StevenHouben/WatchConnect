@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using Watch.Examples;
+using System.Windows.Shapes;
+using Watch.Faces;
 using Watch.Toolkit.Input;
+using Watch.Toolkit.Input.Gestures;
+using Watch.Toolkit.Input.Touch;
+using Watch.Toolkit.Interface;
 using Watch.Toolkit.Sensors;
 
 namespace Watch
 {
-    public partial class OutputWindow
+    public partial class WatchFace:IVisualSharer
     {
         private const bool RunOnWatch = false;
 
         private SensorVisualizer _vis;
 
         private AbstractGestureManager gestureManager;
-        //private AdvancedGestureManager gestureManager;
         private TouchManager touchManager;
-        public OutputWindow()
+
+        public WatchFace(GestureManager _gestureManager,TouchManager _touchManager)
         {
             InitializeComponent();
 
@@ -26,33 +29,44 @@ namespace Watch
 
             Closing += MainWindow_Closing;
 
-            Task.Factory.StartNew(() =>
-            {
-                gestureManager = new GestureManager();
-                //gestureManager= new AdvancedGestureManager();
-                gestureManager.GestureDetected += input_GestureHandler;
-                gestureManager.RawDataReceived += _input_RawDataReceived;
-                gestureManager.Glance += _input_event;
-                gestureManager.HoverLeft += _input_event;
-                gestureManager.HoverRight += _input_event;
-                gestureManager.SwipeLeft += _input_event;
-                gestureManager.SwipeRight += _input_event;
-                gestureManager.Cover += _input_event;
-                gestureManager.Start();
+            gestureManager = _gestureManager;
+            gestureManager.GestureDetected += input_GestureHandler;
+            gestureManager.RawDataReceived += _input_RawDataReceived;
+            gestureManager.Glance += _input_event;
+            gestureManager.HoverLeft += _input_event;
+            gestureManager.HoverRight += _input_event;
+            gestureManager.SwipeLeft += _input_event;
+            gestureManager.SwipeRight += _input_event;
+            gestureManager.Cover += _input_event;
+            //gestureManager.Start();
 
-            });
+  
+            touchManager = _touchManager;
+            touchManager.RawDataReceived += touchManager_RawDataReceived;
+            touchManager.SliderTouchDown += touchManager_SliderTouchDown;
+            touchManager.SliderTouchUp += touchManager_SliderTouchUp;
+            touchManager.SlideUp += touchManager_SlideUp;
+            touchManager.SlideDown += touchManager_SlideDown;
+            touchManager.DoubleTap += touchManager_DoubleTap;
+            touchManager.BevelDown += touchManager_BevelDown;
+            touchManager.BevelUp += touchManager_BevelUp;
+            //touchManager.Start();
+        }
 
-            Task.Factory.StartNew(() =>
-            {
-                touchManager = new TouchManager();
-                touchManager.RawDataReceived += touchManager_RawDataReceived;
-                touchManager.SliderTouchDown += touchManager_SliderTouchDown;
-                touchManager.SliderTouchUp += touchManager_SliderTouchUp;
-                touchManager.SlideUp += touchManager_SlideUp;
-                touchManager.SlideDown += touchManager_SlideDown;
-                touchManager.DoubleTap += touchManager_DoubleTap;
-                touchManager.Start();
-            });
+        readonly BevelState _bevelState = new BevelState();
+        void touchManager_BevelUp(object sender, BevelTouchEventArgs e)
+        {
+           _bevelState.UpdateState(e.BevelSide,false);
+
+            if(_vis!=null)
+                _vis.UpdateBevels(_bevelState);
+        }
+
+        void touchManager_BevelDown(object sender, BevelTouchEventArgs e)
+        {
+            _bevelState.UpdateState(e.BevelSide, true);
+            if (_vis != null)
+                _vis.UpdateBevels(_bevelState);
         }
 
         void touchManager_DoubleTap(object sender, SliderTouchEventArgs e)
@@ -100,11 +114,12 @@ namespace Watch
         {
             if(_vis !=null)
              _vis.UpdateVisualization(e.TopLeftSensor,e.TopRightSensor,e.FrontSensor,e.LightSensor);
+
         }
 
         static void WriteToOutput(string text)
         {
-            Console.WriteLine(text);
+            //Console.WriteLine(text);
         }
 
         void input_GestureHandler(object sender, GestureDetectedEventArgs e)
@@ -155,12 +170,16 @@ namespace Watch
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            //SetDisplayMode(DisplayMode.Extend);
+            Dispatcher.InvokeShutdown();
+            //gestureManager.Stop();
+            touchManager.Stop();
+
+            Environment.Exit(0);
         }
 
         private void InitializeWindow()
         {
-            ResizeMode = ResizeMode.NoResize;
+            ResizeMode = ResizeMode.CanResize;
 
             if (RunOnWatch)
             {
@@ -171,7 +190,7 @@ namespace Watch
             }
             else
             {
-                WindowStyle = WindowStyle.ToolWindow;
+                WindowStyle = WindowStyle.None;
                 WindowState = WindowState.Normal;
             }
 
@@ -210,6 +229,26 @@ namespace Watch
             External,
             Extend,
             Duplicate
+        }
+
+        public object GetVisual()
+        {
+            return new Rectangle() {Width = 50, Height = 50, Fill = Brushes.Red};
+        }
+
+        public object GetThumbnail()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendThumbnail(object thumbnail)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SendVisual(object visual)
+        {
+            throw new NotImplementedException();
         }
     }
 }

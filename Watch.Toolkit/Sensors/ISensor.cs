@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Watch.Toolkit.Sensors
+﻿namespace Watch.Toolkit.Sensors
 {
     public interface ISensor
     {

@@ -1,8 +1,8 @@
 ﻿using Phidgets;
 
-namespace Watch.Toolkit.Hardware
+namespace Watch.Toolkit.Hardware.Phidget
 {
-    public class Hardware
+    public class PhidgetManager:AbstractHardwarePlatform
     {
         private static InterfaceKit _instance;
 
