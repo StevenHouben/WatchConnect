@@ -14,22 +14,28 @@
 #define CAP1188_MISO  12
 #define CAP1188_CLK  13
 
+#define TILT 2
+int buttonState = 0;
+
 Adafruit_CAP1188 cap = Adafruit_CAP1188();
 
 void setup() {
+  
+   pinMode(TILT, INPUT);
+   
   Serial.begin(9600);
- 
+
   if (!cap.begin()) {
     while (1);
   }
-  
+   
   uint8_t reg = cap.readRegister( 0x1f ) & 0x0f;
   cap.writeRegister( 0x1f, reg | 0x60 ); // or whatever value you want
 }
 boolean isConnected = true;
+
+
 void loop() {
-  
-  
   uint8_t touched = cap.touched();
 
   String toSend = "";
@@ -49,23 +55,5 @@ void loop() {
   {
         Serial.print(toSend);
   }
-  delay(50);
+  delay(250);
 }
-
-void ReceiveData()
-{
-    // if there's any serial data available, read it:
-    while (Serial.available() > 0) {
-      
-        // Read the first byte
-        byte readValue = Serial.read();
-        
-        if(readValue == 'A')
-       {
-         Serial.print("B");
-         isConnected = true;
-       }
-    }
-}
-
-

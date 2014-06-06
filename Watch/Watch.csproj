@@ -155,6 +155,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NativeTouchSupport\NativeTouchSupport.csproj">
+      <Project>{8ca2691b-b3a0-4179-8994-9ad9863c6984}</Project>
+      <Name>NativeTouchSupport</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Watch.Toolkit\Watch.Toolkit.csproj">
       <Project>{eec7f4e2-8fad-4cc6-acba-58c0c6a182be}</Project>
       <Name>Watch.Toolkit</Name>

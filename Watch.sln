@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit.Hardware", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Hardware.Test", "Watch.Hardware.Test\Watch.Hardware.Test.csproj", "{97C92770-6DC7-419D-84C4-94DC83BB0C53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeTouchSupport", "NativeTouchSupport\NativeTouchSupport.csproj", "{8CA2691B-B3A0-4179-8994-9AD9863C6984}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,36 +1,51 @@
 ﻿using System;
-using System.Data.Common;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Surface.Presentation.Controls;
+using NativeTouchSupport;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Interface;
+using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace Watch
 {
     public partial class LaptopWindow :IVisualSharer
     {
-        public event EventHandler<System.Windows.Input.TouchEventArgs> ObjectTouchDown = delegate { };
-        public event EventHandler<System.Windows.Input.TouchEventArgs> ObjectTouchUp = delegate { };
+        public event EventHandler<TouchEventArgs> ObjectTouchDown = delegate { };
+        public event EventHandler<TouchEventArgs> ObjectTouchUp = delegate { };
 
-        public event EventHandler<System.Windows.Input.TouchEventArgs> CanvasDown = delegate { };
-        public event EventHandler<System.Windows.Input.TouchEventArgs> CanvasUp = delegate { };
+        public event EventHandler<TouchEventArgs> CanvasDown = delegate { };
+        public event EventHandler<TouchEventArgs> CanvasUp = delegate { };
 
         private readonly EventMonitor _holdMonitor = new EventMonitor(500);
+
 
         public LaptopWindow()
         {
             InitializeComponent();
-
+            
             View.PreviewTouchDown += View_PreviewTouchDown;
             View.PreviewTouchUp += View_PreviewTouchUp;
             View.PreviewTouchMove += View_PreviewTouchMove;
+
+            PreviewTouchDown += LaptopWindow_PreviewTouchDown;
+
+            var a = Tablet.TabletDevices;
+
         }
 
-        void View_PreviewTouchMove(object sender, System.Windows.Input.TouchEventArgs e)
+        void LaptopWindow_PreviewTouchDown(object sender, TouchEventArgs e)
         {
+            throw new NotImplementedException();
+        }
+
+        void View_PreviewTouchMove(object sender, TouchEventArgs e)
+        {
+
+            var pe = e.GetTouchPoint(this);
+
             var pts = e.GetIntermediateTouchPoints(this);
 
             if(!CheckIfPointsAreInRange(pts.First().Position,pts.Last().Position,3))
@@ -47,14 +62,14 @@ namespace Watch
             return !(r1 > range) && !(r2 > range);
         }
 
-        void View_PreviewTouchUp(object sender, System.Windows.Input.TouchEventArgs e)
+        void View_PreviewTouchUp(object sender, TouchEventArgs e)
         {
             _touching = false;
             _holdMonitor.Stop();
             CanvasUp(sender, e);
         }
 
-        void View_PreviewTouchDown(object sender, System.Windows.Input.TouchEventArgs e)
+        void View_PreviewTouchDown(object sender, TouchEventArgs e)
         {
             if (_holdMonitor.Enabled) 
                 return;
@@ -64,7 +79,7 @@ namespace Watch
              var p = e.GetTouchPoint(this);
                 _lastTouch = new Point(p.Position.X, p.Position.Y - 60);
 
-            _lastEvent = new InternalEventHolder
+            _lastEvent = new EventCache
             {
                 Event = e,
                 TouchPoint = _lastTouch
@@ -73,12 +88,12 @@ namespace Watch
             _holdMonitor.Start();
         }
 
-        private InternalEventHolder _lastEvent;
+        private EventCache _lastEvent;
 
-        class InternalEventHolder
+        internal class EventCache
         {
             public Point TouchPoint { get; set; }
-            public System.Windows.Input.TouchEventArgs Event { get; set; }
+            public TouchEventArgs Event { get; set; }
         }
 
         void _holdMonitor_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -139,7 +154,7 @@ namespace Watch
             View.Items.Add(_item);
         }
 
-        void _item_PreviewTouchUp(object sender, System.Windows.Input.TouchEventArgs e)
+        void _item_PreviewTouchUp(object sender, TouchEventArgs e)
         {
                 ObjectTouchUp(sender, e);
 
@@ -147,7 +162,7 @@ namespace Watch
 
         }
 
-        void _item_PreviewTouchDown(object sender, System.Windows.Input.TouchEventArgs e)
+        void _item_PreviewTouchDown(object sender,TouchEventArgs e)
         {
             _visual = sender as Control;
             ObjectTouchDown(sender, e);

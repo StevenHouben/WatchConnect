@@ -10,7 +10,7 @@ namespace Watch
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
 
         private readonly GestureManager _gestureManager = new GestureManager();
@@ -19,8 +19,8 @@ namespace Watch
         private SimpleWatchFace _watchFace;
         private LaptopWindow _laptopWindow;
 
-        private readonly EventMonitor _canvasSynchronizer = new EventMonitor(1000);
-        private readonly EventMonitor _objectSynchronizer = new EventMonitor(1000);
+        private readonly EventMonitor _canvasSynchronizer = new EventMonitor(2000);
+        private readonly EventMonitor _objectSynchronizer = new EventMonitor(2000);
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);

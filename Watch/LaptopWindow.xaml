@@ -1,6 +1,8 @@
 ﻿<Window xmlns:my="http://schemas.microsoft.com/surface/2008"   x:Class="Watch.LaptopWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:watch="clr-namespace:Watch"
+        xmlns:nativeTouchSupport="clr-namespace:NativeTouchSupport;assembly=NativeTouchSupport"
         Title="LaptopWindow" Height="300" Width="300">
     <Grid>
        <my:ScatterView x:Name="View" Background="Gray" />

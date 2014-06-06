@@ -1,4 +1,4 @@
-﻿using System;
+﻿                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      using System;
 using System.IO;
 using System.IO.Ports;
 using System.Threading;
@@ -72,7 +72,7 @@ namespace Watch.Toolkit.Hardware.Arduino
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine(ex);
             }
         }
 
