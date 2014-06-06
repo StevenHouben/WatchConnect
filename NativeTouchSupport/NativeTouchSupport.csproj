@@ -53,6 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper.cs" />
+    <Compile Include="NativeTouchEventArgs.cs" />
+    <Compile Include="Structs\Points.cs" />
+    <Compile Include="Structs\TouchInput.cs" />
     <Compile Include="TouchWindow.cs" />
   </ItemGroup>
   <ItemGroup>
