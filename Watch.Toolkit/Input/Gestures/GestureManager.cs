@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
-
 using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Input.Recognizers;
 using Watch.Toolkit.Sensors;
@@ -37,12 +36,12 @@ namespace Watch.Toolkit.Input.Gestures
         private readonly Queue<int> _detectedSideGestures = new Queue<int>();
         private readonly Queue<int> _detectedTopGestures = new Queue<int>();
 
-        private readonly Timer _swipeSideTimer = new Timer(500);
-        private readonly Timer _swipeTopTimer = new Timer(500);
-        private readonly Timer _holdTimer = new Timer(1000);
-        private readonly Timer _topRightTimer = new Timer(1000);
-        private readonly Timer _topLeftTimer = new Timer(1000);
-        private readonly Timer _lightTimer = new Timer(500);
+        private readonly EventMonitor _swipeSideTimer = new EventMonitor(500);
+        private readonly EventMonitor _swipeTopTimer = new EventMonitor(500);
+        private readonly EventMonitor _holdTimer = new EventMonitor(1000);
+        private readonly EventMonitor _topRightTimer = new EventMonitor(1000);
+        private readonly EventMonitor _topLeftTimer = new EventMonitor(1000);
+        private readonly EventMonitor _lightTimer = new EventMonitor(500);
         
         private readonly List<double> _dataRight = new List<double>();
         private readonly List<double> _dataLeft = new List<double>();
