@@ -24,7 +24,6 @@ namespace Watch
         private readonly Dictionary<int, EventMonitor> _timeTrackers = new Dictionary<int, EventMonitor>();
         private readonly Dictionary<int, TouchTrackEventArgs> _cachedEvents = new Dictionary<int, TouchTrackEventArgs>();
         private readonly Dictionary<int, UIElement> _uiThumbnails = new Dictionary<int, UIElement>();
-        //private readonly Dictionary<Guid, UIElement> _uiComponents = new Dictionary<Guid, UIElement>();
         private readonly Dictionary<int,Size> _lastSize = new Dictionary<int, Size>(); 
 
         public LaptopWindow()

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Collections.Generic;
-using System.Windows.Controls;
 using System.Windows.Media;
 using GestureTouch;
 using Microsoft.Surface.Presentation.Controls;
@@ -17,8 +16,6 @@ namespace AccelerometerTest
 
         readonly Dictionary<int, ScatterViewItem> _touches = new Dictionary<int, ScatterViewItem>();
 
-        private const bool ShowDetails = false;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -26,7 +23,7 @@ namespace AccelerometerTest
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
 
-            var wrap = new GestureTouchPipeline(this);
+            var wrap = new GestureTouchPipeline(View);
             wrap.GestureTouchDown += MainWindow_GestureTouchDown;
             wrap.GestureTouchUp += MainWindow_GestureTouchUp;
             wrap.GestureTouchMove += MainWindow_GestureTouchMove;
@@ -34,6 +31,11 @@ namespace AccelerometerTest
             var arduino = new Arduino();
             arduino.MessageReceived += arduino_MessageReceived;
             arduino.Start("COM4");
+
+            cbGestureList.ItemsSource = 
+                new List<string> { "Right", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
+
+            cbGestureList.SelectedIndex = 0;
         }
         void MainWindow_GestureTouchDown(object sender, GestureTouchEventArgs e)
         {
@@ -42,26 +44,14 @@ namespace AccelerometerTest
                 Width = e.TouchPoint.Size.Width * 9.6,
                 Height = e.TouchPoint.Size.Height * 9.6,
                 Background = Brushes.White,
-                Orientation = 0
+                Orientation = 0,
+                CanMove = false,
+                CanRotate =false,
+                CanScale = false,
+                Center = e.TouchPoint.Position
             };
-            item.CanMove = item.CanRotate = item.CanScale = false;
-            item.Center = e.TouchPoint.Position;
 
-            switch (_lastDetection.ToLower())
-            {
-                case "touch":
-                    Label.Content = "LEFT HAND";
-                    break;
-                case "knuckle":
-                    Label.Content = "KNUCKLE LEFT HAND";
-                    break;
-                case "pinky":
-                    Label.Content = "PINKY LEFT HAND";
-                    break;
-                default:
-                    Label.Content = "RIGHT HAND";
-                    break;
-            }
+            Label.Content = _lastDetection;
 
             _touches.Add(e.Id, item);
 
@@ -91,25 +81,6 @@ namespace AccelerometerTest
             _touches[id].Width = point.Size.Width * 9.6;
             _touches[id].Height = point.Size.Height * 9.6;
             _touches[id].Center = point.Position;
-
-            if (ShowDetails)
-            {
-                if (_touches[id].Content == null)
-                {
-                    var label = new Label { Content = "", Margin = new Thickness(-60, 0, 0, 0) };
-                    _touches[id].Content = label;
-                }
-                ((Label)_touches[id].Content).Content =
-                "x: " + point.Position.X +
-                "\ny: " + point.Position.Y +
-                "\nw: " + point.Size.Width * 9.6 +
-                "\nh: " + point.Size.Height * 9.6;
-            }
-            else
-            {
-                if (((Label)_touches[id].Content) != null)
-                    _touches[id].Content = null;
-            }
 
 
             if (TouchRanges.TinyTouch.ContainsValue(_touches[id].Width)
@@ -141,71 +112,50 @@ namespace AccelerometerTest
         }
         void arduino_MessageReceived(object sender, Watch.Toolkit.Hardware.MessagesReceivedEventArgs e)
         {
-            var data = e.Message.Split('|');
+            try
+            {
+                var data = e.Message.Split('|');
 
-            if (data.Length != 5) return;
+                if (data.Length != 5) return;
 
-            _accelerometerData = new AccelerometerData(
-                Convert.ToInt32(data[0]),
-                Convert.ToInt32(data[1]),
-                Convert.ToInt32(data[2]));
+                _accelerometerData = new AccelerometerData(
+                    Convert.ToInt32(data[0]),
+                    Convert.ToInt32(data[1]),
+                    Convert.ToInt32(data[2]));
+                    var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometerData.RawData);
+                _lastDetection = result.Item1;
 
-                if (_count > 0)
+                Dispatcher.Invoke(() =>
                 {
-                    _lastDetection = _dtwRecognizer.FindClosestLabel(_accelerometerData.RawData);
-                }
+                    lblRaw.Content = _accelerometerData.ToString();
+                    lblDTW.Content = "";
+                    foreach (var item in result.Item2)
+                    {
+                        lblDTW.Content += item.Key + " " + item.Value + "\n";
+                    }
+                });
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("");
+            }
         }
 
         private string _lastDetection = "";
         readonly List<AccelerometerData> _collectedData = new List<AccelerometerData>();
-        private int _count;
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             _collectedData.Add(_accelerometerData);
-            listGesture.Items.Add(_accelerometerData);
+            listGesture.Items.Add(cbGestureList.Text+" "+ _accelerometerData);
 
-            switch (_count)
-            {
-                case 0:
-                    _dtwRecognizer.AddTemplate("Hold",
-                        new double[]
+            _dtwRecognizer.AddTemplate(cbGestureList.Text,
+                          new double[]
                         {
                             _accelerometerData.X,
                             _accelerometerData.Y,
                             _accelerometerData.Z
                         });
-                    break;
-                case 1:
-                    _dtwRecognizer.AddTemplate("Touch",
-                        new double[]
-                        {
-                            _accelerometerData.X,
-                            _accelerometerData.Y,
-                            _accelerometerData.Z
-                        });
-                    break;
-                case 2:
-                    _dtwRecognizer.AddTemplate("Knuckle",
-                        new double[]
-                        {
-                            _accelerometerData.X,
-                            _accelerometerData.Y,
-                            _accelerometerData.Z
-                        });
-                    break;
-                case 3:
-                    _dtwRecognizer.AddTemplate("pinky",
-                        new double[]
-                        {
-                            _accelerometerData.X,
-                            _accelerometerData.Y,
-                            _accelerometerData.Z
-                        });
-                    break;
-            }
-            _count++;
-
         }
     }
     public class TouchRanges

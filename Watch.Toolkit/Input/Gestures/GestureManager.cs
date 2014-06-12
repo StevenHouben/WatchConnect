@@ -242,7 +242,7 @@ namespace Watch.Toolkit.Input.Gestures
             //PrintRow(_dataLeft.ToArray());
             //PrintRow(_dataRight.ToArray());
 
-            var output = _gestureRecognizer.FindClosestLabel(_dataLeft.ToArray());
+            var output = _gestureRecognizer.ComputeClosestLabel(_dataLeft.ToArray());
 
             _lastDetectedGesture = output == "right" ? Gesture.SwipeRight : Gesture.SwipeLeft;
 

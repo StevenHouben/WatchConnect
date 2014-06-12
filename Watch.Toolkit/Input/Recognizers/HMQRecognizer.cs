@@ -6,7 +6,7 @@ namespace Watch.Toolkit.Input.Recognizers
 {
     public class HmqRecognizer
     {
-        public Monotonicity ComputerMonotonicity(double[] rawdata)
+        public Monotonicity ComputeMonotonicity(double[] rawdata)
         {
             if (rawdata.Length == 0)
                 throw new InvalidOperationException("data is empty");
@@ -35,8 +35,6 @@ namespace Watch.Toolkit.Input.Recognizers
     public enum Monotonicity
     {
         Increasing,
-        Decreasing,
-        StrictlyIncreasing,
-        StrictlyDecreasing
+        Decreasing
     }
 }

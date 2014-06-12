@@ -218,7 +218,7 @@ namespace Watch.Toolkit.Input.Touch
         private void AnalyseData()
         {
             if (_pipeline.ToArray().Count() <= 1) return;
-            var output = _gestureRecognizer.FindClosestLabel(_pipeline.ToArray());
+            var output = _gestureRecognizer.ComputeClosestLabel(_pipeline.ToArray());
 
             if (output == "Up")
                 OnSlideUpHandler(new SliderTouchEventArgs(_linearTouch, -1));
