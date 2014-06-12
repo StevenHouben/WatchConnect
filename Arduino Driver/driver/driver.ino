@@ -55,5 +55,5 @@ void loop() {
   {
         Serial.print(toSend);
   }
-  delay(250);
+  delay(200);
 }

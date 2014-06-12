@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit", "Watch.Tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit.Hardware", "Watch.Toolkit.Hardware\Watch.Toolkit.Hardware.csproj", "{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Hardware.Test", "Watch.Hardware.Test\Watch.Hardware.Test.csproj", "{97C92770-6DC7-419D-84C4-94DC83BB0C53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccelerometerTest", "AccelerometerTest\AccelerometerTest.csproj", "{47810F65-B22F-4608-8606-CC25E7F73EA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeTouchSupport", "NativeTouchSupport\NativeTouchSupport.csproj", "{8CA2691B-B3A0-4179-8994-9AD9863C6984}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestureTouch.WPF", "..\GestureTouchToolkit\GestureTouch.WPF\GestureTouch.WPF.csproj", "{3D63A62F-90D3-454C-82CB-2CBB0183C337}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +31,14 @@ Global
 		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Release|Any CPU.Build.0 = Release|Any CPU
-		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{97C92770-6DC7-419D-84C4-94DC83BB0C53}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8CA2691B-B3A0-4179-8994-9AD9863C6984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47810F65-B22F-4608-8606-CC25E7F73EA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47810F65-B22F-4608-8606-CC25E7F73EA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47810F65-B22F-4608-8606-CC25E7F73EA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47810F65-B22F-4608-8606-CC25E7F73EA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

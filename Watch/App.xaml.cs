@@ -1,5 +1,4 @@
-﻿using System;
-using System.Timers;
+﻿using System.Collections.Generic;
 using System.Windows;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Input.Gestures;
@@ -7,9 +6,6 @@ using Watch.Toolkit.Input.Touch;
 
 namespace Watch
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App
     {
 
@@ -19,8 +15,11 @@ namespace Watch
         private SimpleWatchFace _watchFace;
         private LaptopWindow _laptopWindow;
 
-        private readonly EventMonitor _canvasSynchronizer = new EventMonitor(2000);
-        private readonly EventMonitor _objectSynchronizer = new EventMonitor(2000);
+        private readonly Dictionary<int,EventMonitor> _canvasSynchronizers = new Dictionary<int, EventMonitor>(10);
+        private readonly Dictionary<int, EventMonitor> _objectSynchronizers = new Dictionary<int, EventMonitor>(10);
+
+        private readonly Dictionary<int, Point> _currentTouches = new Dictionary<int, Point>(); 
+        private readonly Dictionary<int,object> _currentItems = new Dictionary<int, object>(); 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -47,65 +46,99 @@ namespace Watch
             WindowExt.MaximizeToSecondaryMonitor(_watchFace);
         }
 
-        void _laptopWindow_CanvasUp(object sender, System.Windows.Input.TouchEventArgs e)
+        void _laptopWindow_CanvasUp(object sender, TouchTrackEventArgs e)
         {
-            Console.WriteLine("Touch up");
-            _laptopWindow.RemoveThumbnail();
-            _canvasSynchronizer.Stop();
+            _canvasSynchronizers.Remove(e.Id);
+            _laptopWindow.RemoveThumbnail(e.Id);
         }
 
-        void _laptopWindow_CanvasDown(object sender, System.Windows.Input.TouchEventArgs e)
+        void _laptopWindow_CanvasDown(object sender, TouchTrackEventArgs e)
         {
-            Console.WriteLine("Touch down");
-            _laptopWindow.SendThumbnail(_watchFace.GetThumbnail());
-            _canvasSynchronizer.Elapsed += _synchronizer_Elapsed;
-            _canvasSynchronizer.Start();
+            _laptopWindow.SendThumbnail(_watchFace.GetThumbnail(),e.Id,e.Position.X,e.Position.Y);
+
+            var monitor = new EventMonitor(2000, e.Id);
+            monitor.MonitorTriggered += monitor_MonitorTriggered;
+            _canvasSynchronizers.Add(e.Id,monitor);
+            monitor.Start();
+
+            if (_currentTouches.ContainsKey(e.Id))
+            {
+                _currentTouches[e.Id] = e.Position;
+
+            }
+            else
+            {
+                _currentTouches.Add(e.Id, e.Position);
+            }
         }
 
-        void _laptopWindow_ObjectTouchUp(object sender, System.Windows.Input.TouchEventArgs e)
+        void monitor_MonitorTriggered(object sender, TriggeredEventArgs e)
         {
-            _canvasSynchronizer.Stop();
-            _watchFace.RemoveThumbnail();
+            _canvasSynchronizers.Remove(e.Id);
         }
 
-        void _laptopWindow_ObjectTouchDown(object sender, System.Windows.Input.TouchEventArgs e)
+        void _laptopWindow_ObjectTouchUp(object sender, TouchTrackEventArgs e)
         {
-           _watchFace.SendThumbnail(_laptopWindow.GetThumbnail());
-           _objectSynchronizer.Elapsed += _objectSynchronizer_Elapsed;
-           _objectSynchronizer.Start();
+            _currentItems.Remove(e.Id);
+            _objectSynchronizers.Remove(e.Id);
+            _watchFace.RemoveThumbnail(e.Id);
+            _currentTouches.Remove(e.Id);
+
         }
 
-        void _objectSynchronizer_Elapsed(object sender, ElapsedEventArgs e)
+        void _laptopWindow_ObjectTouchDown(object sender, TouchTrackEventArgs e)
         {
-            _objectSynchronizer.Stop();
+           _watchFace.SendThumbnail(_laptopWindow.GetThumbnail(sender));
+
+            var objectMonitor = new EventMonitor(2000, e.Id);
+            objectMonitor.MonitorTriggered += objectMonitor_MonitorTriggered;
+            _objectSynchronizers.Add(e.Id,objectMonitor);
+            objectMonitor.Start();
+
+            _currentItems.Add(e.Id,sender);
         }
+
+        void objectMonitor_MonitorTriggered(object sender, TriggeredEventArgs e)
+        {
+            _objectSynchronizers.Remove(e.Id);
+        }
+
 
         void _gestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
         {
-
-            if (e.Gesture == Gesture.SwipeLeft && _objectSynchronizer.Enabled)
+            foreach (var mon in _currentTouches)
             {
-                Dispatcher.Invoke(() =>
+                if (e.Gesture == Gesture.SwipeRight)
                 {
-                    var visual = _laptopWindow.GetVisual();
-                    _watchFace.SendVisual(visual);
-                });
+                    Dispatcher.Invoke(() =>
+                    {
+                        var visual = _watchFace.GetVisual(mon.Key);
+                        _laptopWindow.SendVisual(visual, mon.Key, mon.Value.X, mon.Value.Y);
+                    });
 
+                }
             }
-            if (e.Gesture == Gesture.SwipeRight && _canvasSynchronizer.Enabled )
+            var toBeDeleted = new List<int>();
+            foreach (var mon in _currentItems)
             {
-                Dispatcher.Invoke(() =>
+
+                if (e.Gesture == Gesture.SwipeLeft)
                 {
-                    var visual = _watchFace.GetVisual();
-                    _laptopWindow.SendVisual(visual);
-                });
-
+                    Dispatcher.Invoke(() =>
+                    {
+                        var visual = _laptopWindow.GetVisual(_currentItems[mon.Key]);
+                        _watchFace.SendVisual(visual, mon.Key);
+                        toBeDeleted.Add(mon.Key);
+                    });
+                }
             }
-        }
-
-       void _synchronizer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            _canvasSynchronizer.Stop();
+            foreach (var id in toBeDeleted)
+            {
+                if (_currentItems.ContainsKey(id))
+                    _currentItems.Remove(id);
+                if (_objectSynchronizers.ContainsKey(id))
+                    _objectSynchronizers.Remove(id);
+            }
         }
     }
 }

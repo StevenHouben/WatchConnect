@@ -1,4 +1,4 @@
-﻿                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      using System;
+﻿using System;
 using System.IO;
 using System.IO.Ports;
 using System.Threading;
@@ -177,7 +177,7 @@ namespace Watch.Toolkit.Hardware.Arduino
         {
             _output += _serialPort.ReadTo("#");
 
-            if (_output.Length != 4) return;
+            //if (_output.Length != 4) return;
 
             OnMessageReceived(this, new MessagesReceivedEventArgs(-1,_output));
             _output = "";

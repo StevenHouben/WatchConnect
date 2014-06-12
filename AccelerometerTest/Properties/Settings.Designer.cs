@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace NativeTouchSupport.Properties
+namespace AccelerometerTest.Properties
 {
 
 

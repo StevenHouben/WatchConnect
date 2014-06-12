@@ -1,12 +1,12 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace Watch.Toolkit.Interface
+﻿namespace Watch.Toolkit.Interface
 {
     public interface IVisualSharer
     {
-        object GetVisual();
-        object GetThumbnail();
-        void SendThumbnail(object thumbnail);
-        void SendVisual(object visual);
+        object GetVisual(int id);
+        object GetThumbnail(int id);
+
+        void RemoveThumbnail(int id);
+        void SendThumbnail(object thumbnail,int id, double x, double y);
+        void SendVisual(object visual,int id, double x, double y);
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Surface.Presentation.Controls;
-using NativeTouchSupport;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Interface;
 using Point = System.Windows.Point;
@@ -11,47 +12,113 @@ using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace Watch
 {
-    public partial class LaptopWindow :IVisualSharer
+    public partial class LaptopWindow 
     {
-        public event EventHandler<TouchEventArgs> ObjectTouchDown = delegate { };
-        public event EventHandler<TouchEventArgs> ObjectTouchUp = delegate { };
+        public event EventHandler<TouchTrackEventArgs> ObjectTouchDown = delegate { };
+        public event EventHandler<TouchTrackEventArgs> ObjectTouchUp = delegate { };
 
-        public event EventHandler<TouchEventArgs> CanvasDown = delegate { };
-        public event EventHandler<TouchEventArgs> CanvasUp = delegate { };
+        public event EventHandler<TouchTrackEventArgs> CanvasDown = delegate { };
+        public event EventHandler<TouchTrackEventArgs> CanvasUp = delegate { };
 
-        private readonly EventMonitor _holdMonitor = new EventMonitor(500);
-
+        private readonly Dictionary<int, List<Size>> _pointTrackers = new Dictionary<int, List<Size>>();
+        private readonly Dictionary<int, EventMonitor> _timeTrackers = new Dictionary<int, EventMonitor>();
+        private readonly Dictionary<int, TouchTrackEventArgs> _cachedEvents = new Dictionary<int, TouchTrackEventArgs>();
+        private readonly Dictionary<int, UIElement> _uiThumbnails = new Dictionary<int, UIElement>();
+        //private readonly Dictionary<Guid, UIElement> _uiComponents = new Dictionary<Guid, UIElement>();
+        private readonly Dictionary<int,Size> _lastSize = new Dictionary<int, Size>(); 
 
         public LaptopWindow()
         {
             InitializeComponent();
             
-            View.PreviewTouchDown += View_PreviewTouchDown;
-            View.PreviewTouchUp += View_PreviewTouchUp;
-            View.PreviewTouchMove += View_PreviewTouchMove;
-
-            PreviewTouchDown += LaptopWindow_PreviewTouchDown;
-
-            var a = Tablet.TabletDevices;
-
+            PreviewStylusDown += LaptopWindow_PreviewStylusDown;
+            PreviewStylusMove += LaptopWindow_PreviewStylusMove;
+            PreviewTouchUp += LaptopWindow_PreviewTouchUp;
         }
 
-        void LaptopWindow_PreviewTouchDown(object sender, TouchEventArgs e)
+        void LaptopWindow_PreviewTouchUp(object sender, TouchEventArgs e)
         {
-            throw new NotImplementedException();
-        }
-
-        void View_PreviewTouchMove(object sender, TouchEventArgs e)
-        {
-
-            var pe = e.GetTouchPoint(this);
-
-            var pts = e.GetIntermediateTouchPoints(this);
-
-            if(!CheckIfPointsAreInRange(pts.First().Position,pts.Last().Position,3))
+            if (!_timeTrackers.ContainsKey(e.TouchDevice.Id)) 
+                return;
+          
+            if (_timeTrackers[e.TouchDevice.Id].Trigger)
             {
-                _holdMonitor.Stop();
+                CanvasUp(sender, new TouchTrackEventArgs() { Id = e.TouchDevice.Id, Position = e.GetTouchPoint(this).Position });
             }
+            _pointTrackers.Remove(e.TouchDevice.Id);
+            _timeTrackers[e.TouchDevice.Id].Stop();
+            _timeTrackers.Remove(e.TouchDevice.Id);
+            _pointTrackers.Remove(e.TouchDevice.Id);
+            _cachedEvents.Remove(e.TouchDevice.Id);
+            _lastSize.Remove(e.TouchDevice.Id);
+        }
+
+        private void LaptopWindow_PreviewStylusMove(object sender, StylusEventArgs e)
+        {
+            var pts = e.GetStylusPoints(this);
+
+            if (_pointTrackers.ContainsKey(e.StylusDevice.Id))
+                _pointTrackers[e.StylusDevice.Id].Add(GetSize(pts[0]));
+
+            if (_lastSize.ContainsKey(e.StylusDevice.Id))
+                _lastSize[e.StylusDevice.Id] = GetSize(pts[0]);
+
+            if (CheckIfPointsAreInRange(pts.First().ToPoint(), pts.Last().ToPoint(), 3)) return;
+
+            if (!_timeTrackers.ContainsKey(e.StylusDevice.Id)) 
+                return;
+
+            _timeTrackers[e.StylusDevice.Id].Stop();
+            _timeTrackers.Remove(e.StylusDevice.Id);
+            _pointTrackers.Remove(e.StylusDevice.Id);
+            _cachedEvents.Remove(e.StylusDevice.Id);
+            if (_uiThumbnails.ContainsKey(e.StylusDevice.Id))
+            {
+                CanvasUp(this, new TouchTrackEventArgs(){Id=e.StylusDevice.Id});
+            }
+        }
+
+        void LaptopWindow_PreviewStylusDown(object sender, StylusEventArgs e)
+        {
+            if (_timeTrackers.ContainsKey(e.StylusDevice.Id))
+            {
+                _timeTrackers[e.StylusDevice.Id].Stop();
+                _timeTrackers.Remove(e.StylusDevice.Id);
+            }
+            if (_pointTrackers.ContainsKey(e.StylusDevice.Id))
+                _pointTrackers.Remove(e.StylusDevice.Id);
+            if(_cachedEvents.ContainsKey(e.StylusDevice.Id))
+                _cachedEvents.Remove(e.StylusDevice.Id);
+
+            _cachedEvents.Add(e.StylusDevice.Id, new TouchTrackEventArgs
+                { Id = e.StylusDevice.Id, Position = e.GetPosition(this) });
+            _pointTrackers.Add(e.StylusDevice.Id, new List<Size>());
+            if (_lastSize.ContainsKey(e.StylusDevice.Id))
+                _lastSize[e.StylusDevice.Id] = GetSize(e.GetStylusPoints(this)[0]);
+            else
+                _lastSize.Add(e.StylusDevice.Id,GetSize(e.GetStylusPoints(this)[0]));
+
+            var monitor = new EventMonitor(500,e.StylusDevice.Id);
+            monitor.MonitorTriggered += monitor_MonitorTriggered;
+            _timeTrackers.Add(e.StylusDevice.Id, monitor);
+
+            monitor.Start();
+        }
+
+        void monitor_MonitorTriggered(object sender, TriggeredEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                CanvasDown(sender, _cachedEvents[e.Id]);
+                _timeTrackers[e.Id].Trigger = true;
+                _timeTrackers[e.Id].Stop();
+            });
+        }
+        private static Size GetSize(StylusPoint stylusPoint)
+        {
+            return new Size(
+                stylusPoint.GetPropertyValue(StylusPointProperties.Width), 
+                stylusPoint.GetPropertyValue(StylusPointProperties.Height));
         }
 
         static Boolean CheckIfPointsAreInRange(Point p1, Point p2, int range)
@@ -62,133 +129,96 @@ namespace Watch
             return !(r1 > range) && !(r2 > range);
         }
 
-        void View_PreviewTouchUp(object sender, TouchEventArgs e)
-        {
-            _touching = false;
-            _holdMonitor.Stop();
-            CanvasUp(sender, e);
-        }
-
-        void View_PreviewTouchDown(object sender, TouchEventArgs e)
-        {
-            if (_holdMonitor.Enabled) 
-                return;
-
-            _holdMonitor.Elapsed += _holdMonitor_Elapsed;
-
-             var p = e.GetTouchPoint(this);
-                _lastTouch = new Point(p.Position.X, p.Position.Y - 60);
-
-            _lastEvent = new EventCache
-            {
-                Event = e,
-                TouchPoint = _lastTouch
-            };
-
-            _holdMonitor.Start();
-        }
-
         private EventCache _lastEvent;
 
         internal class EventCache
         {
             public Point TouchPoint { get; set; }
-            public TouchEventArgs Event { get; set; }
+            public StylusEventArgs Event { get; set; }
         }
 
-        void _holdMonitor_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                if (_touching) return;
-                _touching = true;
-                CanvasDown(sender, _lastEvent.Event);
-            });
-        }
-
-        private bool _touching;
-        private Point _lastTouch = new Point(0,0);
-
-        private Control _visual;
         private Rectangle _thumb;
-        private ScatterViewItem _item;
 
-        public object GetVisual()
+        public object GetVisual(object uiElement)
         {
-            var visualObj = ((ScatterViewItem) _visual).Content;
-            ((ScatterViewItem) _visual).Content = null;
-            _visual.PreviewTouchDown -= _item_PreviewTouchDown;
-            _item.PreviewTouchUp -= _item_PreviewTouchUp;
-            View.Items.Remove(_visual);
-            _visual = null;
+            var item = ((ScatterViewItem) uiElement);
+            var visualObj = item.Content;
+            View.Items.Remove(item);
+
             return visualObj;
         }
 
-        public object GetThumbnail()
+        public object GetThumbnail(object uiElement)
         {
-            if (_visual == null)
-                return _visual;
-            return new Rectangle { Width = Height = 60, Fill = ((Control)((ScatterViewItem)_visual).Content).Background };
+            if (uiElement == null)
+                return uiElement;
+            var visualObj = ((ScatterViewItem)uiElement); 
+                return new Rectangle { Width = Height = 60, Fill = ((Control)visualObj.Content).Background };
         }
 
-        public void SendThumbnail(object thumbnail)
+        public void SendThumbnail(object thumbnail,int id, double x, double y)
         {
             _thumb = thumbnail as Rectangle;
 
             if (_thumb == null)
                 return;
 
-            if (!_touching) return;
-
-            _item = new ScatterViewItem
+            var item = new ScatterViewItem
             {
-                Content = _thumb,
-                Center = _lastTouch,
+                Background = _thumb.Fill,
+                Center = new Point(x,y),
+                Width = _lastSize[id].Width*10,
+                Height = _lastSize[id].Height*10,
                 Orientation = 0,
                 CanRotate = false,
                 CanMove = false,
                 CanScale = false
             };
-            _item.PreviewTouchDown += _item_PreviewTouchDown;
-            _item.PreviewTouchUp += _item_PreviewTouchUp;
-            View.Items.Add(_item);
+            item.PreviewStylusDown += _item_PreviewStylusDown;
+            item.PreviewStylusUp += _item_PreviewStylusUp;
+            View.Items.Add(item);
+
+            _uiThumbnails.Add(id,item);
         }
 
-        void _item_PreviewTouchUp(object sender, TouchEventArgs e)
+        void _item_PreviewStylusUp(object sender, StylusEventArgs e)
         {
-                ObjectTouchUp(sender, e);
-
-            _visual = null;
-
+            ObjectTouchUp(sender, new TouchTrackEventArgs{ Id = e.StylusDevice.Id, Position = e.GetPosition(this) });
         }
 
-        void _item_PreviewTouchDown(object sender,TouchEventArgs e)
+        void _item_PreviewStylusDown(object sender, StylusDownEventArgs e)
         {
-            _visual = sender as Control;
-            ObjectTouchDown(sender, e);
+            ObjectTouchDown(sender, new TouchTrackEventArgs() { Id = e.StylusDevice.Id, Position = e.GetPosition(this) });
 
-            _holdMonitor.Stop();
-
+            _timeTrackers[e.StylusDevice.Id].Stop();
+            _timeTrackers.Remove(e.StylusDevice.Id);
+            _pointTrackers.Remove(e.StylusDevice.Id);
         }
-        public void RemoveThumbnail()
+
+        public void RemoveThumbnail(int id)
         {
-            if (_thumb == null) return;
-            _thumb = null;
-            View.Items.Remove(_item);
+            View.Items.Remove(_uiThumbnails[id]);
+            _uiThumbnails.Remove(id);
         }
 
-        public void SendVisual(object visual)
+        public void SendVisual(object visual, int id, double x, double y)
         {
             var item = new ScatterViewItem
             {
                 Content = visual,
-                Center = _lastTouch
+                Center = new Point(x,y)
             };
-            item.PreviewTouchDown += _item_PreviewTouchDown;
-            item.PreviewTouchUp += _item_PreviewTouchUp;
+            item.PreviewStylusDown += _item_PreviewStylusDown;
+            item.PreviewStylusUp += _item_PreviewStylusUp;
 
 
             View.Items.Add(item);
         }
+    }
+
+    public class TouchTrackEventArgs : EventArgs
+    {
+        public int Id { get; set; }
+        public Point Position { get; set; }
     }
 }

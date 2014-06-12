@@ -13,5 +13,13 @@ namespace Watch.Faces
         {
             InitializeComponent();
         }
+
+        public WatchVisual Clone()
+        {
+            return new WatchVisual
+            {
+                Background = Background
+            };
+        }
     }
 }

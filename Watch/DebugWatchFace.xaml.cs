@@ -231,22 +231,28 @@ namespace Watch
             Duplicate
         }
 
-        public object GetVisual()
+        public object GetVisual(int id=0)
         {
             return new Rectangle() {Width = 50, Height = 50, Fill = Brushes.Red};
         }
 
-        public object GetThumbnail()
+        public object GetThumbnail(int id=0)
         {
             throw new NotImplementedException();
         }
 
-        public void SendThumbnail(object thumbnail)
+        public void SendThumbnail(object thumbnail,int id=0, double x = 0, double y = 0)
         {
             throw new NotImplementedException();
         }
 
-        public void SendVisual(object visual)
+        public void SendVisual(object visual, int id = 0, double x = 0, double y = 0)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public void RemoveThumbnail(int id)
         {
             throw new NotImplementedException();
         }

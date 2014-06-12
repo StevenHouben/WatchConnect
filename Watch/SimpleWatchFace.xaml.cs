@@ -9,9 +9,6 @@ using Watch.Toolkit.Interface;
 
 namespace Watch
 {
-    /// <summary>
-    /// Interaction logic for SimpleWatchFace.xaml
-    /// </summary>
     public partial class SimpleWatchFace : IVisualSharer
     {
         private TouchManager _touchManager;
@@ -30,7 +27,8 @@ namespace Watch
             {
                 Dispatcher.Invoke(() =>
                 {
-                    VisualContent.Background = PickBrush();
+                    if(VisualContent !=null)
+                        VisualContent.Background = PickBrush();
                 });
             }
             
@@ -51,7 +49,7 @@ namespace Watch
             return result;
         }
 
-        public object GetVisual()
+        public object GetVisual(int id=0)
         {
             object content = VisualContent;
             Content.Child = null;
@@ -61,12 +59,12 @@ namespace Watch
             return content;
         }
 
-        public object GetThumbnail()
+        public object GetThumbnail(int id=0)
         {
-            return VisualContent == null ? new Rectangle {Width = Height = 100, Fill = Brushes.Transparent} : new Rectangle{Width = Height = 100, Fill = VisualContent.Background};
+            return VisualContent == null ? new Rectangle {Width = Height = 100, Fill = Brushes.Transparent} : new Rectangle{Width = Height = 100, Fill = VisualContent.Background, VerticalAlignment = VerticalAlignment.Stretch, HorizontalAlignment = HorizontalAlignment.Stretch};
         }
 
-        public void SendThumbnail(object thumbnail)
+        public void SendThumbnail(object thumbnail,int id=0, double x = 0, double y = 0)
         {
             Dispatcher.Invoke(() =>
             {
@@ -77,7 +75,7 @@ namespace Watch
             });
         }
 
-        public void RemoveThumbnail()
+        public void RemoveThumbnail(int id=0)
         {
             Dispatcher.Invoke(() =>
             {
@@ -86,12 +84,12 @@ namespace Watch
             });
         }
 
-        public void SendVisual(object visual)
+        public void SendVisual(object visual,int id=0, double x = 0, double y = 0)
         {
             Dispatcher.Invoke(() =>
             {
                 VisualContent = visual as WatchVisual;
-                Content.Child = VisualContent;
+                Content.Child = VisualContent.Clone();
                 Content.BorderThickness = new Thickness(0, 0, 0, 0);
             });
 
