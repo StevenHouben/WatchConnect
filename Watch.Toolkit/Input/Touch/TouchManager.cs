@@ -65,7 +65,11 @@ namespace Watch.Toolkit.Input.Touch
 
         void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
         {
-            if (e.Message.Length != 4) return;
+            if (!e.Message.StartsWith("T"))
+                return;
+
+            if (e.Message.Length != 4) 
+                return;
 
             var state = new BevelState()
             {

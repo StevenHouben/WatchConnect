@@ -1,9 +1,8 @@
 ﻿
 using System.Collections.Generic;
 
-namespace Watch.Toolkit.Input
+namespace Watch.Toolkit.Input.Recognizers
 {
-
     public class Template
     {
         public string Label { get; set; }

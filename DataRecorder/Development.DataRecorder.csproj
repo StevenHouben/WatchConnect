@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{47810F65-B22F-4608-8606-CC25E7F73EA5}</ProjectGuid>
+    <ProjectGuid>{463C9B35-7579-403E-8F51-369A90C9C33B}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AccelerometerTest</RootNamespace>
-    <AssemblyName>AccelerometerTest</AssemblyName>
+    <RootNamespace>Development.DataRecorder</RootNamespace>
+    <AssemblyName>Development.DataRecorder</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -34,14 +34,35 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Surface, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Surface.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Surface.Presentation, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="Accord">
+      <HintPath>..\ml\packages\Accord.2.12.0.0\lib\Accord.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Controls">
+      <HintPath>..\ml\packages\Accord.Controls.2.12.0.0\lib\Accord.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Imaging">
+      <HintPath>..\ml\packages\Accord.Imaging.2.12.0.0\lib\Accord.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.MachineLearning">
+      <HintPath>..\ml\packages\Accord.MachineLearning.2.12.0.0\lib\Accord.MachineLearning.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Math">
+      <HintPath>..\ml\packages\Accord.Math.2.12.0.0\lib\Accord.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Statistics">
+      <HintPath>..\ml\packages\Accord.Statistics.2.12.0.0\lib\Accord.Statistics.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge">
+      <HintPath>..\ml\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Imaging">
+      <HintPath>..\ml\packages\AForge.Imaging.2.2.5\lib\AForge.Imaging.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Math">
+      <HintPath>..\ml\packages\AForge.Math.2.2.5\lib\AForge.Math.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -50,8 +71,6 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="UIAutomationTypes" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -92,6 +111,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -102,10 +122,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\GestureTouchToolkit\GestureTouch.WPF\GestureTouch.WPF.csproj">
-      <Project>{3d63a62f-90d3-454c-82cb-2cbb0183c337}</Project>
-      <Name>GestureTouch.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Watch.Toolkit.Hardware\Watch.Toolkit.Hardware.csproj">
       <Project>{67be83b9-ee89-4ec2-8b57-aafe1af46699}</Project>
       <Name>Watch.Toolkit.Hardware</Name>

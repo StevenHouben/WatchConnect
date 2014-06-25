@@ -8,7 +8,6 @@ namespace Watch
 {
     public partial class App
     {
-
         private readonly GestureManager _gestureManager = new GestureManager();
         private readonly TouchManager _touchManager = new TouchManager();
 

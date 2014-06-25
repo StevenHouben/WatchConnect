@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Watch
+namespace Watch.Toolkit
 {
     public static class Helper
     {

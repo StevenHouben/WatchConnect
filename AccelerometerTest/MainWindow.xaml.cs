@@ -1,32 +1,41 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows;
 using System.Collections.Generic;
-using System.Windows.Media;
+using System.Windows.Input;
 using GestureTouch;
-using Microsoft.Surface.Presentation.Controls;
 using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Input.Recognizers;
+using Watch.Toolkit.Sensors;
+using Watch.Toolkit.Sensors.MachineLearning;
 
 namespace AccelerometerTest
 {
     public partial class MainWindow
     {
         private readonly DtwRecognizer _dtwRecognizer = new DtwRecognizer();
-        private AccelerometerData _accelerometerData;
+        private Accelerometer _accelerometerData;
+        private readonly Classifier _classifier;
 
-        readonly Dictionary<int, ScatterViewItem> _touches = new Dictionary<int, ScatterViewItem>();
+        private string _lastDetection = "";
+        private double _lastDetectionCost;
+        private int _lastDetectedClassification;
+        private int _aX, _aY, _aZ;
+        private int _pX, _pY, _pZ;
 
         public MainWindow()
         {
             InitializeComponent();
 
+            _classifier = new Classifier(
+                AppDomain.CurrentDomain.BaseDirectory + "recording3.log",3);
+            _classifier.Run(MachineLearningAlgorithm.ID3);
+
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
 
-            var wrap = new GestureTouchPipeline(View);
-            wrap.GestureTouchDown += MainWindow_GestureTouchDown;
-            wrap.GestureTouchUp += MainWindow_GestureTouchUp;
-            wrap.GestureTouchMove += MainWindow_GestureTouchMove;
+            TouchVisualizer.GestureTouchUp += MainWindow_GestureTouchUp;
+            TouchVisualizer.GestureTouchDown += TouchVisualizer_GestureTouchDown;
 
             var arduino = new Arduino();
             arduino.MessageReceived += arduino_MessageReceived;
@@ -36,104 +45,69 @@ namespace AccelerometerTest
                 new List<string> { "Right", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
 
             cbGestureList.SelectedIndex = 0;
+
+            KeyDown += MainWindow_KeyDown;
+
         }
-        void MainWindow_GestureTouchDown(object sender, GestureTouchEventArgs e)
+
+        void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            var item = new ScatterViewItem
-            {
-                Width = e.TouchPoint.Size.Width * 9.6,
-                Height = e.TouchPoint.Size.Height * 9.6,
-                Background = Brushes.White,
-                Orientation = 0,
-                CanMove = false,
-                CanRotate =false,
-                CanScale = false,
-                Center = e.TouchPoint.Position
-            };
-
-            Label.Content = _lastDetection;
-
-            _touches.Add(e.Id, item);
-
-            View.Items.Add(item);
-
-            UpdateVisualTouchPoint(e.Id, e.TouchPoint);
+            if(e.Key == Key.Escape)
+                Environment.Exit(0);
         }
+
+        void TouchVisualizer_GestureTouchDown(object sender, GestureTouchEventArgs e)
+        {
+            var avg = 1;// (_aX + _aY + _aZ)/1.5;
+            var inRange = (_lastDetectionCost < 650);
+            var isTouching = _lastDetectedClassification;
+            Label.Content =  avg> 0 &&  inRange && isTouching==1 ? _lastDetection : "Right Hand";
+        }
+
         void MainWindow_GestureTouchUp(object sender, GestureTouchEventArgs e)
         {
-            if (!_touches.ContainsKey(e.Id))
-                return;
-            View.Items.Remove(_touches[e.Id]);
-            _touches.Remove(e.Id);
-
             Label.Content = "";
         }
 
-        void MainWindow_GestureTouchMove(object sender, GestureTouchEventArgs e)
-        {
-            UpdateVisualTouchPoint(e.Id, e.TouchPoint);
-        }
-
-        private void UpdateVisualTouchPoint(int id, GestureTouchPoint point)
-        {
-            if (!_touches.ContainsKey(id))
-                return;
-            _touches[id].Width = point.Size.Width * 9.6;
-            _touches[id].Height = point.Size.Height * 9.6;
-            _touches[id].Center = point.Position;
-
-
-            if (TouchRanges.TinyTouch.ContainsValue(_touches[id].Width)
-                && TouchRanges.TinyTouch.ContainsValue(_touches[id].Width))
-            {
-                _touches[id].Background = Brushes.White;
-            }
-
-            else if (TouchRanges.SmallTouch.ContainsValue(_touches[id].Width)
-                || TouchRanges.SmallTouch.ContainsValue(_touches[id].Width))
-            {
-                _touches[id].Background = Brushes.Green;
-            }
-            else if (TouchRanges.MediumTouch.ContainsValue(_touches[id].Width)
-                && TouchRanges.MediumTouch.ContainsValue(_touches[id].Width))
-            {
-                _touches[id].Background = Brushes.Yellow;
-            }
-            else if (TouchRanges.LargeTouch.ContainsValue(_touches[id].Width)
-                && TouchRanges.LargeTouch.ContainsValue(_touches[id].Width))
-            {
-                _touches[id].Background = Brushes.Orange;
-            }
-            else if (TouchRanges.VeryLargeTouch.ContainsValue(_touches[id].Width)
-                && TouchRanges.VeryLargeTouch.ContainsValue(_touches[id].Width))
-            {
-                _touches[id].Background = Brushes.Red;
-            }
-        }
         void arduino_MessageReceived(object sender, Watch.Toolkit.Hardware.MessagesReceivedEventArgs e)
         {
             try
             {
-                var data = e.Message.Split('|');
+                if (!e.Message.StartsWith("A"))
+                    return;
+                var data = e.Message.Split(',');
 
-                if (data.Length != 5) return;
+                if (data.Length != 9) return;
 
-                _accelerometerData = new AccelerometerData(
-                    Convert.ToInt32(data[0]),
-                    Convert.ToInt32(data[1]),
-                    Convert.ToInt32(data[2]));
+                _accelerometerData = new Accelerometer(
+                    Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
+                    Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
+                    Convert.ToDouble(data[3], CultureInfo.InvariantCulture),
+                    Convert.ToDouble(data[4], CultureInfo.InvariantCulture),
+                    Convert.ToDouble(data[5], CultureInfo.InvariantCulture),
+                    Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
+                    Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
+                    Convert.ToDouble(data[8], CultureInfo.InvariantCulture));
                     var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometerData.RawData);
-                _lastDetection = result.Item1;
+                    _lastDetection = result.Item1;
+                    var computedLabel = _classifier.ComputeLabel(_accelerometerData.RawData);
+                    _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
 
-                Dispatcher.Invoke(() =>
-                {
-                    lblRaw.Content = _accelerometerData.ToString();
-                    lblDTW.Content = "";
-                    foreach (var item in result.Item2)
+                    Dispatcher.Invoke(() =>
                     {
-                        lblDTW.Content += item.Key + " " + item.Value + "\n";
-                    }
-                });
+                        lblRaw.Content = _accelerometerData.ToFormattedString();
+                        lblDTW.Content = "";
+                        lblDT.Content = _lastDetectedClassification;
+                        foreach (var item in result.Item2)
+                        {
+                            lblDTW.Content += item.Key + " " + item.Value + "\n";
+                            if (item.Key == result.Item1)
+                                _lastDetectionCost = item.Value;
+                        }
+                    });
+
+                CalculateDistance(_accelerometerData);
+
             }
             catch (Exception)
             {
@@ -141,21 +115,37 @@ namespace AccelerometerTest
             }
         }
 
-        private string _lastDetection = "";
-        readonly List<AccelerometerData> _collectedData = new List<AccelerometerData>();
+        private void CalculateDistance(Accelerometer accelerometerData)
+        {
+            if (_pX == 0)
+                _pX = (int)accelerometerData.Fx;
+            if (_pY == 0)
+                _pY = (int)accelerometerData.Fy;
+            if (_pZ == 0)
+                _pZ = (int)accelerometerData.Fz;
 
+            _aX = Math.Abs((int)((Math.Abs(_pX) - Math.Abs(accelerometerData.Fx))/50));
+            _aY = Math.Abs((int)((Math.Abs(_pY) - Math.Abs(accelerometerData.Fy))/50));
+            _aZ = Math.Abs((int)((Math.Abs(_pZ) - Math.Abs(accelerometerData.Fz))/50));
+
+            _pX = (int)accelerometerData.Fx;
+            _pY = (int)accelerometerData.Fy;
+            _pZ = (int)accelerometerData.Fz;
+
+        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            _collectedData.Add(_accelerometerData);
             listGesture.Items.Add(cbGestureList.Text+" "+ _accelerometerData);
 
             _dtwRecognizer.AddTemplate(cbGestureList.Text,
-                          new double[]
+                          new []
                         {
                             _accelerometerData.X,
                             _accelerometerData.Y,
                             _accelerometerData.Z
                         });
+
+            cbGestureList.SelectedIndex++;
         }
     }
     public class TouchRanges
@@ -166,29 +156,5 @@ namespace AccelerometerTest
         public static Range<double> LargeTouch = new Range<double>(101, 200);
         public static Range<double> VeryLargeTouch = new Range<double>(201, 1000);
     }
-    public class AccelerometerData
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
-        public int Z { get; set; }
-
-        public double[] RawData
-        {
-            get { return new double[] {X, Y, Z}; }
-        }
-
-        public AccelerometerData() { }
-
-        public AccelerometerData(int x, int y, int z)
-        {
-            X = x;
-            Y = y;
-            Z = z;
-        }
-
-        public override string ToString()
-        {
-            return "X: " + X + " Y: " + Y + " Z: " + Z;
-        }
-    }
+    
 }

@@ -2,7 +2,7 @@
 
 namespace Watch.Toolkit.Hardware.Phidget
 {
-    public class PhidgetManager:AbstractHardwarePlatform
+    internal class PhidgetManager:AbstractHardwarePlatform
     {
         private static InterfaceKit _instance;
 

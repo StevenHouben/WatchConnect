@@ -42,7 +42,7 @@ void loop(){
   
   if(y>yMax) yMax = y;
   if(y<yMin) yMin = y;
-  
+//  
   if(z>zMax) zMax = z;
   if(z<zMin) zMin = z;
  
@@ -52,11 +52,17 @@ void loop(){
  Serial.print("|");
  Serial.print(z);
  Serial.print("|");
+ Serial.print(fXg);
+ Serial.print("|");
+ Serial.print(fYg);
+ Serial.print("|");
+ Serial.print(fZg);
+  Serial.print("|");
  Serial.print(pitch);
  Serial.print("|");
  Serial.print(roll);
  Serial.print("#");   
 
-delay(100); 
+delay(0); 
 }
 

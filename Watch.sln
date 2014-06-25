@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccelerometerTest", "Accele
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestureTouch.WPF", "..\GestureTouchToolkit\GestureTouch.WPF\GestureTouch.WPF.csproj", "{3D63A62F-90D3-454C-82CB-2CBB0183C337}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Development.DataRecorder", "DataRecorder\Development.DataRecorder.csproj", "{463C9B35-7579-403E-8F51-369A90C9C33B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Development.DecisionTreeTrainer", "DecisionTreeTrainer\Development.DecisionTreeTrainer.csproj", "{304E75FB-34A8-4328-ADE0-8F925E28FF6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Any CPU.Build.0 = Release|Any CPU
+		{463C9B35-7579-403E-8F51-369A90C9C33B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{463C9B35-7579-403E-8F51-369A90C9C33B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{463C9B35-7579-403E-8F51-369A90C9C33B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{463C9B35-7579-403E-8F51-369A90C9C33B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{304E75FB-34A8-4328-ADE0-8F925E28FF6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{304E75FB-34A8-4328-ADE0-8F925E28FF6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{304E75FB-34A8-4328-ADE0-8F925E28FF6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{304E75FB-34A8-4328-ADE0-8F925E28FF6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

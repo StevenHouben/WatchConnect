@@ -4,15 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EEC7F4E2-8FAD-4CC6-ACBA-58C0C6A182BE}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{304E75FB-34A8-4328-ADE0-8F925E28FF6E}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Watch.Toolkit</RootNamespace>
-    <AssemblyName>Watch.Toolkit</AssemblyName>
+    <RootNamespace>Development.DecisionTreeTrainer</RootNamespace>
+    <AssemblyName>Development.DecisionTreeTrainer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +23,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,6 +34,12 @@
   <ItemGroup>
     <Reference Include="Accord">
       <HintPath>..\packages\Accord.2.12.0.0\lib\Accord.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Controls">
+      <HintPath>..\packages\Accord.Controls.2.12.0.0\lib\Accord.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Accord.Imaging">
+      <HintPath>..\packages\Accord.Imaging.2.12.0.0\lib\Accord.Imaging.dll</HintPath>
     </Reference>
     <Reference Include="Accord.MachineLearning">
       <HintPath>..\packages\Accord.MachineLearning.2.12.0.0\lib\Accord.MachineLearning.dll</HintPath>
@@ -45,6 +53,9 @@
     <Reference Include="AForge">
       <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
     </Reference>
+    <Reference Include="AForge.Imaging">
+      <HintPath>..\packages\AForge.Imaging.2.2.5\lib\AForge.Imaging.dll</HintPath>
+    </Reference>
     <Reference Include="AForge.Math">
       <HintPath>..\packages\AForge.Math.2.2.5\lib\AForge.Math.dll</HintPath>
     </Reference>
@@ -57,61 +68,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helper.cs" />
-    <Compile Include="Input\Gestures\AdvancedGestureManager.cs" />
-    <Compile Include="Input\IInputManager.cs" />
-    <Compile Include="Input\EventMonitor.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Input\Touch\MultiBevelTouchEventArgs.cs" />
-    <Compile Include="Input\Touch\BevelSide.cs" />
-    <Compile Include="Input\Gestures\Gesture.cs" />
-    <Compile Include="Input\Gestures\GestureDetectedEventArgs.cs" />
-    <Compile Include="Input\Gestures\GestureManager.cs" />
-    <Compile Include="Input\Touch\BevelState.cs" />
-    <Compile Include="Interface\IVisualSharer.cs" />
-    <Compile Include="Sensors\Accelerometer.cs" />
-    <Compile Include="Sensors\IConvertable.cs" />
-    <Compile Include="Sensors\MachineLearning\Classifier.cs" />
-    <Compile Include="Sensors\RawSensorDataReceivedEventArgs.cs" />
-    <Compile Include="Input\Touch\RawTouchDataReceivedEventArgs.cs" />
-    <Compile Include="Input\Touch\BevelTouchEventArgs.cs" />
-    <Compile Include="Input\Recognizers\DtwRecognizer.cs" />
-    <Compile Include="Input\Recognizers\HMQRecognizer.cs" />
-    <Compile Include="Input\Recognizers\MultiDtwRecoginizer.cs" />
-    <Compile Include="Input\Touch\SliderTouchEventArgs.cs" />
-    <Compile Include="Input\Gestures\AbstractGestureManager.cs" />
-    <Compile Include="Sensors\Dtw\DistanceMeasure.cs" />
-    <Compile Include="Sensors\Dtw\Dtw.cs" />
-    <Compile Include="Sensors\Dtw\IDtw.cs" />
-    <Compile Include="Sensors\Dtw\Preprocessing\CentralizationPreprocessor.cs" />
-    <Compile Include="Sensors\Dtw\Preprocessing\IPreprocessor.cs" />
-    <Compile Include="Sensors\Dtw\Preprocessing\NonePreprocessor.cs" />
-    <Compile Include="Sensors\Dtw\Preprocessing\NormalizationPreprocessor.cs" />
-    <Compile Include="Sensors\Dtw\Preprocessing\StandardizationPreprocessor.cs" />
-    <Compile Include="Sensors\Dtw\SeriesVariable.cs" />
-    <Compile Include="Sensors\Filters\Kalman.cs" />
-    <Compile Include="Sensors\InfraredSensor.cs" />
-    <Compile Include="Sensors\ISensor.cs" />
-    <Compile Include="Sensors\LightSensor.cs" />
-    <Compile Include="Sensors\LinearTouchSensor.cs" />
-    <Compile Include="Sensors\ProximitySensor.cs" />
-    <Compile Include="Sensors\RangeChangedEventArgs.cs" />
-    <Compile Include="Sensors\TouchSensor.cs" />
-    <Compile Include="Input\Recognizers\TemplateData.cs" />
-    <Compile Include="Input\Touch\TouchManager.cs" />
-    <Compile Include="Interface\IWatchFace.cs" />
-    <Compile Include="Interface\WatchFaceManager.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Watch.Toolkit.Hardware\Watch.Toolkit.Hardware.csproj">
       <Project>{67be83b9-ee89-4ec2-8b57-aafe1af46699}</Project>
       <Name>Watch.Toolkit.Hardware</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Watch.Toolkit\Watch.Toolkit.csproj">
+      <Project>{eec7f4e2-8fad-4cc6-acba-58c0c6a182be}</Project>
+      <Name>Watch.Toolkit</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
