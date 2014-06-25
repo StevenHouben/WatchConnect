@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace DecisionTreeExample
+namespace Watch.Toolkit.Utils
 {
     /// <summary>
     /// Interaction logic for App.xaml

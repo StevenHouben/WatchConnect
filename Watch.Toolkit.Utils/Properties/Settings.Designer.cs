@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AccelerometerTest.Properties
+namespace Watch.Toolkit.Utils.Properties
 {
 
 

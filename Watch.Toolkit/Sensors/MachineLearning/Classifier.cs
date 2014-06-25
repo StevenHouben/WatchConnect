@@ -20,7 +20,6 @@ namespace Watch.Toolkit.Sensors.MachineLearning
         {
             Classes = classes;
             _data = BuildTableFromLogs(filePath);
-
         }
 
         public void Run(MachineLearningAlgorithm algorithm)
