@@ -2,11 +2,11 @@
 {
     class ArduinoManager:AbstractHardwarePlatform
     {
-        private static Arduino _instance;
+        private static ArduinoDriver _instance;
 
-        public static Arduino InterfaceKit 
+        public static ArduinoDriver Arduino 
         {
-            get { return _instance ?? (_instance = new Arduino()); }
+            get { return _instance ?? (_instance = new ArduinoDriver("COM4")); }
         }
     }
 }

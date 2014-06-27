@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
+using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Input.Recognizers;
 using Watch.Toolkit.Sensors;
@@ -10,21 +11,21 @@ namespace Watch.Toolkit.Input.Gestures
     public class GestureManager:AbstractGestureManager
     {
 
-        private const int InfraRedDistanceTheshold = 300;
+        private const int InfraRedDistanceThreshold = 300;
 
         private readonly DtwRecognizer _gestureRecognizer = new DtwRecognizer();
 
-        private readonly ProximitySensor _frontSensor = new InfraredSensor(0, InfraRedDistanceTheshold)
+        private readonly ProximitySensor _frontSensor = new InfraredSensor(0, InfraRedDistanceThreshold)
         {
             Name = "front-sensor"
         };
 
-        private readonly ProximitySensor _topLeftSensor = new InfraredSensor(1, InfraRedDistanceTheshold)
+        private readonly ProximitySensor _topLeftSensor = new InfraredSensor(1, InfraRedDistanceThreshold)
         {
             Name = "top-left-sensor"
         };
 
-        private readonly ProximitySensor _topRightSensor = new InfraredSensor(2, InfraRedDistanceTheshold)
+        private readonly ProximitySensor _topRightSensor = new InfraredSensor(2, InfraRedDistanceThreshold)
         {
             Name = "top-right-sensor"
         };
@@ -34,7 +35,6 @@ namespace Watch.Toolkit.Input.Gestures
         private Gesture _lastDetectedGesture;
 
         private readonly Queue<int> _detectedSideGestures = new Queue<int>();
-        private readonly Queue<int> _detectedTopGestures = new Queue<int>();
 
         private readonly EventMonitor _swipeSideTimer = new EventMonitor(500);
         private readonly EventMonitor _swipeTopTimer = new EventMonitor(500);
@@ -45,7 +45,6 @@ namespace Watch.Toolkit.Input.Gestures
         
         private readonly List<double> _dataRight = new List<double>();
         private readonly List<double> _dataLeft = new List<double>();
-
 
         private Phidget _phidget;
         public override void Start()

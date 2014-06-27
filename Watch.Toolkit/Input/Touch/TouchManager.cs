@@ -58,9 +58,8 @@ namespace Watch.Toolkit.Input.Touch
 
 
             _arduino = new Arduino();
-
+            _arduino.Start();
             _arduino.MessageReceived += _arduino_MessageReceived;
-            _arduino.Start("COM4");
         }
 
         void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)

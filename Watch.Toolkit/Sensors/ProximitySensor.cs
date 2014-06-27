@@ -2,7 +2,7 @@
 
 namespace Watch.Toolkit.Sensors
 {
-    public abstract class ProximitySensor:ISensor
+    public abstract class ProximitySensor:ISimpleSensor
     {
         public event EventHandler<RangeChangedEventArgs> RangeChanged;
         public string Name { get; set; }

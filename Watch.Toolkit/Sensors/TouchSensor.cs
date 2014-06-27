@@ -2,7 +2,7 @@
 
 namespace Watch.Toolkit.Sensors
 {
-    public abstract class TouchSensor:ISensor
+    public abstract class TouchSensor:ISimpleSensor
     {
         public string Name { get; set; }
 

@@ -11,13 +11,12 @@ using Accord.Statistics.Filters;
 using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Sensors;
 
-namespace DataRecorder
+namespace Watch.Toolkit.Utils
 {
     public partial class MainWindow
     {
         private readonly StringBuilder _logger = new StringBuilder();
-        private Accelerometer _accelerometerData;
-        private readonly string _logDirectory = AppDomain.CurrentDomain.BaseDirectory + "/Logs/";
+        private readonly Accelerometer _accelerometer = new Accelerometer();
         private readonly Timer _recorder = new Timer(500);
         public MainWindow()
         {
@@ -28,7 +27,7 @@ namespace DataRecorder
             var arduino = new Arduino();
             arduino.MessageReceived += arduino_MessageReceived;
             _recorder.Elapsed += _recorder_Elapsed;
-            arduino.Start("COM4");
+            arduino.Start();
 
         }
 
@@ -58,7 +57,7 @@ namespace DataRecorder
 
                 if (data.Length != 9) return;
 
-                _accelerometerData = new Accelerometer(
+                _accelerometer.Update(
                     Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
                     Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
                     Convert.ToDouble(data[3], CultureInfo.InvariantCulture),
@@ -77,8 +76,8 @@ namespace DataRecorder
 
         public void AddPoint(int label)
         {
-            _logger.AppendLine(_accelerometerData.X + "," + _accelerometerData.Y + "," + _accelerometerData.Z+","+label);
-            ListBox.Items.Add(_accelerometerData.ToString());
+            _logger.AppendLine(_accelerometer.X + "," + _accelerometer.Y + "," + _accelerometer.Z + "," + label);
+            ListBox.Items.Add(_accelerometer.ToString());
 
         }
 

@@ -1,7 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
 using Accord.MachineLearning.DecisionTrees;
 using Accord.MachineLearning.DecisionTrees.Learning;
 using Accord.Math;
@@ -9,17 +8,20 @@ using AForge;
 
 namespace Watch.Toolkit.Sensors.MachineLearning
 {
-    public class Classifier
+    public class TreeClassifier
     {
         private DecisionTree _tree;
         private readonly DataTable _data;
         private Func<double[], int> _classifier;
-        public int Classes { get;private set; }
 
-        public Classifier(string filePath,int classes)
+        private readonly int _classes;
+        private readonly List<string> _classLabels; 
+
+        public TreeClassifier(string filePath,int classes,List<string> classLabels)
         {
-            Classes = classes;
-            _data = BuildTableFromLogs(filePath);
+            _classes = classes;
+            _classLabels = classLabels;
+            _data = Helper.ReadCsvToDataTable(filePath);
         }
 
         public void Run(MachineLearningAlgorithm algorithm)
@@ -27,36 +29,26 @@ namespace Watch.Toolkit.Sensors.MachineLearning
             Compute(_data, algorithm);
         }
 
-        public int ComputeLabel(double[] input)
+        public int ComputeValue(double[] input)
         {
             return _classifier(input);
         }
-        private DataTable BuildTableFromLogs(string filePath)
+        public string ComputeLabel(double[] input)
         {
-            var filename = filePath;
-            var reader = File.ReadAllLines(filename);
-
-            var data = new DataTable();
-
-            var headers = reader.First().Split(',');
-            foreach (var header in headers)
-                data.Columns.Add(header);
-
-            var records = reader.Skip(1);
-            foreach (var record in records.Where(record => record != null))
-                data.Rows.Add(record.Split(','));
-            return data;
+            var res = _classifier(input);
+            return (res == -1) ? "none" : _classLabels[res];
         }
+
         private void Compute(DataTable data,MachineLearningAlgorithm algorithm)
         {
             DecisionVariable[] attributes =
             {
-                new DecisionVariable("X",new IntRange(-2000,2000)), 
-                new DecisionVariable("Y",new IntRange(-2000,2000)),
-                new DecisionVariable("Z",new IntRange(-2000,2000)) 
+                new DecisionVariable("X",new IntRange(-2500,2500)), 
+                new DecisionVariable("Y",new IntRange(-2500,2500)),
+                new DecisionVariable("Z",new IntRange(-2500,2500)) 
             };
 
-            _tree = new DecisionTree(attributes, Classes);
+            _tree = new DecisionTree(attributes, _classes);
 
 
             switch (algorithm)
@@ -71,7 +63,7 @@ namespace Watch.Toolkit.Sensors.MachineLearning
                     _classifier = expression.Compile();
                 }
                 break;
-                case MachineLearningAlgorithm.ID3:
+                case MachineLearningAlgorithm.Id3:
                 {
                     var learning = new ID3Learning(_tree);
                     var inputs = data.ToArray<int>("X", "Y", "Z");
@@ -88,6 +80,6 @@ namespace Watch.Toolkit.Sensors.MachineLearning
     public enum MachineLearningAlgorithm
     {
         C45,
-        ID3
+        Id3
     }
 }

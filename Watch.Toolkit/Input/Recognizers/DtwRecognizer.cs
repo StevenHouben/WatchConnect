@@ -7,56 +7,75 @@ namespace Watch.Toolkit.Input.Recognizers
     public class DtwRecognizer
     {
         readonly Dictionary<string,double[]> _templates = new Dictionary<string, double[]>(); 
+        readonly object _readlock = new object();
         public void AddTemplate(string label,double[] template)
         {
-            _templates.Add(label,template);
+            lock (_readlock)
+            {
+                if (_templates.ContainsKey(label))
+                    _templates[label] = template;
+                else
+                    _templates.Add(label,template);
+            }
+
         }
 
         public void RemoveTemplate(string label)
         {
-            _templates.Remove(label);
+            lock (_readlock)
+                _templates.Remove(label);
         }
 
         public string ComputeClosestLabel(double[] rawData)
         {
-            var label = "";
-            var cost = Double.MaxValue;
-            foreach (var template in _templates)
+            lock (_readlock)
             {
-                var newCost = new Dtw(template.Value, rawData).GetCost();
-                if (!(newCost < cost)) continue;
-                cost = newCost;
-                label = template.Key;
-            }
-            return label;
+                var label = "";
+                var cost = Double.MaxValue;
+                foreach (var template in _templates)
+                {
+                    var newCost = new Dtw(template.Value, rawData).GetCost();
+                    if (!(newCost < cost)) continue;
+                    cost = newCost;
+                    label = template.Key;
+                }
+                return label;
+            } 
         }
         public Tuple<string,Dictionary<string,double>> ComputeClosestLabelAndCosts(double[] rawData)
         {
-            var label = "";
-            var cost = Double.MaxValue;
-            var costs = new Dictionary<string, double>();
-            foreach (var template in _templates)
+            lock (_readlock)
             {
-                var newCost = new Dtw(template.Value, rawData).GetCost();
-                costs.Add(template.Key, newCost);
-                if (!(newCost < cost)) continue;
-                cost = newCost;
-                label = template.Key;
+                var label = "";
+                var cost = Double.MaxValue;
+                var costs = new Dictionary<string, double>();
+                foreach (var template in _templates)
+                {
+                    var newCost = new Dtw(template.Value, rawData).GetCost();
+                    costs.Add(template.Key, newCost);
+                    if (!(newCost < cost)) continue;
+                    cost = newCost;
+                    label = template.Key;
+                }
+                return new Tuple<string, Dictionary<string, double>>(label, costs);
             }
-            return new Tuple<string, Dictionary<string, double>>(label,costs);
+
         }
-        public Tuple<string,double> FindClosestLabelAndCost(double[] rawData)
+        public Tuple<string,double> ComputerClosestLabelAndCost(double[] rawData)
         {
-            var label = "";
-            var cost = Double.MaxValue;
-            foreach (var template in _templates)
+            lock (_readlock)
             {
-                var newCost = new Dtw(template.Value, rawData).GetCost();
-                if (!(newCost < cost)) continue;
-                cost = newCost;
-                label = template.Key;
+                var label = "";
+                var cost = Double.MaxValue;
+                foreach (var template in _templates)
+                {
+                    var newCost = new Dtw(template.Value, rawData).GetCost();
+                    if (!(newCost < cost)) continue;
+                    cost = newCost;
+                    label = template.Key;
+                }
+                return new Tuple<string, double>(label, cost);
             }
-            return new Tuple<string, double>(label,cost);
         }
     }
 }

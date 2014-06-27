@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arduino\Arduino.cs" />
+    <Compile Include="Arduino\ArduinoDriver.cs" />
     <Compile Include="Arduino\ArduinoManager.cs" />
     <Compile Include="Arduino\SafeSerial.cs">
       <SubType>Component</SubType>

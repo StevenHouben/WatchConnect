@@ -160,7 +160,7 @@ namespace Watch.Toolkit.Input.Gestures
                     Helper.WriteToFile(sb,"left-to-right.txt");
                     sb.Clear();
                     
-                    var output = _vecMatcher.FindClosestLabelAndCost(recordedTemplate.Vector);
+                    var output = _vecMatcher.ComputerClosestLabelAndCost(recordedTemplate.Vector);
 
                     //var li = new List<string>();
                     //li.Add(_leftMatcher.FindClosestLabel(_dataLeftSensor.ToArray()));

@@ -1,21 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
-using System.Collections.Generic;
 using System.Windows.Input;
 using GestureTouch;
 using Watch.Toolkit.Hardware.Arduino;
-using Watch.Toolkit.Input.Recognizers;
 using Watch.Toolkit.Sensors;
 using Watch.Toolkit.Sensors.MachineLearning;
 
-namespace AccelerometerTest
+namespace Watch.Toolkit.Applications
 {
     public partial class MainWindow
     {
-        private readonly DtwRecognizer _dtwRecognizer = new DtwRecognizer();
-        private Accelerometer _accelerometerData;
-        private readonly Classifier _classifier;
+        private readonly Accelerometer _accelerometer = new Accelerometer();
+        private readonly TreeClassifier _classifier;
+        private readonly DtwClassifier _dtwClassifier;
 
         private string _lastDetection = "";
         private double _lastDetectionCost;
@@ -27,19 +26,26 @@ namespace AccelerometerTest
         {
             InitializeComponent();
 
-            _classifier = new Classifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording3.log",3);
-            _classifier.Run(MachineLearningAlgorithm.ID3);
+            _classifier = new TreeClassifier(
+                AppDomain.CurrentDomain.BaseDirectory + "recording3.log",3, new List<string>{"Right","Left Index","Left Knuckle"});
+
+            _dtwClassifier = new DtwClassifier(
+                AppDomain.CurrentDomain.BaseDirectory + "recording3.log", 3, new List<string>{"Right","Left Index","Left Knuckle"});
+
+            _classifier.Run(MachineLearningAlgorithm.Id3);
+
+            _dtwClassifier.Run();
 
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
 
             TouchVisualizer.GestureTouchUp += MainWindow_GestureTouchUp;
             TouchVisualizer.GestureTouchDown += TouchVisualizer_GestureTouchDown;
+            TouchVisualizer.GestureTouchMove += TouchVisualizer_GestureTouchMove;
 
             var arduino = new Arduino();
             arduino.MessageReceived += arduino_MessageReceived;
-            arduino.Start("COM4");
+            arduino.Start();
 
             cbGestureList.ItemsSource = 
                 new List<string> { "Right", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
@@ -50,6 +56,16 @@ namespace AccelerometerTest
 
         }
 
+        void TouchVisualizer_GestureTouchMove(object sender, GestureTouchEventArgs e)
+        {
+            var avg = (_aX + _aY + _aZ)/1.5;
+            //var inRange = (_lastDetectionCost < 650);
+            var isTouching = _lastDetectedClassification;
+            if(LabelClassifierLookUpTable.ContainsKey(_lastDetection))
+                Label.Content =  isTouching == LabelClassifierLookUpTable[_lastDetection] ? _lastDetection : "Right Hand";
+            Label.Content = _lastDetection;
+        }
+
         void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if(e.Key == Key.Escape)
@@ -58,10 +74,8 @@ namespace AccelerometerTest
 
         void TouchVisualizer_GestureTouchDown(object sender, GestureTouchEventArgs e)
         {
-            var avg = 1;// (_aX + _aY + _aZ)/1.5;
-            var inRange = (_lastDetectionCost < 650);
-            var isTouching = _lastDetectedClassification;
-            Label.Content =  avg> 0 &&  inRange && isTouching==1 ? _lastDetection : "Right Hand";
+            
+          
         }
 
         void MainWindow_GestureTouchUp(object sender, GestureTouchEventArgs e)
@@ -79,7 +93,7 @@ namespace AccelerometerTest
 
                 if (data.Length != 9) return;
 
-                _accelerometerData = new Accelerometer(
+                _accelerometer.Update(
                     Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
                     Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
                     Convert.ToDouble(data[3], CultureInfo.InvariantCulture),
@@ -88,14 +102,14 @@ namespace AccelerometerTest
                     Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
                     Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
                     Convert.ToDouble(data[8], CultureInfo.InvariantCulture));
-                    var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometerData.RawData);
+                    var result = _dtwClassifier.ComputeLabelAndCosts(_accelerometer.RawData);
                     _lastDetection = result.Item1;
-                    var computedLabel = _classifier.ComputeLabel(_accelerometerData.RawData);
+                    var computedLabel = _classifier.ComputeValue(_accelerometer.RawData);
                     _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
 
                     Dispatcher.Invoke(() =>
                     {
-                        lblRaw.Content = _accelerometerData.ToFormattedString();
+                        lblRaw.Content = _accelerometer.ToFormattedString();
                         lblDTW.Content = "";
                         lblDT.Content = _lastDetectedClassification;
                         foreach (var item in result.Item2)
@@ -106,7 +120,7 @@ namespace AccelerometerTest
                         }
                     });
 
-                CalculateDistance(_accelerometerData);
+                    CalculateDistance(_accelerometer);
 
             }
             catch (Exception)
@@ -135,26 +149,12 @@ namespace AccelerometerTest
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            listGesture.Items.Add(cbGestureList.Text+" "+ _accelerometerData);
-
-            _dtwRecognizer.AddTemplate(cbGestureList.Text,
-                          new []
-                        {
-                            _accelerometerData.X,
-                            _accelerometerData.Y,
-                            _accelerometerData.Z
-                        });
+            listGesture.Items.Add(cbGestureList.Text + " " + _accelerometer);
+            LabelClassifierLookUpTable.Add(cbGestureList.Text,_lastDetectedClassification);
+            _dtwClassifier.AddTemplate(cbGestureList.Text,_accelerometer.RawData);
 
             cbGestureList.SelectedIndex++;
         }
+        public Dictionary<string,int> LabelClassifierLookUpTable = new Dictionary<string, int>(); 
     }
-    public class TouchRanges
-    {
-        public static Range<double> TinyTouch = new Range<double>(0, 25);
-        public static Range<double> SmallTouch = new Range<double>(26, 50);
-        public static Range<double> MediumTouch = new Range<double>(51, 100);
-        public static Range<double> LargeTouch = new Range<double>(101, 200);
-        public static Range<double> VeryLargeTouch = new Range<double>(201, 1000);
-    }
-    
 }

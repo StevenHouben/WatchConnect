@@ -1,4 +1,4 @@
-﻿<Window xmlns:Controls="clr-namespace:GestureTouch.Controls;assembly=GestureTouch"  x:Class="AccelerometerTest.MainWindow"
+﻿<Window xmlns:Controls="clr-namespace:GestureTouch.Controls;assembly=GestureTouch"  x:Class="Watch.Toolkit.Applications.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="780" Width="1198.4">
