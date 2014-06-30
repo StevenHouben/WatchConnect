@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Watch.Toolkit.Sensors.Dtw;
 
-namespace Watch.Toolkit.Input.Recognizers
+namespace Watch.Toolkit.Processing.Recognizers
 {
     public class DtwRecognizer
     {
+        public Dictionary<string, double[]> Templates
+        {
+            get { return _templates; }
+        }
+
         readonly Dictionary<string,double[]> _templates = new Dictionary<string, double[]>(); 
         readonly object _readlock = new object();
         public void AddTemplate(string label,double[] template)
@@ -34,7 +38,7 @@ namespace Watch.Toolkit.Input.Recognizers
                 var cost = Double.MaxValue;
                 foreach (var template in _templates)
                 {
-                    var newCost = new Dtw(template.Value, rawData).GetCost();
+                    var newCost = new Dtw.Dtw(template.Value, rawData).GetCost();
                     if (!(newCost < cost)) continue;
                     cost = newCost;
                     label = template.Key;
@@ -51,7 +55,7 @@ namespace Watch.Toolkit.Input.Recognizers
                 var costs = new Dictionary<string, double>();
                 foreach (var template in _templates)
                 {
-                    var newCost = new Dtw(template.Value, rawData).GetCost();
+                    var newCost = new Dtw.Dtw(template.Value, rawData).GetCost();
                     costs.Add(template.Key, newCost);
                     if (!(newCost < cost)) continue;
                     cost = newCost;
@@ -69,7 +73,7 @@ namespace Watch.Toolkit.Input.Recognizers
                 var cost = Double.MaxValue;
                 foreach (var template in _templates)
                 {
-                    var newCost = new Dtw(template.Value, rawData).GetCost();
+                    var newCost = new Dtw.Dtw(template.Value, rawData).GetCost();
                     if (!(newCost < cost)) continue;
                     cost = newCost;
                     label = template.Key;

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
-using Watch.Toolkit.Sensors.Dtw.Preprocessing;
 
-namespace Watch.Toolkit.Sensors.Dtw.Preprocessing
+namespace Watch.Toolkit.Processing.Dtw.Preprocessing
 {
     public class CentralizationPreprocessor : IPreprocessor
     {

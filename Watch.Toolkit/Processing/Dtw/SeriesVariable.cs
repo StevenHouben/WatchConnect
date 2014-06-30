@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Watch.Toolkit.Sensors.Dtw.Preprocessing;
+﻿using Watch.Toolkit.Processing.Dtw.Preprocessing;
 
-namespace Watch.Toolkit.Sensors.Dtw
+namespace Watch.Toolkit.Processing.Dtw
 {
     public class SeriesVariable
     {

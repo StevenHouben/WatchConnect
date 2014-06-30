@@ -1,4 +1,4 @@
-namespace Watch.Toolkit.Sensors.Dtw.Preprocessing
+namespace Watch.Toolkit.Processing.Dtw.Preprocessing
 {
     public interface IPreprocessor
     {

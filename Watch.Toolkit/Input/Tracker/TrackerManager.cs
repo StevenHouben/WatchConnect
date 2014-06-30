@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Globalization;
 using Watch.Toolkit.Hardware.Arduino;
-using Watch.Toolkit.Input.Recognizers;
+using Watch.Toolkit.Processing.MachineLearning;
+using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
-using Watch.Toolkit.Sensors.MachineLearning;
 
 namespace Watch.Toolkit.Input.Tracker
 {
@@ -14,22 +14,39 @@ namespace Watch.Toolkit.Input.Tracker
         private readonly DtwRecognizer _dtwRecognizer = new DtwRecognizer();
         private readonly Accelerometer _accelerometer = new Accelerometer();
         private TreeClassifier _classifier;
+        private DtwClassifier _dtwClassifier;
 
         private string _lastDetection = "";
         private double _lastDetectionCost;
         private int _lastDetectedClassification;
 
         public event EventHandler<AccelerometerDataReceivedEventArgs> AccelerometerDataReceived = delegate { };
+        private List<string> _labels; 
+        public TrackerManager(List<string> labels)
+        {
+            _labels = labels;
+        }
+
         public void Start()
         {
+            // new List<string> { "Right", "Left Index", "Left Knuckle" }
+            _classifier = new TreeClassifier(
+                AppDomain.CurrentDomain.BaseDirectory + "recording3.log", 3, _labels);
+
+            _dtwClassifier = new DtwClassifier(
+                AppDomain.CurrentDomain.BaseDirectory + "recording3.log", 3, _labels);
+
+            _classifier.Run(MachineLearningAlgorithm.Id3);
+
+            _dtwClassifier.Run();
+
             _arduino.MessageReceived += _arduino_MessageReceived;
             _arduino.Start();
+        }
 
-            //_classifier = new TreeClassifier(
-            //   AppDomain.CurrentDomain.BaseDirectory + "recording3.log", 3);
-            //_classifier.Run(MachineLearningAlgorithm.Id3);
-
-   
+        public string GetLabel()
+        {
+            return "";
         }
 
         void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
@@ -52,9 +69,9 @@ namespace Watch.Toolkit.Input.Tracker
 
             AccelerometerDataReceived(this,new AccelerometerDataReceivedEventArgs(_accelerometer));
 
-            var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometer.RawData);
+            var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometer.RawValues.RawData);
             _lastDetection = result.Item1;
-            var computedLabel = _classifier.ComputeValue(_accelerometer.RawData);
+            var computedLabel = _classifier.ComputeValue(_accelerometer.RawValues.RawData);
             _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
         }
         public void Stop()

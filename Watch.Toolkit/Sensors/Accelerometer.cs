@@ -1,56 +1,51 @@
-﻿namespace Watch.Toolkit.Sensors
+﻿using System;
+
+namespace Watch.Toolkit.Sensors
 {
     public class Accelerometer:ISimpleSensor
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
-        public double Fx { get; set; }
-        public double Fy { get; set; }
-        public double Fz { get; set; }
+        private Vector _storedValues;
 
-        public double Px { get; set; }
-        public double Py { get; set; }
-        public double Pz { get; set; }
-
+        public Vector RawValues { get; set; }
+        public Vector FilteredValues { get; set; }
+        public Vector DistanceValues { get; set; }
         public double Roll { get; set; }
         public double Pitch { get; set; }
 
-        public double[] RawData
-        {
-            get { return new [] { X, Y, Z }; }
-        }
-
-        public double[] RawFilteredData
-        {
-            get { return new [] { Fx, Fy, Fz }; }
-        }
-
         public void Update(double x, double y, double z,double fx, double fy, double fz,double roll, double pitch)
         {
-            X = x;
-            Y = y;
-            Z = z;
-            Fx = fx;
-            Fy = fy;
-            Fz = fz;
+            RawValues =  new Vector(x,y,z);
+            FilteredValues =  new Vector(fx,fy,fz);
             Roll = roll;
             Pitch = pitch;
+
+            CalculateDistance();
         }
 
-        public override string ToString()
+        private void CalculateDistance()
         {
-            return "X: " + X + " Y: " + Y + " Z: " + Z;
+            if (_storedValues == null)
+                _storedValues = FilteredValues;
+            DistanceValues = _storedValues.ComputeDistance(FilteredValues, 50);
+            _storedValues = FilteredValues;
         }
+
         public string ToFormattedString()
         {
-            return "X: " + X + "\nfX: " + Fx + "\nY: " + Y + "\nfY: " + Fy +"\nZ: " + Z
-                +"\nfZ: " + Fz +"\nRoll: "+Roll + "\nPitch: "+Pitch;
+            return "X: " + 
+                RawValues.X + "\nfX: " + 
+                FilteredValues.X + "\nY: " + 
+                RawValues.Y + "\nfY: " + 
+                FilteredValues.Y +"\nZ: " +
+                RawValues.Z +"\nfZ: " + 
+                FilteredValues.Z +"\nRoll: "
+                +Roll + "\nPitch: "
+                +Pitch;
         }
 
         public string Name { get; set; }
         public int Id { get; set; }
         public double Value { get; set; }
-    }
-    
-}
+
+     }
+ }

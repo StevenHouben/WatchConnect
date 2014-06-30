@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Watch.Toolkit.Sensors.Dtw
+﻿namespace Watch.Toolkit.Processing.Dtw
 {
     public enum DistanceMeasure
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Watch.Toolkit.Sensors.Dtw
+namespace Watch.Toolkit.Processing.Dtw
 {
     public interface IDtw
     {

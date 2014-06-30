@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Timers;
-using Accord.MachineLearning.DecisionTrees;
-using Accord.MachineLearning.DecisionTrees.Learning;
-using Accord.Math;
-using Accord.Statistics.Filters;
+using Microsoft.Win32;
 using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Sensors;
 
@@ -22,8 +18,11 @@ namespace Watch.Toolkit.Utils
         {
             InitializeComponent();
 
+            InitializeLabelBox();
+
             BtnStart.Click += BtnStart_Click;
             BtnStop.Click += BtnStop_Click;
+            BtnPause.Click += BtnPause_Click;
             var arduino = new Arduino();
             arduino.MessageReceived += arduino_MessageReceived;
             _recorder.Elapsed += _recorder_Elapsed;
@@ -31,25 +30,55 @@ namespace Watch.Toolkit.Utils
 
         }
 
+        void BtnPause_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (_recorder.Enabled)
+            {
+                _recorder.Stop();
+                BtnPause.Content = "Resume Recording";
+            }
+            else
+            {
+                _recorder.Start();
+                BtnPause.Content = "Pause Recording";
+            }
+        }
+        private void InitializeLabelBox()
+        {
+            for (var i = 0; i < 100; i++)
+                CbLabel.Items.Add(i);
+            CbLabel.Text = "0";
+        }
+
         void BtnStop_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-           Save(TxtFileName.Text);
+            var dlg = new SaveFileDialog
+            {
+                FileName = "Recording"+Guid.NewGuid(),
+                DefaultExt = ".log",
+                Filter = "Log (.log)|*.log"
+            };
 
+             var result = dlg.ShowDialog();
+
+            if (result == true)
+            {
+                Save(dlg.FileName);
+            }
         }
 
         void BtnStart_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            AddPoint(Convert.ToInt32(TxtLabel.Text));
             _recorder.Start();
         }
 
         void _recorder_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(() => AddPoint(Convert.ToInt32(TxtLabel.Text)));
+            Dispatcher.Invoke(() => AddPoint(Convert.ToInt32(CbLabel.Text)));
             
         }
 
-        void arduino_MessageReceived(object sender, Watch.Toolkit.Hardware.MessagesReceivedEventArgs e)
+        void arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
         {
             try
             {
@@ -76,54 +105,26 @@ namespace Watch.Toolkit.Utils
 
         public void AddPoint(int label)
         {
-            _logger.AppendLine(_accelerometer.X + "," + _accelerometer.Y + "," + _accelerometer.Z + "," + label);
-            ListBox.Items.Add(_accelerometer.ToString());
+            _logger.AppendLine((
+                int)_accelerometer.FilteredValues.X + "," + 
+                (int)_accelerometer.FilteredValues.Y + "," + 
+                (int)_accelerometer.FilteredValues.Z + "," + label);
 
+            ListBox.Items.Add(
+                (int)_accelerometer.FilteredValues.X + "," + 
+                (int)_accelerometer.FilteredValues.Y + "," + 
+                (int)_accelerometer.FilteredValues.Z + "," + label);
         }
 
         public void Save(string name)
         {
             _recorder.Stop();
-            File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory +"/Logs/"+ name+".log", _logger.ToString());
+
+            if (!File.Exists(name))
+                File.AppendAllText(name, "X,Y,Z,LABEL\n");
+            File.AppendAllText(name, _logger.ToString());
             _logger.Clear();
             ListBox.Items.Clear();
-        }
-        public void Compute()
-        {
-            var data = new DataTable("Mitchell's Tennis Example");
-            data.Columns.Add("x", typeof(double));
-            data.Columns.Add("y", typeof(double));
-            data.Columns.Add("z", typeof(double));
-
-            var codebook = new Codification(data);
-
-            DecisionVariable[] attributes =
-            {
-                new DecisionVariable("Outlook",   3), // 3 possible values (Sunny, overcast, rain)
-                new DecisionVariable("Temperature", 3), // 3 possible values (Hot, mild, cool)  
-                new DecisionVariable("Humidity",    2), // 2 possible values (High, normal)    
-                new DecisionVariable("Wind",        2)  // 2 possible values (Weak, strong) 
-            };
-
-            var classCount = 2; // 2 possible output values for playing tennis: yes or no
-
-            var tree = new DecisionTree(attributes, classCount);
-
-            var id3Learning = new ID3Learning(tree);
-
-            // Translate our training data into integer symbols using our codebook:
-            DataTable symbols = codebook.Apply(data);
-            int[][] inputs = symbols.ToIntArray("Outlook", "Temperature", "Humidity", "Wind");
-            int[] outputs = symbols.ToIntArray("PlayTennis").GetColumn(0);
-
-            // Learn the training instances!
-            id3Learning.Run(inputs, outputs);
-
-            // Convert to an expression tree
-            var expression = tree.ToExpression();
-
-            // Compiles the expression to IL
-            var func = expression.Compile();
         }
     }
 }

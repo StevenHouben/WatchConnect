@@ -7,6 +7,7 @@ ADXL362 xl;
 int16_t temp;
 int16_t x, y, z, t;
 
+long X,Y,Z;
 
 long xy_max = 470;
 long xy_min = 550;
@@ -28,41 +29,31 @@ void loop(){
     
   xl.readXYZTData(x, y, z, t);  
   
-   //Low Pass Filter
-    fXg = x * alpha + (fXg * (1.0 - alpha));
-    fYg = y* alpha + (fYg * (1.0 - alpha));
-    fZg = z * alpha + (fZg * (1.0 - alpha));
-    //Roll & Pitch Equations
-    double pitch = (atan2(-fYg, fZg) * 180.0) / 3.14;
-    double roll = (atan2(fXg, sqrt(fYg * fYg + fZg * fZg)) * 180.0) / 3.14;
-    pitch = (pitch >= 0) ? (180 - pitch) : (-pitch - 180);
+  X = map(x, -2048, 2048, 0, 1);
+  Y = map(y, -2048, 2048, 0, 1);
+  Z = map(z, -2048, 2048, 0, 1);
   
-  if(x>xMax) xMax = x;
-  if(x<xMin) xMin = x;
-  
-  if(y>yMax) yMax = y;
-  if(y<yMin) yMin = y;
-//  
-  if(z>zMax) zMax = z;
-  if(z<zMin) zMin = z;
- 
- Serial.print(x);
- Serial.print("|");
- Serial.print(y);
- Serial.print("|");
- Serial.print(z);
- Serial.print("|");
- Serial.print(fXg);
- Serial.print("|");
- Serial.print(fYg);
- Serial.print("|");
- Serial.print(fZg);
-  Serial.print("|");
- Serial.print(pitch);
- Serial.print("|");
- Serial.print(roll);
- Serial.print("#");   
+  //convert read values to degrees -90 to 90 - Needed for atan2
+//  int xAng = map(x, -2048, 2048, -90, 90);
+//  int yAng = map(y, -2048, 2048, -90, 90);
+//  int zAng = map(z, -2048, 2048, -90, 90);
 
-delay(0); 
+  //Caculate 360deg values like so: atan2(-yAng, -zAng)
+  //atan2 outputs the value of -π to π (radians)
+  //We are then converting the radians to degrees
+//  x = RAD_TO_DEG * (atan2(-yAng, -zAng) + PI);
+//  y = RAD_TO_DEG * (atan2(-xAng, -zAng) + PI);
+//  z = RAD_TO_DEG * (atan2(-yAng, -xAng) + PI);
+
+  //Output the caculations
+  Serial.print("x: ");
+  Serial.print(X);
+  Serial.print(" | y: ");
+  Serial.print(Y);
+  Serial.print(" | z: ");
+  Serial.println(Z);
+
+  delay(150);//just here to slow down the serial output - Easier to read
+
 }
 

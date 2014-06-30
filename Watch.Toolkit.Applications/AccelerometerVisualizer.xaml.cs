@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using GestureTouch;
 using Watch.Toolkit.Hardware.Arduino;
+using Watch.Toolkit.Processing.MachineLearning;
 using Watch.Toolkit.Sensors;
-using Watch.Toolkit.Sensors.MachineLearning;
 
 namespace Watch.Toolkit.Applications
 {
@@ -19,22 +20,31 @@ namespace Watch.Toolkit.Applications
         private string _lastDetection = "";
         private double _lastDetectionCost;
         private int _lastDetectedClassification;
-        private int _aX, _aY, _aZ;
-        private int _pX, _pY, _pZ;
+
+        public Dictionary<string, int> LabelClassifierLookUpTable = new Dictionary<string, int>(); 
 
         public MainWindow()
         {
             InitializeComponent();
 
             _classifier = new TreeClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording3.log",3, new List<string>{"Right","Left Index","Left Knuckle"});
+                AppDomain.CurrentDomain.BaseDirectory + "recording6.log", 5, new List<string> { "Normal Mode", "Left Index", "Left Knuckle", "Flat hand", "Touch hand", "Flat hand" });
 
             _dtwClassifier = new DtwClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording3.log", 3, new List<string>{"Right","Left Index","Left Knuckle"});
+                AppDomain.CurrentDomain.BaseDirectory + "recording6.log", 5, new List<string> { "Normal Mode", "Left Index", "Left Knuckle", "Touch hand", "Flat hand"});
 
             _classifier.Run(MachineLearningAlgorithm.Id3);
 
+            LabelClassifierLookUpTable.Add("Right",0);
+            LabelClassifierLookUpTable.Add("Left Index", 1);
+            LabelClassifierLookUpTable.Add("Left Knuckle", 2);
+
             _dtwClassifier.Run();
+
+            foreach (var template in _dtwClassifier.GetTemplates())
+            {
+                listGesture.Items.Add(template.Key + " - " + String.Join(",", template.Value.Select(p => p.ToString()).ToArray()));
+            }
 
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
@@ -48,7 +58,7 @@ namespace Watch.Toolkit.Applications
             arduino.Start();
 
             cbGestureList.ItemsSource = 
-                new List<string> { "Right", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
+                new List<string> { "None", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
 
             cbGestureList.SelectedIndex = 0;
 
@@ -58,12 +68,7 @@ namespace Watch.Toolkit.Applications
 
         void TouchVisualizer_GestureTouchMove(object sender, GestureTouchEventArgs e)
         {
-            var avg = (_aX + _aY + _aZ)/1.5;
-            //var inRange = (_lastDetectionCost < 650);
-            var isTouching = _lastDetectedClassification;
-            if(LabelClassifierLookUpTable.ContainsKey(_lastDetection))
-                Label.Content =  isTouching == LabelClassifierLookUpTable[_lastDetection] ? _lastDetection : "Right Hand";
-            Label.Content = _lastDetection;
+            
         }
 
         void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -74,7 +79,11 @@ namespace Watch.Toolkit.Applications
 
         void TouchVisualizer_GestureTouchDown(object sender, GestureTouchEventArgs e)
         {
-            
+            var avg = (_accelerometer.DistanceValues.Sum()) / 1.5;
+            var touch = _accelerometer.DistanceValues.Sum() > 1.5;
+            var inRange = (_lastDetectionCost < 1000);
+            var isTouching = _lastDetectedClassification;
+            Label.Content = inRange ? _lastDetection : "Normal Mode";
           
         }
 
@@ -83,7 +92,7 @@ namespace Watch.Toolkit.Applications
             Label.Content = "";
         }
 
-        void arduino_MessageReceived(object sender, Watch.Toolkit.Hardware.MessagesReceivedEventArgs e)
+        void arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
         {
             try
             {
@@ -93,35 +102,43 @@ namespace Watch.Toolkit.Applications
 
                 if (data.Length != 9) return;
 
-                _accelerometer.Update(
-                    Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
-                    Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
-                    Convert.ToDouble(data[3], CultureInfo.InvariantCulture),
-                    Convert.ToDouble(data[4], CultureInfo.InvariantCulture),
-                    Convert.ToDouble(data[5], CultureInfo.InvariantCulture),
-                    Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
-                    Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
-                    Convert.ToDouble(data[8], CultureInfo.InvariantCulture));
-                    var result = _dtwClassifier.ComputeLabelAndCosts(_accelerometer.RawData);
-                    _lastDetection = result.Item1;
-                    var computedLabel = _classifier.ComputeValue(_accelerometer.RawData);
-                    _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
+                try
+                {
+                    _accelerometer.Update(
+                   Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[3], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[4], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[5], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[8], CultureInfo.InvariantCulture));
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+               
+                var result = _dtwClassifier.ComputeLabelAndCosts(_accelerometer.RawValues.RawData);
+                _lastDetection = result.Item1;
 
-                    Dispatcher.Invoke(() =>
+                var computedLabel = _classifier.ComputeValue(_accelerometer.RawValues.RawData);
+                _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
+
+                Dispatcher.Invoke(() =>
+                {
+                    lblRaw.Content = _accelerometer.ToFormattedString();
+                    lblDTW.Content = "";
+
+                    lblDT.Content = _lastDetectedClassification;
+
+                    foreach (var item in result.Item2)
                     {
-                        lblRaw.Content = _accelerometer.ToFormattedString();
-                        lblDTW.Content = "";
-                        lblDT.Content = _lastDetectedClassification;
-                        foreach (var item in result.Item2)
-                        {
-                            lblDTW.Content += item.Key + " " + item.Value + "\n";
-                            if (item.Key == result.Item1)
-                                _lastDetectionCost = item.Value;
-                        }
-                    });
-
-                    CalculateDistance(_accelerometer);
-
+                        lblDTW.Content += item.Key + " " + item.Value + "\n";
+                        if (item.Key == result.Item1)
+                            _lastDetectionCost = item.Value;
+                    }
+                });
             }
             catch (Exception)
             {
@@ -129,32 +146,13 @@ namespace Watch.Toolkit.Applications
             }
         }
 
-        private void CalculateDistance(Accelerometer accelerometerData)
-        {
-            if (_pX == 0)
-                _pX = (int)accelerometerData.Fx;
-            if (_pY == 0)
-                _pY = (int)accelerometerData.Fy;
-            if (_pZ == 0)
-                _pZ = (int)accelerometerData.Fz;
-
-            _aX = Math.Abs((int)((Math.Abs(_pX) - Math.Abs(accelerometerData.Fx))/50));
-            _aY = Math.Abs((int)((Math.Abs(_pY) - Math.Abs(accelerometerData.Fy))/50));
-            _aZ = Math.Abs((int)((Math.Abs(_pZ) - Math.Abs(accelerometerData.Fz))/50));
-
-            _pX = (int)accelerometerData.Fx;
-            _pY = (int)accelerometerData.Fy;
-            _pZ = (int)accelerometerData.Fz;
-
-        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             listGesture.Items.Add(cbGestureList.Text + " " + _accelerometer);
-            LabelClassifierLookUpTable.Add(cbGestureList.Text,_lastDetectedClassification);
-            _dtwClassifier.AddTemplate(cbGestureList.Text,_accelerometer.RawData);
+            _dtwClassifier.AddTemplate(cbGestureList.Text,_accelerometer.RawValues.RawData);
 
             cbGestureList.SelectedIndex++;
         }
-        public Dictionary<string,int> LabelClassifierLookUpTable = new Dictionary<string, int>(); 
+
     }
 }

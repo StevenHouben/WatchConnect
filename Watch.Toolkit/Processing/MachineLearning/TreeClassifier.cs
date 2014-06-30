@@ -6,7 +6,7 @@ using Accord.MachineLearning.DecisionTrees.Learning;
 using Accord.Math;
 using AForge;
 
-namespace Watch.Toolkit.Sensors.MachineLearning
+namespace Watch.Toolkit.Processing.MachineLearning
 {
     public class TreeClassifier
     {

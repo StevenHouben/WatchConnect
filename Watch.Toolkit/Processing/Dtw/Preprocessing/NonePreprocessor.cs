@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Watch.Toolkit.Sensors.Dtw.Preprocessing
+﻿namespace Watch.Toolkit.Processing.Dtw.Preprocessing
 {
     public class NonePreprocessor : IPreprocessor
     {

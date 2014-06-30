@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Watch.Toolkit.Sensors.Dtw;
+using Watch.Toolkit.Processing.Dtw;
 
-namespace Watch.Toolkit.Input.Recognizers
+namespace Watch.Toolkit.Processing.Recognizers
 {
     public class MultiDtwRecoginizer
     {
@@ -25,7 +25,7 @@ namespace Watch.Toolkit.Input.Recognizers
             var cost = Double.MaxValue;
             foreach (var template in _templates)
             {
-                var newCost = new Dtw(new [] { template.Value, new SeriesVariable(x, y) }).GetCost();
+                var newCost = new Dtw.Dtw(new [] { template.Value, new SeriesVariable(x, y) }).GetCost();
                 Console.WriteLine(template.Key + " -> "+ newCost);
                 if (!(newCost < cost)) continue;
                 cost = newCost;

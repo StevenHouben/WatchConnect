@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Watch.Toolkit.Sensors.Dtw
+namespace Watch.Toolkit.Processing.Dtw
 {
     public class Dtw : IDtw
     {

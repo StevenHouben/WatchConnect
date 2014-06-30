@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Watch.Toolkit.Input.Recognizers
+namespace Watch.Toolkit.Processing.Recognizers
 {
     public class HmqRecognizer
     {

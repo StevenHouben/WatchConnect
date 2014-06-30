@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-namespace Watch.Toolkit.Input.Recognizers
+namespace Watch.Toolkit.Processing.Recognizers
 {
     public class Template
     {

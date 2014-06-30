@@ -1,4 +1,4 @@
-﻿namespace Watch.Toolkit.Input
+﻿namespace Watch.Toolkit.Input.Gestures
 {
     public enum Gesture
     {

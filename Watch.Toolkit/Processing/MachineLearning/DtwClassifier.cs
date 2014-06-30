@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Watch.Toolkit.Input.Recognizers;
+using Watch.Toolkit.Processing.Recognizers;
 
-namespace Watch.Toolkit.Sensors.MachineLearning
+namespace Watch.Toolkit.Processing.MachineLearning
 {
     public class DtwClassifier
     {
@@ -18,7 +18,11 @@ namespace Watch.Toolkit.Sensors.MachineLearning
             _data = Helper.ReadCsvToDataTable(filePath);
             _classes = classes;
             _classLabels = classLabels;
+        }
 
+        public Dictionary<string, double[]> GetTemplates()
+        {
+            return _recognizer.Templates;
         }
 
         public void AddTemplate(string label,double[] template)
@@ -27,7 +31,7 @@ namespace Watch.Toolkit.Sensors.MachineLearning
         }
         public void Run()
         {
-            GenerateTemlates();
+            GenerateTemplates();
         }
 
         public string ComputeLabel(double[] input)
@@ -45,17 +49,21 @@ namespace Watch.Toolkit.Sensors.MachineLearning
             return _recognizer.ComputeClosestLabelAndCosts(input);
         }
 
-        private void GenerateTemlates()
+        private void GenerateTemplates()
         {
             for (var i = 0; i < _classes; i++)
             {
                 double x = 0, y = 0, z = 0;
                 var labeledData = _data.Select("LABEL =" + i).ToArray();
+                if(labeledData.Length == 0)
+                    throw new InvalidOperationException("The label - "+ i + " - was not found in the datatable." +
+                                                        " This can be caused by indicating a wrong number of class labels or" +
+                                                        " loading a malformed csv file.");
                 foreach (var dataPoint in labeledData)
                 {
-                    x += Convert.ToDouble(dataPoint.ItemArray[0]);
-                    y += Convert.ToDouble(dataPoint.ItemArray[1]);
-                    z += Convert.ToDouble(dataPoint.ItemArray[2]);
+                    x += Convert.ToInt32(dataPoint.ItemArray[0]);
+                    y += Convert.ToInt32(dataPoint.ItemArray[1]);
+                    z += Convert.ToInt32(dataPoint.ItemArray[2]);
                 }
 
                 _recognizer.AddTemplate(_classLabels[i],

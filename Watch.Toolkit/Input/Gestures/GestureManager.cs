@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Timers;
 using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Hardware.Phidget;
-using Watch.Toolkit.Input.Recognizers;
+using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
 
 namespace Watch.Toolkit.Input.Gestures
