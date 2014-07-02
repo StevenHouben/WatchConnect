@@ -61,9 +61,9 @@ namespace Watch.Toolkit.Processing.MachineLearning
                                                         " loading a malformed csv file.");
                 foreach (var dataPoint in labeledData)
                 {
-                    x += Convert.ToInt32(dataPoint.ItemArray[0]);
-                    y += Convert.ToInt32(dataPoint.ItemArray[1]);
-                    z += Convert.ToInt32(dataPoint.ItemArray[2]);
+                    x += Convert.ToDouble(dataPoint.ItemArray[0]);
+                    y += Convert.ToDouble(dataPoint.ItemArray[1]);
+                    z += Convert.ToDouble(dataPoint.ItemArray[2]);
                 }
 
                 _recognizer.AddTemplate(_classLabels[i],

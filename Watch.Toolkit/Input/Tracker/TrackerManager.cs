@@ -55,7 +55,7 @@ namespace Watch.Toolkit.Input.Tracker
                 return;
             var data = e.Message.Split(',');
 
-            if (data.Length != 9) return;
+            if (data.Length != 11) return;
 
             _accelerometer.Update(
                 Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
@@ -65,13 +65,15 @@ namespace Watch.Toolkit.Input.Tracker
                 Convert.ToDouble(data[5], CultureInfo.InvariantCulture),
                 Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
                 Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[8], CultureInfo.InvariantCulture));
+                Convert.ToDouble(data[8], CultureInfo.InvariantCulture),
+                Convert.ToDouble(data[9], CultureInfo.InvariantCulture),
+                Convert.ToDouble(data[10], CultureInfo.InvariantCulture));
 
             AccelerometerDataReceived(this,new AccelerometerDataReceivedEventArgs(_accelerometer));
 
-            var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometer.RawValues.RawData);
+            var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometer.FilteredValues.RawData);
             _lastDetection = result.Item1;
-            var computedLabel = _classifier.ComputeValue(_accelerometer.RawValues.RawData);
+            var computedLabel = _classifier.ComputeValue(_accelerometer.FilteredValues.RawData);
             _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
         }
         public void Stop()

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using GestureTouch;
 using Watch.Toolkit.Hardware.Arduino;
@@ -18,6 +20,7 @@ namespace Watch.Toolkit.Applications
         private readonly DtwClassifier _dtwClassifier;
 
         private string _lastDetection = "";
+        private string _lastDetectedClassificationLabel;
         private double _lastDetectionCost;
         private int _lastDetectedClassification;
 
@@ -28,12 +31,12 @@ namespace Watch.Toolkit.Applications
             InitializeComponent();
 
             _classifier = new TreeClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording6.log", 5, new List<string> { "Normal Mode", "Left Index", "Left Knuckle", "Flat hand", "Touch hand", "Flat hand" });
+                AppDomain.CurrentDomain.BaseDirectory + "recording9.log", 3, new List<string> { "Normal Mode", "Left Index", "Left Knuckle"});
 
             _dtwClassifier = new DtwClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording6.log", 5, new List<string> { "Normal Mode", "Left Index", "Left Knuckle", "Touch hand", "Flat hand"});
+                AppDomain.CurrentDomain.BaseDirectory + "recording9.log", 3, new List<string> { "Normal Mode", "Left Index", "Left Knuckle"});
 
-            _classifier.Run(MachineLearningAlgorithm.Id3);
+            _classifier.Run(MachineLearningAlgorithm.C45);
 
             LabelClassifierLookUpTable.Add("Right",0);
             LabelClassifierLookUpTable.Add("Left Index", 1);
@@ -73,8 +76,15 @@ namespace Watch.Toolkit.Applications
 
         void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Escape)
+            if (e.Key == Key.Escape)
+            {
+                foreach (string item in listGesture.Items)
+                {
+                    File.AppendAllText("log.log", item+"\n");
+                }
                 Environment.Exit(0);
+            }
+
         }
 
         void TouchVisualizer_GestureTouchDown(object sender, GestureTouchEventArgs e)
@@ -83,8 +93,9 @@ namespace Watch.Toolkit.Applications
             var touch = _accelerometer.DistanceValues.Sum() > 1.5;
             var inRange = (_lastDetectionCost < 1000);
             var isTouching = _lastDetectedClassification;
-            Label.Content = inRange ? _lastDetection : "Normal Mode";
-          
+            //Label.Content = inRange ? _lastDetection : "Normal Mode";
+            Label.Content = _lastDetectedClassificationLabel;
+
         }
 
         void MainWindow_GestureTouchUp(object sender, GestureTouchEventArgs e)
@@ -100,7 +111,7 @@ namespace Watch.Toolkit.Applications
                     return;
                 var data = e.Message.Split(',');
 
-                if (data.Length != 9) return;
+                if (data.Length != 11) return;
 
                 try
                 {
@@ -112,18 +123,21 @@ namespace Watch.Toolkit.Applications
                    Convert.ToDouble(data[5], CultureInfo.InvariantCulture),
                    Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
                    Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[8], CultureInfo.InvariantCulture));
+                   Convert.ToDouble(data[8], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[9], CultureInfo.InvariantCulture),
+                   Convert.ToDouble(data[10], CultureInfo.InvariantCulture));
                 }
                 catch (Exception)
                 {
                     return;
                 }
                
-                var result = _dtwClassifier.ComputeLabelAndCosts(_accelerometer.RawValues.RawData);
+                var result = _dtwClassifier.ComputeLabelAndCosts(_accelerometer.FilteredValues.RawData);
                 _lastDetection = result.Item1;
 
-                var computedLabel = _classifier.ComputeValue(_accelerometer.RawValues.RawData);
+                var computedLabel = _classifier.ComputeValue(_accelerometer.FilteredValues.RawData);
                 _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
+                _lastDetectedClassificationLabel = _classifier.ComputeLabel(_accelerometer.FilteredValues.RawData); ;
 
                 Dispatcher.Invoke(() =>
                 {
@@ -148,8 +162,8 @@ namespace Watch.Toolkit.Applications
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            listGesture.Items.Add(cbGestureList.Text + " " + _accelerometer);
-            _dtwClassifier.AddTemplate(cbGestureList.Text,_accelerometer.RawValues.RawData);
+            listGesture.Items.Add(cbGestureList.Text + " " + _accelerometer.FilteredValues);
+            _dtwClassifier.AddTemplate(cbGestureList.Text,_accelerometer.FilteredValues.RawData);
 
             cbGestureList.SelectedIndex++;
         }

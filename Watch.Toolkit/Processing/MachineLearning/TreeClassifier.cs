@@ -43,9 +43,9 @@ namespace Watch.Toolkit.Processing.MachineLearning
         {
             DecisionVariable[] attributes =
             {
-                new DecisionVariable("X",new IntRange(-2500,2500)), 
-                new DecisionVariable("Y",new IntRange(-2500,2500)),
-                new DecisionVariable("Z",new IntRange(-2500,2500)) 
+                new DecisionVariable("X",new DoubleRange(-180,180)), 
+                new DecisionVariable("Y",new DoubleRange(-180,180)),
+                new DecisionVariable("Z",new DoubleRange(-180,180)) 
             };
 
             _tree = new DecisionTree(attributes, _classes);

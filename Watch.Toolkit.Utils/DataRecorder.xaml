@@ -1,14 +1,45 @@
 ﻿<Window x:Class="Watch.Toolkit.Utils.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="438.358" Width="809.179">
+        Title="MainWindow" Height="600" Width="800">
     <Grid>
-        <Button x:Name="BtnStart" FontSize="20" Content="Start Recording" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="232" Height="44"/>
-        <Button x:Name="BtnStop" FontSize="20" Content="Stop and Save" HorizontalAlignment="Left" Margin="10,108,0,0" VerticalAlignment="Top" Width="232" Height="44"/>
-        <ListBox x:Name="ListBox" HorizontalAlignment="Left" Height="389" Margin="267,10,0,0" VerticalAlignment="Top" Width="525"/>
-        <Label FontSize="20" Content="Label" HorizontalAlignment="Left" Margin="10,172,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="CbLabel" FontSize="20" HorizontalAlignment="Left" Margin="86,178,0,0" VerticalAlignment="Top" Width="156">
-        </ComboBox>
-        <Button x:Name="BtnPause" FontSize="20" Content="Pause Recording" HorizontalAlignment="Left" Margin="10,59,0,0" VerticalAlignment="Top" Width="232" Height="44"/>
+        <DockPanel LastChildFill="True" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <StackPanel Background="Black" HorizontalAlignment="Stretch" VerticalAlignment="Top" Orientation="Horizontal" Height="47" DockPanel.Dock="Top" Margin="0,0,0.4,0">
+                <Button Background="White" x:Name="BtnStart" FontSize="20" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="30" Height="30">
+                    <Image Source="Images/play.png"></Image>
+                </Button>
+                <Button Background="White" x:Name="BtnPause" FontSize="20" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="30" Height="30">
+                    <Image Source="Images/pause.png"></Image>
+                </Button>
+                <Button Background="White" x:Name="BtnStop" FontSize="20" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="30" Height="30">
+                    <Image Source="Images/stop.png"></Image>
+                </Button>
+                <Label Padding="10" Content="Sample Rate" FontSize="20" Foreground="White" VerticalAlignment="Center"></Label>
+                <TextBox x:Name="TxTSampleRate" Height="27" TextWrapping="Wrap" Text="500" VerticalAlignment="Top" Width="73" FontSize="20" Margin="10,10,10,0"></TextBox>
+                <Label Content="Label" FontSize="20" Foreground="White" VerticalAlignment="Center">
+                </Label>
+                <ComboBox x:Name="CbLabel" VerticalContentAlignment="Center" Width="100" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                </ComboBox>
+                <Label Content="Data" FontSize="20" Foreground="White" VerticalAlignment="Center">
+                </Label>
+                <ComboBox x:Name="CbData" VerticalContentAlignment="Center" Width="184" FontSize="16" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,8,0,7.2">
+                </ComboBox>
+
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" >
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Width="250">
+                    <Label FontWeight="Bold" FontSize="20" Content="Raw Data" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+                    <Label x:Name="LblData" FontSize="20" Content="Label" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+
+                </StackPanel>
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"> 
+                    <ListBox x:Name="ListBox" HorizontalAlignment="Left" Height="521" HorizontalContentAlignment="Stretch" VerticalAlignment="Stretch" Width="543"/>
+                </StackPanel>
+            </StackPanel>
+        </DockPanel>
+
+
+
+
     </Grid>
 </Window>

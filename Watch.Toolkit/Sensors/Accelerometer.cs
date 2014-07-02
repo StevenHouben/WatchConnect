@@ -1,23 +1,23 @@
 ﻿using System;
+using System.Security.Permissions;
 
 namespace Watch.Toolkit.Sensors
 {
     public class Accelerometer:ISimpleSensor
     {
         private Vector _storedValues;
-
-        public Vector RawValues { get; set; }
+        public double Delta { get; private set; }
+        public Vector RawGyroValue { get; set; }
+        public Vector RawAccelerometerValues{ get; set; }
         public Vector FilteredValues { get; set; }
         public Vector DistanceValues { get; set; }
-        public double Roll { get; set; }
-        public double Pitch { get; set; }
 
-        public void Update(double x, double y, double z,double fx, double fy, double fz,double roll, double pitch)
+        public void Update(double delta, double accX, double accY, double accZ,double gyrX, double gyrY, double gyrZ,double filX,double filY, double filZ)
         {
-            RawValues =  new Vector(x,y,z);
-            FilteredValues =  new Vector(fx,fy,fz);
-            Roll = roll;
-            Pitch = pitch;
+            Delta = delta;
+            RawAccelerometerValues = new Vector(accX, accY, accZ);
+            RawGyroValue = new Vector(gyrX,gyrY,gyrZ);
+            FilteredValues =  new Vector(filX,filY,filZ);
 
             CalculateDistance();
         }
@@ -32,15 +32,15 @@ namespace Watch.Toolkit.Sensors
 
         public string ToFormattedString()
         {
-            return "X: " + 
-                RawValues.X + "\nfX: " + 
-                FilteredValues.X + "\nY: " + 
-                RawValues.Y + "\nfY: " + 
-                FilteredValues.Y +"\nZ: " +
-                RawValues.Z +"\nfZ: " + 
-                FilteredValues.Z +"\nRoll: "
-                +Roll + "\nPitch: "
-                +Pitch;
+            return "X: " + FilteredValues.X +
+                   "\nY: " + FilteredValues.Y +
+                   "\nZ: " + FilteredValues.Z +
+                   "\nAccX: " + RawAccelerometerValues.X +
+                   "\nAccY: " + RawAccelerometerValues.Y +
+                   "\nAccZ:" + RawAccelerometerValues.Z +
+                   "\nGyrX: " + RawGyroValue.X +
+                   "\nGyrY: " + RawGyroValue.Y +
+                   "\nGyrZ: " + RawGyroValue.Z;
         }
 
         public string Name { get; set; }
