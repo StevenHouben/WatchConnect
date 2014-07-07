@@ -1,6 +1,4 @@
-﻿using Watch.Toolkit.Sensors;
-
-namespace Watch.Toolkit.Input.Tracker
+﻿namespace Watch.Toolkit.Sensors
 {
     public class AccelerometerDataReceivedEventArgs
     {

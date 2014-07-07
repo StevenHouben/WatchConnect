@@ -8,7 +8,7 @@ namespace Watch.Toolkit.Hardware.Arduino
         public string Port { get; private set; }
         public string ReadData { get; private set; }
 
-        private const int BaudRate = 9600;
+        private const int BaudRate = 115200;
 
         private SafeSerialPort _serialPort;
         private string _output;
@@ -47,6 +47,8 @@ namespace Watch.Toolkit.Hardware.Arduino
                 _serialPort = null;
                 _serialPort = new SafeSerialPort(portname, BaudRate);
                 _serialPort.DataReceived += serialPort_DataReceived;
+                _serialPort.PinChanged += _serialPort_PinChanged;
+                _serialPort.ErrorReceived += _serialPort_ErrorReceived;
                 _serialPort.Open();
 
                 Console.WriteLine("Found device at: " + portname);
@@ -56,6 +58,16 @@ namespace Watch.Toolkit.Hardware.Arduino
                 Console.WriteLine("NOT connected to: " + portname);
                 Console.WriteLine(ex.ToString());
             }
+        }
+
+        void _serialPort_ErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        void _serialPort_PinChanged(object sender, SerialPinChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)

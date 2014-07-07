@@ -12,7 +12,6 @@ namespace Watch.Toolkit.Sensors
             Y = y;
             Z = z;
         }
-
         public double[] RawData
         {
             get { return new[] { X, Y, Z }; }

@@ -13,7 +13,7 @@ namespace Watch.Toolkit
             File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + fileName, data.ToString());
         }
 
-        public static DataTable ReadCsvToDataTable(string filePath)
+        public static DataTable ReadCsvToDataTable(string filePath,char splitter)
         {
             var filename = filePath;
 
@@ -24,13 +24,13 @@ namespace Watch.Toolkit
 
             var data = new DataTable();
 
-            var headers = reader.First().Split(',');
+            var headers = reader.First().Split(splitter);
             foreach (var header in headers)
                 data.Columns.Add(header);
 
             var records = reader.Skip(1);
             foreach (var record in records.Where(record => record != null))
-                data.Rows.Add(record.Split(','));
+                data.Rows.Add(record.Split(splitter));
             return data;
         }
     }

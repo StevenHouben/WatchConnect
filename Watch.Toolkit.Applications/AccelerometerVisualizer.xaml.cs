@@ -1,50 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using GestureTouch;
-using Watch.Toolkit.Hardware.Arduino;
+using Watch.Toolkit.Input.Tracker;
 using Watch.Toolkit.Processing.MachineLearning;
-using Watch.Toolkit.Sensors;
 
 namespace Watch.Toolkit.Applications
 {
     public partial class MainWindow
     {
-        private readonly Accelerometer _accelerometer = new Accelerometer();
-        private readonly TreeClassifier _classifier;
-        private readonly DtwClassifier _dtwClassifier;
-
-        private string _lastDetection = "";
-        private string _lastDetectedClassificationLabel;
-        private double _lastDetectionCost;
-        private int _lastDetectedClassification;
-
-        public Dictionary<string, int> LabelClassifierLookUpTable = new Dictionary<string, int>(); 
+        private readonly TrackerManager _trackerManager;
+        private string _detection;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _classifier = new TreeClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording9.log", 3, new List<string> { "Normal Mode", "Left Index", "Left Knuckle"});
+             var classifierConfiguration = new ClassifierConfiguration(
+                 new List<string> {"Normal Mode", "Left Index", "Left Knuckle", "Hand"}, AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
 
-            _dtwClassifier = new DtwClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording9.log", 3, new List<string> { "Normal Mode", "Left Index", "Left Knuckle"});
+            _trackerManager = new TrackerManager(classifierConfiguration);
+            _trackerManager.TrackGestureRecognized += _trackerManager_GestureRecognized;
+            _trackerManager.Start();
 
-            _classifier.Run(MachineLearningAlgorithm.C45);
-
-            LabelClassifierLookUpTable.Add("Right",0);
-            LabelClassifierLookUpTable.Add("Left Index", 1);
-            LabelClassifierLookUpTable.Add("Left Knuckle", 2);
-
-            _dtwClassifier.Run();
-
-            foreach (var template in _dtwClassifier.GetTemplates())
+        
+            foreach (var template in _trackerManager.DtwClassifier.GetTemplates())
             {
                 listGesture.Items.Add(template.Key + " - " + String.Join(",", template.Value.Select(p => p.ToString()).ToArray()));
             }
@@ -52,26 +35,46 @@ namespace Watch.Toolkit.Applications
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
 
-            TouchVisualizer.GestureTouchUp += MainWindow_GestureTouchUp;
-            TouchVisualizer.GestureTouchDown += TouchVisualizer_GestureTouchDown;
-            TouchVisualizer.GestureTouchMove += TouchVisualizer_GestureTouchMove;
+            Closing += MainWindow_Closing;
 
-            var arduino = new Arduino();
-            arduino.MessageReceived += arduino_MessageReceived;
-            arduino.Start();
+            TouchVisualizer.GestureTouchUp += MainWindow_GestureTouchUp;
+            TouchVisualizer.GestureTouchMove += TouchVisualizer_GestureTouchMove;
+            TouchVisualizer.GestureTouchDown += TouchVisualizer_GestureTouchDown;
 
             cbGestureList.ItemsSource = 
                 new List<string> { "None", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
-
             cbGestureList.SelectedIndex = 0;
-
             KeyDown += MainWindow_KeyDown;
-
         }
 
         void TouchVisualizer_GestureTouchMove(object sender, GestureTouchEventArgs e)
         {
-            
+            //Label.Content = _detection;
+        }
+
+        void _trackerManager_GestureRecognized(object sender, TrackGestureEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                lblRaw.Content = _trackerManager.Accelerometer.ToFormattedString();
+                lblDTW.Content = "";
+
+                lblDT.Content = e.TreeLabel;
+
+
+
+                _detection =  e.TreeLabel == e.DtwLabel ? e.TreeLabel: "Normal Mode";
+
+                foreach (var item in e.ComputedDtwCosts)
+                {
+                    lblDTW.Content += item.Key + " " + item.Value + "\n";
+                }
+            });
+        }
+
+        void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _trackerManager.Stop();
         }
 
         void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -89,12 +92,7 @@ namespace Watch.Toolkit.Applications
 
         void TouchVisualizer_GestureTouchDown(object sender, GestureTouchEventArgs e)
         {
-            var avg = (_accelerometer.DistanceValues.Sum()) / 1.5;
-            var touch = _accelerometer.DistanceValues.Sum() > 1.5;
-            var inRange = (_lastDetectionCost < 1000);
-            var isTouching = _lastDetectedClassification;
-            //Label.Content = inRange ? _lastDetection : "Normal Mode";
-            Label.Content = _lastDetectedClassificationLabel;
+            Label.Content = _detection;
 
         }
 
@@ -103,69 +101,9 @@ namespace Watch.Toolkit.Applications
             Label.Content = "";
         }
 
-        void arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
-        {
-            try
-            {
-                if (!e.Message.StartsWith("A"))
-                    return;
-                var data = e.Message.Split(',');
-
-                if (data.Length != 11) return;
-
-                try
-                {
-                    _accelerometer.Update(
-                   Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[3], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[4], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[5], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[8], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[9], CultureInfo.InvariantCulture),
-                   Convert.ToDouble(data[10], CultureInfo.InvariantCulture));
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-               
-                var result = _dtwClassifier.ComputeLabelAndCosts(_accelerometer.FilteredValues.RawData);
-                _lastDetection = result.Item1;
-
-                var computedLabel = _classifier.ComputeValue(_accelerometer.FilteredValues.RawData);
-                _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
-                _lastDetectedClassificationLabel = _classifier.ComputeLabel(_accelerometer.FilteredValues.RawData); ;
-
-                Dispatcher.Invoke(() =>
-                {
-                    lblRaw.Content = _accelerometer.ToFormattedString();
-                    lblDTW.Content = "";
-
-                    lblDT.Content = _lastDetectedClassification;
-
-                    foreach (var item in result.Item2)
-                    {
-                        lblDTW.Content += item.Key + " " + item.Value + "\n";
-                        if (item.Key == result.Item1)
-                            _lastDetectionCost = item.Value;
-                    }
-                });
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("");
-            }
-        }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            listGesture.Items.Add(cbGestureList.Text + " " + _accelerometer.FilteredValues);
-            _dtwClassifier.AddTemplate(cbGestureList.Text,_accelerometer.FilteredValues.RawData);
-
-            cbGestureList.SelectedIndex++;
         }
 
     }

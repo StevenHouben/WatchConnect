@@ -17,11 +17,11 @@ namespace Watch.Toolkit.Processing.MachineLearning
         private readonly int _classes;
         private readonly List<string> _classLabels; 
 
-        public TreeClassifier(string filePath,int classes,List<string> classLabels)
+        public TreeClassifier(ClassifierConfiguration configuration)
         {
-            _classes = classes;
-            _classLabels = classLabels;
-            _data = Helper.ReadCsvToDataTable(filePath);
+            _data = Helper.ReadCsvToDataTable(configuration.TrainingDataPath,' ');
+            _classes = configuration.Labels.Count;
+            _classLabels = configuration.Labels;
         }
 
         public void Run(MachineLearningAlgorithm algorithm)

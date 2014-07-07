@@ -6,7 +6,7 @@
 
         public static ArduinoDriver Arduino 
         {
-            get { return _instance ?? (_instance = new ArduinoDriver("COM4")); }
+            get { return _instance ?? (_instance = new ArduinoDriver("COM7")); }
         }
     }
 }

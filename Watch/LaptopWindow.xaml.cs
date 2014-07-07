@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Surface.Presentation.Controls;
 using Watch.Toolkit.Input;
-using Watch.Toolkit.Interface;
 using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 

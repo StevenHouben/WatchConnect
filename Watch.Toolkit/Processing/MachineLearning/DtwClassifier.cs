@@ -13,12 +13,13 @@ namespace Watch.Toolkit.Processing.MachineLearning
         private readonly int _classes;
         private readonly List<string> _classLabels; 
 
-        public DtwClassifier(string filePath,int classes,List<string> classLabels)
+        public DtwClassifier(ClassifierConfiguration configuration)
         {
-            _data = Helper.ReadCsvToDataTable(filePath);
-            _classes = classes;
-            _classLabels = classLabels;
+            _data = Helper.ReadCsvToDataTable(configuration.TrainingDataPath,' ');
+            _classes = configuration.Labels.Count;
+            _classLabels = configuration.Labels;
         }
+        
 
         public Dictionary<string, double[]> GetTemplates()
         {

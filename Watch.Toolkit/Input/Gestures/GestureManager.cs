@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
-using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;

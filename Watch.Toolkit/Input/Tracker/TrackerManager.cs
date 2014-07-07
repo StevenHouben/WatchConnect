@@ -1,85 +1,78 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Processing.MachineLearning;
-using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
 
 namespace Watch.Toolkit.Input.Tracker
 {
-    public class TrackerManager:IInputManager
+    public class TrackerManager : IInputManager
     {
-        private readonly Arduino _arduino = new Arduino();
-        private readonly DtwRecognizer _dtwRecognizer = new DtwRecognizer();
-        private readonly Accelerometer _accelerometer = new Accelerometer();
-        private TreeClassifier _classifier;
-        private DtwClassifier _dtwClassifier;
+        private readonly ClassifierConfiguration _classifierConfiguration;
+        private readonly AccelerometerParser _accelerometerParser = new AccelerometerParser();
 
-        private string _lastDetection = "";
-        private double _lastDetectionCost;
-        private int _lastDetectedClassification;
+        public Accelerometer Accelerometer { get; private set; }
+        public TreeClassifier TreeClassifier { get; set; }
+        public DtwClassifier DtwClassifier { get; set; }
 
-        public event EventHandler<AccelerometerDataReceivedEventArgs> AccelerometerDataReceived = delegate { };
-        private List<string> _labels; 
-        public TrackerManager(List<string> labels)
+        public event EventHandler<TrackGestureEventArgs> TrackGestureRecognized = delegate { }; 
+
+        public TrackerManager(ClassifierConfiguration classifierConfiguration)
         {
-            _labels = labels;
+            _classifierConfiguration = classifierConfiguration;
+
+            Accelerometer = new Accelerometer();
+
+            _accelerometerParser.AccelerometerDataReceived += _accelerometerParser_AccelerometerDataReceived;
         }
 
         public void Start()
         {
-            // new List<string> { "Right", "Left Index", "Left Knuckle" }
-            _classifier = new TreeClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording3.log", 3, _labels);
+            TreeClassifier = new TreeClassifier(_classifierConfiguration);
+            TreeClassifier.Run(MachineLearningAlgorithm.C45);
 
-            _dtwClassifier = new DtwClassifier(
-                AppDomain.CurrentDomain.BaseDirectory + "recording3.log", 3, _labels);
+            DtwClassifier = new DtwClassifier(_classifierConfiguration);
+            DtwClassifier.Run();
 
-            _classifier.Run(MachineLearningAlgorithm.Id3);
-
-            _dtwClassifier.Run();
-
-            _arduino.MessageReceived += _arduino_MessageReceived;
-            _arduino.Start();
+            _accelerometerParser.Start();
         }
 
-        public string GetLabel()
+        private string _dtwLabel;
+        private string _treeLabel;
+        private int _lastDetectedClassification;
+        void _accelerometerParser_AccelerometerDataReceived(object sender, 
+            AccelerometerDataReceivedEventArgs e)
         {
-            return "";
-        }
+            Accelerometer.Update(e.Accelerometer);
 
-        void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
-        {
-            if (!e.Message.StartsWith("A"))
-                return;
-            var data = e.Message.Split(',');
+            var result = DtwClassifier.ComputeLabelAndCosts(Accelerometer.YawPitchRollValues.RawData);
+            _dtwLabel = result.Item1;
 
-            if (data.Length != 11) return;
-
-            _accelerometer.Update(
-                Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[3], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[4], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[5], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[6], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[7], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[8], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[9], CultureInfo.InvariantCulture),
-                Convert.ToDouble(data[10], CultureInfo.InvariantCulture));
-
-            AccelerometerDataReceived(this,new AccelerometerDataReceivedEventArgs(_accelerometer));
-
-            var result = _dtwRecognizer.ComputeClosestLabelAndCosts(_accelerometer.FilteredValues.RawData);
-            _lastDetection = result.Item1;
-            var computedLabel = _classifier.ComputeValue(_accelerometer.FilteredValues.RawData);
+            var computedLabel = TreeClassifier.ComputeValue(Accelerometer.YawPitchRollValues.RawData);
             _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
+            _treeLabel = _classifierConfiguration.GetLabel(_lastDetectedClassification);
+
+            //if (_dtwLabel == _treeLabel)
+                TrackGestureRecognized(this,
+                    new TrackGestureEventArgs()
+                    {
+                        DtwLabel = _dtwLabel,
+                        TreeLabel = _treeLabel,
+                        ComputedDtwCosts = result.Item2
+                    });
         }
+
         public void Stop()
         {
-            _arduino.Stop();
-            _arduino.MessageReceived -= _arduino_MessageReceived;
+            _accelerometerParser.Stop();
         }
+    }
+
+    public class TrackGestureEventArgs
+    {
+        public string DtwLabel { get; set; }
+        public string TreeLabel { get; set; }
+
+        public Dictionary<string,double> ComputedDtwCosts { get; set; }
+
     }
 }
