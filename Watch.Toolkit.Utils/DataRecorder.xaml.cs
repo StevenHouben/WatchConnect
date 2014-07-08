@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Timers;
 using Microsoft.Win32;
-using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Sensors;
 using Timer = System.Timers.Timer;
 
@@ -106,7 +104,6 @@ namespace Watch.Toolkit.Utils
 
         void BtnStart_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-
             _recorder = new Timer(Convert.ToInt32(TxTSampleRate.Text));
             _recorder.Elapsed += _recorder_Elapsed;
             _recorder.Start();
