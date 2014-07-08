@@ -8,9 +8,7 @@ namespace Watch
 {
     public partial class App
     {
-        private readonly GestureManager _gestureManager = new GestureManager();
-        private readonly TouchManager _touchManager = new TouchManager();
-
+ 
         private SimpleWatchFace _watchFace;
         private LaptopWindow _laptopWindow;
 
@@ -23,12 +21,9 @@ namespace Watch
         {
             base.OnStartup(e);
 
-            _gestureManager.GestureDetected+=_gestureManager_GestureDetected;
+            _watchFace.GestureManager.GestureDetected+= _gestureManager_GestureDetected;
 
-            _gestureManager.Start();
-            _touchManager.Start();
-
-            _watchFace = new SimpleWatchFace(_touchManager);
+            _watchFace = new SimpleWatchFace();
             _watchFace.Loaded += _watchFace_Loaded;
             _watchFace.Show();
 

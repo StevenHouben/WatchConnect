@@ -1,24 +1,44 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections.Generic;
 using Watch.Faces;
+using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Watch.Toolkit.Input.Tracker;
 using Watch.Toolkit.Interface;
+using Watch.Toolkit.Processing.MachineLearning;
 
 namespace Watch
 {
     public partial class SimpleWatchFace : IVisualSharer
     {
-        private TouchManager _touchManager;
-
-        public SimpleWatchFace(TouchManager touchManager)
+        public TouchManager TouchManager { get; set; }
+        public GestureManager GestureManager { get; set; }
+        public TrackerManager TrackerManager { get; set; }
+        public SimpleWatchFace()
         {
             InitializeComponent();
-            _touchManager = touchManager;
-            _touchManager.BevelUp += touchManager_BevelUp;
+            TouchManager = new TouchManager();
+            TouchManager.BevelUp += touchManager_BevelUp;
+            TouchManager.Start();
+
+            var classifierConfiguration = new ClassifierConfiguration(
+                new List<string> { "Normal Mode", "Left Index", "Left Knuckle", "Hand" }, AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
+
+            TrackerManager = new TrackerManager(classifierConfiguration);
+            TrackerManager.TrackGestureRecognized += _trackerManager_TrackGestureRecognized;
+            TrackerManager.Start();
+
+            GestureManager = new GestureManager();
+            GestureManager.Start();
             
+        }
+
+        static void _trackerManager_TrackGestureRecognized(object sender, TrackGestureEventArgs e)
+        {
+            Console.WriteLine(e.DtwLabel + @" - " +e.TreeLabel);
         }
 
         void touchManager_BevelUp(object sender, BevelTouchEventArgs e)
@@ -33,20 +53,13 @@ namespace Watch
             }
             
         }
-        private Brush PickBrush()
+        private static Brush PickBrush()
         {
-            Brush result = Brushes.Transparent;
+            var rnd = new Random();
 
-            Random rnd = new Random();
+            var properties = typeof(Brushes).GetProperties();
 
-            Type brushesType = typeof(Brushes);
-
-            PropertyInfo[] properties = brushesType.GetProperties();
-
-            int random = rnd.Next(properties.Length);
-            result = (Brush)properties[random].GetValue(null, null);
-
-            return result;
+            return (SolidColorBrush) properties[rnd.Next(properties.Length)].GetValue(null, null);
         }
 
         public object GetVisual(int id=0)
@@ -89,7 +102,7 @@ namespace Watch
             Dispatcher.Invoke(() =>
             {
                 VisualContent = visual as WatchVisual;
-                Content.Child = VisualContent.Clone();
+                if (VisualContent != null) Content.Child = VisualContent.Clone();
                 Content.BorderThickness = new Thickness(0, 0, 0, 0);
             });
 

@@ -14,8 +14,8 @@ namespace Watch.Toolkit.Utils
     public partial class MainWindow
     {
         private readonly StringBuilder _logger = new StringBuilder();
-        private readonly Accelerometer _accelerometer = new Accelerometer();
-        private readonly AccelerometerParser _accelerometerParser = new AccelerometerParser();
+        private readonly Imu _accelerometer = new Imu();
+        private readonly ImuParser _accelerometerParser = new ImuParser();
         private Timer _recorder = new Timer(500);
 
         public DataType RecordingDatatype;
@@ -38,7 +38,7 @@ namespace Watch.Toolkit.Utils
             _accelerometerParser.Start();
         }
 
-        void _accelerometerParser_AccelerometerDataReceived(object sender, AccelerometerDataReceivedEventArgs e)
+        void _accelerometerParser_AccelerometerDataReceived(object sender, ImuDataReceivedEventArgs e)
         {
             _accelerometer.Update(e.Accelerometer);
             Dispatcher.Invoke(

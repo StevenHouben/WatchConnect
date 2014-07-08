@@ -69,13 +69,13 @@
     <Compile Include="Input\Gestures\GestureDetectedEventArgs.cs" />
     <Compile Include="Input\Gestures\GestureManager.cs" />
     <Compile Include="Input\Touch\BevelState.cs" />
-    <Compile Include="Sensors\AccelerometerDataReceivedEventArgs.cs" />
+    <Compile Include="Sensors\ImuDataReceivedEventArgs.cs" />
     <Compile Include="Input\Tracker\TrackerApproach.cs" />
     <Compile Include="Input\Tracker\TrackerManager.cs" />
     <Compile Include="Interface\IVisualSharer.cs" />
     <Compile Include="Processing\MachineLearning\ClassifierConfiguration.cs" />
-    <Compile Include="Sensors\Accelerometer.cs" />
-    <Compile Include="Sensors\AccelerometerParser.cs" />
+    <Compile Include="Sensors\Imu.cs" />
+    <Compile Include="Sensors\ImuParser.cs" />
     <Compile Include="Processing\MachineLearning\TreeClassifier.cs" />
     <Compile Include="Processing\MachineLearning\DtwClassifier.cs" />
     <Compile Include="Sensors\RawSensorDataReceivedEventArgs.cs" />

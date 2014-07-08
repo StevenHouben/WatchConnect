@@ -1,22 +1,21 @@
 ﻿namespace Watch.Toolkit.Sensors
 {
-    public class Accelerometer:ISimpleSensor
+    public class Imu:ISimpleSensor
     {
         private Vector _storedValues;
         public Vector RawGyroValue { get; set; }
         public Vector RawAccelerometerValues{ get; set; }
         public Vector RealWorldAccelerationValues { get; set; }
         public Vector YawPitchRollValues { get; set; }
-        public Vector DistanceValues { get; set; }
+        public Vector RawMagnetometerValues { get; set; }
 
-        public bool Update(Accelerometer acc)
+        public bool Update(Imu acc)
         {
             RawAccelerometerValues = acc.RawAccelerometerValues;
             RawGyroValue = acc.RawGyroValue;
             YawPitchRollValues = acc.YawPitchRollValues;
             RealWorldAccelerationValues = acc.RealWorldAccelerationValues;
 
-            CalculateDistance();
             return true;
         }
         public bool Update(Vector rawAccData, Vector rawGyroData, Vector yawPitchRoll, Vector worldAcceleration)
@@ -25,18 +24,9 @@
             RawGyroValue = rawGyroData;
             YawPitchRollValues = yawPitchRoll;
             RealWorldAccelerationValues = worldAcceleration;
-
-            CalculateDistance();
             return true;
         }
 
-        private void CalculateDistance()
-        {
-            if (_storedValues == null)
-                _storedValues = YawPitchRollValues;
-            DistanceValues = _storedValues.ComputeDistance(YawPitchRollValues, 50);
-            _storedValues = YawPitchRollValues;
-        }
 
         public string ToFormattedString()
         {

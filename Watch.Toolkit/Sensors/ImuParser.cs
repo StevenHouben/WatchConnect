@@ -4,9 +4,9 @@ using Watch.Toolkit.Hardware.Arduino;
 
 namespace Watch.Toolkit.Sensors
 {
-    public class AccelerometerParser
+    public class ImuParser
     {
-        public event EventHandler<AccelerometerDataReceivedEventArgs> AccelerometerDataReceived = delegate { };
+        public event EventHandler<ImuDataReceivedEventArgs> AccelerometerDataReceived = delegate { };
 
         private Arduino _arduino;
         public void Start()
@@ -29,7 +29,7 @@ namespace Watch.Toolkit.Sensors
 
             if (data.Length != 13) return;
 
-            var acc = new Accelerometer();
+            var acc = new Imu();
             acc.Update(new Vector(
                 Convert.ToDouble(data[1], CultureInfo.InvariantCulture),
                 Convert.ToDouble(data[2], CultureInfo.InvariantCulture),
@@ -47,7 +47,7 @@ namespace Watch.Toolkit.Sensors
                     Convert.ToDouble(data[11], CultureInfo.InvariantCulture),
                     Convert.ToDouble(data[12], CultureInfo.InvariantCulture)));
 
-           AccelerometerDataReceived(this, new AccelerometerDataReceivedEventArgs(acc));
+           AccelerometerDataReceived(this, new ImuDataReceivedEventArgs(acc));
                 
         }
 

@@ -8,9 +8,9 @@ namespace Watch.Toolkit.Input.Tracker
     public class TrackerManager : IInputManager
     {
         private readonly ClassifierConfiguration _classifierConfiguration;
-        private readonly AccelerometerParser _accelerometerParser = new AccelerometerParser();
+        private readonly ImuParser _accelerometerParser = new ImuParser();
 
-        public Accelerometer Accelerometer { get; private set; }
+        public Imu Accelerometer { get; private set; }
         public TreeClassifier TreeClassifier { get; set; }
         public DtwClassifier DtwClassifier { get; set; }
 
@@ -20,7 +20,7 @@ namespace Watch.Toolkit.Input.Tracker
         {
             _classifierConfiguration = classifierConfiguration;
 
-            Accelerometer = new Accelerometer();
+            Accelerometer = new Imu();
 
             _accelerometerParser.AccelerometerDataReceived += _accelerometerParser_AccelerometerDataReceived;
         }
@@ -40,7 +40,7 @@ namespace Watch.Toolkit.Input.Tracker
         private string _treeLabel;
         private int _lastDetectedClassification;
         void _accelerometerParser_AccelerometerDataReceived(object sender, 
-            AccelerometerDataReceivedEventArgs e)
+            ImuDataReceivedEventArgs e)
         {
             Accelerometer.Update(e.Accelerometer);
 
