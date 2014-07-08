@@ -8,6 +8,7 @@ namespace Watch.Toolkit.Input
         public event EventHandler<DataTriggeredEventArgs<T>> MonitorTriggered = delegate { };
         public bool Trigger { get; set; }
 
+        public int Counter { get; set; }
         public T Data { get; set; }
         public int Id { get; set; }
 

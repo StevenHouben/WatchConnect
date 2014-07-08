@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using GestureTouch;
 using Microsoft.Surface.Presentation.Controls;
 using Watch.Examples.Desktop.Design;
@@ -8,35 +11,40 @@ using Watch.Toolkit;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Processing.MachineLearning;
+using Point = System.Windows.Point;
 
 namespace Watch.Examples.Desktop
 {
     public partial class DesktopWindow
     {
         const int TouchHoldTime = 500;              
-        const int GestureFrameTime = 2000;          
+        const int GestureFrameTime = 2000;
 
-        readonly WatchWindow _watchWindow = new WatchWindow();
+        private readonly WatchWindow _watchWindow;
         readonly WatchConfiguration _configuration = new WatchConfiguration();
 
         readonly Dictionary<int,DataEventMonitor<ScatterViewItem>> _swipeGestureTrackers = 
             new Dictionary<int, DataEventMonitor<ScatterViewItem>>();
 
-        readonly Dictionary<int,DataEventMonitor<GestureTouchPoint>> _touchHoldMonitors =
-            new Dictionary<int, DataEventMonitor<GestureTouchPoint>>();
+        readonly Dictionary<int, DataEventMonitor<ScatterViewItem>> _touchHoldMonitors =
+            new Dictionary<int, DataEventMonitor<ScatterViewItem>>();
 
         public DesktopWindow()
         {
             InitializeComponent();
 
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
-                new List<string> {"Normal Mode", "Left Index", "Left Knuckle", "Hand"},
+                new List<string> {"Right Hand", "Left Hand", "Left Knuckle", "Hand"},
                 AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
+
+            _watchWindow = new WatchWindow(_configuration);
 
             var touchPipeline = new GestureTouchPipeline(View);
             touchPipeline.GestureTouchDown += touchPipeline_GestureTouchDown;
             touchPipeline.GestureTouchMove += touchPipeline_GestureTouchMove;
             touchPipeline.GestureTouchUp += touchPipeline_GestureTouchUp;
+
+            WindowState = WindowState.Maximized;
 
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
@@ -62,42 +70,71 @@ namespace Watch.Examples.Desktop
         }
         void touchPipeline_GestureTouchDown(object sender, GestureTouchEventArgs e)
         {
-            Console.WriteLine(_watchWindow.LastDetectedPosture);
-            if (_watchWindow.LastDetectedPosture == "Normal Mode") 
+            LblMode.Content = _watchWindow.LastDetectedPosture;
+           if (_watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First()) 
                 return;
 
-            LblMode.Content = _watchWindow.LastDetectedPosture;
+            var progress = new ProgressBar
+            {
+                Minimum = 0, Maximum = 100, 
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Foreground = _watchWindow.ActiveVisual.Background
+            };
 
-            var monitor = new DataEventMonitor<GestureTouchPoint>(TouchHoldTime, e.Id, e.TouchPoint);
+            var touchVisualization = new ScatterViewItem
+            {
+                Background = Brushes.Transparent,
+                CanScale = false,
+                CanRotate = false,
+                Width = 100,
+                Height = 20,
+                Center = e.TouchPoint.Position,
+                Content = progress
+            };
+
+            View.Items.Add(touchVisualization);
+            var monitor = new DataEventMonitor<ScatterViewItem>(1, e.Id, touchVisualization);
             monitor.MonitorTriggered += monitor_MonitorTriggered;
             monitor.Start();
 
             _touchHoldMonitors.Add(e.Id,monitor);
         }
 
-        void monitor_MonitorTriggered(object sender, DataTriggeredEventArgs<GestureTouchPoint> e)
+        readonly object _progressLock= new object();
+        void monitor_MonitorTriggered(object sender, DataTriggeredEventArgs<ScatterViewItem> e)
         {
-            _touchHoldMonitors[e.Id].Stop();
-
-            Dispatcher.Invoke(() =>
+            if (!_touchHoldMonitors.ContainsKey(e.Id)) return;
+            if (_touchHoldMonitors[e.Id].Counter == 100)
             {
-                var touchVisualization = new ScatterViewItem
-                {
-                    Background = _watchWindow.ActiveVisual.Background,
-                    CanScale = false,
-                    CanRotate = false,
-                    Width = 50,
-                    Height = 50,
-                    Center = e.Data.Position
-                };
-                var swipeMonitor = new DataEventMonitor<ScatterViewItem>(GestureFrameTime, e.Id, touchVisualization);
-                swipeMonitor.MonitorTriggered += gestureFrameMonitor_MonitorTriggered;
-                swipeMonitor.Start();
+                _touchHoldMonitors[e.Id].Stop();
 
-                _swipeGestureTrackers.Add(e.Id, swipeMonitor);
-               
-                View.Items.Add(touchVisualization);
-            });
+                Dispatcher.Invoke(() =>
+                {
+                    e.Data.Content = null;
+                    e.Data.Background = _watchWindow.ActiveVisual.Background;
+                    e.Data.BorderThickness = new Thickness(1);
+                    e.Data.BorderBrush = Brushes.Black;
+                    var swipeMonitor = new DataEventMonitor<ScatterViewItem>(GestureFrameTime, e.Id, e.Data);
+                    swipeMonitor.MonitorTriggered += gestureFrameMonitor_MonitorTriggered;
+                    swipeMonitor.Start();
+
+                    _swipeGestureTrackers.Add(e.Id, swipeMonitor);
+
+                });
+            }
+            else
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (!_touchHoldMonitors.ContainsKey(e.Id)) return;
+                    lock (_progressLock)
+                    {
+                        ((ProgressBar) _touchHoldMonitors[e.Id].Data.Content).Value =
+                            _touchHoldMonitors[e.Id].Counter++;
+                    }
+                });
+            }
         }
 
         void gestureFrameMonitor_MonitorTriggered(object sender, DataTriggeredEventArgs<ScatterViewItem> e)
@@ -110,7 +147,9 @@ namespace Watch.Examples.Desktop
         {
             if (!_touchHoldMonitors.ContainsKey(e.Id)) return;
             _touchHoldMonitors[e.Id].Stop();
+            Dispatcher.Invoke(() => View.Items.Remove(_touchHoldMonitors[e.Id].Data));
             _touchHoldMonitors.Remove(e.Id);
+
             LblMode.Content = "";
 
             if (!_swipeGestureTrackers.ContainsKey(e.Id)) return;
@@ -123,8 +162,12 @@ namespace Watch.Examples.Desktop
         {
             if (_touchHoldMonitors.ContainsKey(e.Id))
             {
-                if(!CheckIfPointsAreInRange(e.TouchPoint.Position,_touchHoldMonitors[e.Id].Data.Position,10))
+                if (!CheckIfPointsAreInRange(e.TouchPoint.Position, _touchHoldMonitors[e.Id].Data.Center, 10))
+                {
                     _touchHoldMonitors[e.Id].Stop();
+                    Dispatcher.Invoke(() => View.Items.Remove(_touchHoldMonitors[e.Id].Data));
+                }
+
             }
             if(!_swipeGestureTrackers.ContainsKey(e.Id))return;
 
