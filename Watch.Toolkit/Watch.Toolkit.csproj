@@ -29,6 +29,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accord">
       <HintPath>..\packages\Accord.2.12.0.0\lib\Accord.dll</HintPath>
@@ -48,15 +51,28 @@
     <Reference Include="AForge.Math">
       <HintPath>..\packages\AForge.Math.2.2.5\lib\AForge.Math.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interface\Debug\DebugWatchWindow.xaml.cs">
+      <DependentUpon>DebugWatchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Interface\DefaultFaces\Clock.xaml.cs">
+      <DependentUpon>Clock.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helper.cs" />
     <Compile Include="Input\Gestures\AdvancedGestureManager.cs" />
     <Compile Include="Input\IInputManager.cs" />
@@ -69,6 +85,9 @@
     <Compile Include="Input\Gestures\GestureDetectedEventArgs.cs" />
     <Compile Include="Input\Gestures\GestureManager.cs" />
     <Compile Include="Input\Touch\BevelState.cs" />
+    <Compile Include="Interface\DefaultFaces\SensorVisualizer.xaml.cs">
+      <DependentUpon>SensorVisualizer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Sensors\ImuDataReceivedEventArgs.cs" />
     <Compile Include="Input\Tracker\TrackerApproach.cs" />
     <Compile Include="Input\Tracker\TrackerManager.cs" />
@@ -109,6 +128,12 @@
     <Compile Include="Interface\WatchFaceManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sensors\Vector.cs" />
+    <Compile Include="WatchConfiguration.cs" />
+    <Compile Include="Interface\WatchVisual.cs" />
+    <Compile Include="WatchWindow.xaml.cs">
+      <DependentUpon>WatchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Interface\WindowManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Watch.Toolkit.Hardware\Watch.Toolkit.Hardware.csproj">
@@ -118,6 +143,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Interface\Debug\DebugWatchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Interface\DefaultFaces\Clock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Interface\DefaultFaces\SensorVisualizer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WatchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

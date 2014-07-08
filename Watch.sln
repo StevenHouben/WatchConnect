@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A3DB12
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Examples.Desktop", "Watch.Examples.Desktop\Watch.Examples.Desktop.csproj", "{690ED346-1842-4410-9438-B08E0FBE4699}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,6 +104,16 @@ Global
 		{5A806AD7-28D4-404D-90DD-E8F4B434E17E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{5A806AD7-28D4-404D-90DD-E8F4B434E17E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{5A806AD7-28D4-404D-90DD-E8F4B434E17E}.Release|Win32.ActiveCfg = Release|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{690ED346-1842-4410-9438-B08E0FBE4699}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,14 +2,13 @@
 using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Watch.Toolkit.Interface;
 
-namespace Watch.Faces
+namespace Watch.Toolkit.Interface.DefaultFaces
 {
     /// <summary>
-    /// Interaction logic for WatchFace.xaml
+    /// Interaction logic for Clock.xaml
     /// </summary>
-    public partial class Clock : IWatchFace
+    public partial class Clock : WatchVisual
     {
         readonly Label _lbl;
         public Clock()
@@ -44,12 +43,12 @@ namespace Watch.Faces
 
         public void Suspend()
         {
-            
+
         }
 
         public void Resume()
         {
-           
+
         }
 
 

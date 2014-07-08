@@ -1,17 +1,19 @@
-﻿using System;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using Watch.Toolkit.Input.Touch;
 using Watch.Toolkit.Sensors;
 
-namespace Watch.Faces
+namespace Watch.Toolkit.Interface.DefaultFaces
 {
-    public partial class SensorVisualizer 
+    /// <summary>
+    /// Interaction logic for SensorVisualizer.xaml
+    /// </summary>
+    public partial class SensorVisualizer : WatchVisual
     {
         public SensorVisualizer()
         {
             InitializeComponent();
         }
-        public void UpdateVisualization(ProximitySensor topLeft,ProximitySensor topRight, ProximitySensor front, ProximitySensor light)
+        public void UpdateVisualization(ProximitySensor topLeft, ProximitySensor topRight, ProximitySensor front, ProximitySensor light)
         {
             Dispatcher.Invoke(() =>
             {
@@ -42,7 +44,7 @@ namespace Watch.Faces
                 BevelTop.Fill = state.BevelTop ? Brushes.Red : Brushes.White;
                 BevelBottom.Fill = state.BevelBottom ? Brushes.Red : Brushes.White;
             });
-            
+
         }
 
         public void UpdateDetection(string name)

@@ -12,9 +12,9 @@ namespace Watch.Toolkit.Interface
             _faces.Add(face.Id,face);
         }
 
-        public void RemoveFace(IWatchFace face)
+        public void RemoveFace(Guid id)
         {
-            _faces.Remove(face.Id);
+            _faces.Remove(id);
         }
 
         public IWatchFace FindFace(Guid id)

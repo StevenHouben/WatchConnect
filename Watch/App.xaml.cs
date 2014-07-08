@@ -2,7 +2,7 @@
 using System.Windows;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Input.Gestures;
-using Watch.Toolkit.Input.Touch;
+using Watch.Toolkit.Interface;
 
 namespace Watch
 {
@@ -37,7 +37,7 @@ namespace Watch
 
         void _watchFace_Loaded(object sender, RoutedEventArgs e)
         {
-            WindowExt.MaximizeToSecondaryMonitor(_watchFace);
+            WindowManager.MaximizeToSecondaryMonitor(_watchFace);
         }
 
         void _laptopWindow_CanvasUp(object sender, TouchTrackEventArgs e)

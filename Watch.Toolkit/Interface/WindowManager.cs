@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using System.Windows;
 
-namespace Watch
+namespace Watch.Toolkit.Interface
 {
-    static public class WindowExt
+    static public class WindowManager
     {
         public static void MaximizeToSecondaryMonitor(Window window)
         {

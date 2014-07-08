@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Watch.Faces;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
 using System.Windows;

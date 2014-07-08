@@ -1,11 +1,12 @@
-﻿<UserControl x:Class="Watch.Faces.SensorVisualizer"
+﻿<interface:WatchVisual x:Class="Watch.Toolkit.Interface.DefaultFaces.SensorVisualizer"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:oxy="http://oxyplot.codeplex.com"
-             mc:Ignorable="d" d:DesignWidth="1024"
-             Background="SlateGray" Height="678">
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:toolkit="clr-namespace:Watch.Toolkit"
+             xmlns:interface="clr-namespace:Watch.Toolkit.Interface"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <ProgressBar x:Name="FrontSensorBar" Maximum="800" Minimum="0" Orientation="Vertical" HorizontalAlignment="Left" Height="316" Margin="527,22,0,0" VerticalAlignment="Top" Width="66"/>
         <ProgressBar x:Name="TopLeftSensorBar" Maximum="800" Minimum="0" Orientation="Vertical"  HorizontalAlignment="Left" Height="316" Margin="19,22,0,0" VerticalAlignment="Top" Width="68"/>
@@ -27,12 +28,7 @@
         <ProgressBar Foreground="Orange" x:Name="TouchSlider" Maximum="1000" Minimum="0" Orientation="Horizontal" HorizontalAlignment="Left" Height="39" Margin="167,393,0,0" VerticalAlignment="Top" Width="821"/>
         <Label HorizontalContentAlignment="Center" FontSize="20" Content="Touch" HorizontalAlignment="Left" Margin="16,393,0,0" VerticalAlignment="Top" Width="146"/>
         <StackPanel Margin="313,454,36,0.4">
-            <oxy:PlotView x:Name="PlotView"  Height="206" Margin="0,0,-0.2,0" >
-                <oxy:PlotView.Axes>
-                    <oxy:DateTimeAxis x:Name="XAxis" Position="Bottom"/>
-                    <oxy:LinearAxis Position="Left" />
-                </oxy:PlotView.Axes>
-            </oxy:PlotView>
+
         </StackPanel>
         <Rectangle x:Name="BevelTop" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="34" Margin="87,485,0,0" Stroke="Black" VerticalAlignment="Top" Width="136"/>
         <Rectangle x:Name="BevelBottom" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="34" Margin="87,634,0,0" Stroke="Black" VerticalAlignment="Top" Width="136"/>
@@ -40,4 +36,4 @@
         <Rectangle x:Name="BevelRight" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="118" Margin="228,520,0,0" Stroke="Black" VerticalAlignment="Top" Width="40"/>
 
     </Grid>
-</UserControl>
+</interface:WatchVisual>
