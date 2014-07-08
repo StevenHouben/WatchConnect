@@ -46,7 +46,7 @@ namespace Watch
           
             if (_timeTrackers[e.TouchDevice.Id].Trigger)
             {
-                CanvasUp(sender, new TouchTrackEventArgs() { Id = e.TouchDevice.Id, Position = e.GetTouchPoint(this).Position });
+                CanvasUp(sender, new TouchTrackEventArgs { Id = e.TouchDevice.Id, Position = e.GetTouchPoint(this).Position });
             }
             _pointTrackers.Remove(e.TouchDevice.Id);
             _timeTrackers[e.TouchDevice.Id].Stop();
@@ -213,7 +213,6 @@ namespace Watch
             };
             item.PreviewStylusDown += _item_PreviewStylusDown;
             item.PreviewStylusUp += _item_PreviewStylusUp;
-
 
             View.Items.Add(item);
         }

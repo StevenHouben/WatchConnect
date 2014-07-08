@@ -27,7 +27,7 @@ namespace Watch
                 new List<string> { "Normal Mode", "Left Index", "Left Knuckle", "Hand" }, AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
 
             TrackerManager = new TrackerManager(classifierConfiguration);
-            TrackerManager.TrackGestureRecognized += _trackerManager_TrackGestureRecognized;
+            TrackerManager.TrackGestureRecognized += TrackerManager_TrackGestureRecognized;
             TrackerManager.Start();
 
             GestureManager = new GestureManager();
@@ -35,9 +35,9 @@ namespace Watch
             
         }
 
-        static void _trackerManager_TrackGestureRecognized(object sender, TrackGestureEventArgs e)
+        void TrackerManager_TrackGestureRecognized(object sender, string e)
         {
-            Console.WriteLine(e.DtwLabel + @" - " +e.TreeLabel);
+            
         }
 
         void touchManager_BevelUp(object sender, BevelTouchEventArgs e)

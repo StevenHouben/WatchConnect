@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Watch.Toolkit.Processing.MachineLearning
 {
@@ -12,6 +13,11 @@ namespace Watch.Toolkit.Processing.MachineLearning
         {
             Labels = labels;
             TrainingDataPath = trainingDataPath;
+
+            if (!File.Exists(trainingDataPath))
+            {
+                throw new IOException("File with training data was not found.");
+            }
         }
 
         public int GetLabelValue(string label)

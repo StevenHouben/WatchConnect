@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using Watch.Toolkit.Processing.MachineLearning;
 using Watch.Toolkit.Sensors;
 
@@ -14,7 +16,9 @@ namespace Watch.Toolkit.Input.Tracker
         public TreeClassifier TreeClassifier { get; set; }
         public DtwClassifier DtwClassifier { get; set; }
 
-        public event EventHandler<TrackGestureEventArgs> TrackGestureRecognized = delegate { }; 
+        public event EventHandler<TrackGestureEventArgs> RawTrackGestureDataUpdated= delegate { };
+
+        public event EventHandler<string> TrackGestureRecognized = delegate { }; 
 
         public TrackerManager(ClassifierConfiguration classifierConfiguration)
         {
@@ -51,14 +55,18 @@ namespace Watch.Toolkit.Input.Tracker
             _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
             _treeLabel = _classifierConfiguration.GetLabel(_lastDetectedClassification);
 
-            //if (_dtwLabel == _treeLabel)
-                TrackGestureRecognized(this,
-                    new TrackGestureEventArgs()
-                    {
-                        DtwLabel = _dtwLabel,
-                        TreeLabel = _treeLabel,
-                        ComputedDtwCosts = result.Item2
-                    });
+            RawTrackGestureDataUpdated(this,
+                   new TrackGestureEventArgs()
+                   {
+                       DtwLabel = _dtwLabel,
+                       TreeLabel = _treeLabel,
+                       ComputedDtwCosts = result.Item2
+                   });
+
+            TrackGestureRecognized(this, _treeLabel == _dtwLabel ? _treeLabel : _classifierConfiguration.Labels.First());
+
+
+
         }
 
         public void Stop()

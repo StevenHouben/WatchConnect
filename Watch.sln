@@ -9,11 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit", "Watch.Tool
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit.Hardware", "Watch.Toolkit.Hardware\Watch.Toolkit.Hardware.csproj", "{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GestureTouch.WPF", "..\GestureTouchToolkit\GestureTouch.WPF\GestureTouch.WPF.csproj", "{3D63A62F-90D3-454C-82CB-2CBB0183C337}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit.Utils", "Watch.Toolkit.Utils\Watch.Toolkit.Utils.csproj", "{F659B34D-D043-4ECE-9D7D-491E65193827}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit.Applications", "Watch.Toolkit.Applications\Watch.Toolkit.Applications.csproj", "{447355A0-7ACC-472F-A51E-5B5B6EEEA874}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Toolkit.Network", "Watch.Toolkit.Network\Watch.Toolkit.Network.csproj", "{5A806AD7-28D4-404D-90DD-E8F4B434E17E}"
 EndProject
@@ -64,16 +60,6 @@ Global
 		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{67BE83B9-EE89-4EC2-8B57-AAFE1AF46699}.Release|Win32.ActiveCfg = Release|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{3D63A62F-90D3-454C-82CB-2CBB0183C337}.Release|Win32.ActiveCfg = Release|Any CPU
 		{F659B34D-D043-4ECE-9D7D-491E65193827}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F659B34D-D043-4ECE-9D7D-491E65193827}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F659B34D-D043-4ECE-9D7D-491E65193827}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -84,16 +70,6 @@ Global
 		{F659B34D-D043-4ECE-9D7D-491E65193827}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F659B34D-D043-4ECE-9D7D-491E65193827}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F659B34D-D043-4ECE-9D7D-491E65193827}.Release|Win32.ActiveCfg = Release|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Release|Any CPU.Build.0 = Release|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{447355A0-7ACC-472F-A51E-5B5B6EEEA874}.Release|Win32.ActiveCfg = Release|Any CPU
 		{5A806AD7-28D4-404D-90DD-E8F4B434E17E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A806AD7-28D4-404D-90DD-E8F4B434E17E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A806AD7-28D4-404D-90DD-E8F4B434E17E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

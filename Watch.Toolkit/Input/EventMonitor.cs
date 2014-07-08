@@ -7,7 +7,6 @@ namespace Watch.Toolkit.Input
     {
         public event EventHandler<TriggeredEventArgs> MonitorTriggered = delegate { }; 
         public bool Trigger { get; set; }
-
         public int Id { get; set; }
 
         public EventMonitor(int time,int id=-1):base(time)
@@ -18,6 +17,7 @@ namespace Watch.Toolkit.Input
 
         void EventMonitor_Elapsed(object sender, ElapsedEventArgs e)
         {
+            Trigger = true;
             MonitorTriggered(this, new TriggeredEventArgs{Id = Id, Trigger=Trigger});
         }
     }

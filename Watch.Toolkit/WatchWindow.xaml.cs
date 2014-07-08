@@ -12,8 +12,12 @@ namespace Watch.Toolkit
         public TouchManager TouchManager { get; set; }
         public GestureManager GestureManager { get; set; }
         public TrackerManager TrackerManager { get; set; }
+        public WatchVisual ActiveVisual { get; set; }
 
         private readonly WatchFaceManager _watchFaceManager = new WatchFaceManager();
+
+        public string LastDetectedPosture { get; set; }
+        public string LastDetectedGesture { get; set; }
 
         public WatchWindow()
         {
@@ -40,16 +44,29 @@ namespace Watch.Toolkit
             TouchManager.Start();
 
             TrackerManager = new TrackerManager(watchConfiguration.ClassifierConfiguration);
+            TrackerManager.TrackGestureRecognized += TrackerManager_TrackGestureRecognized;
             TrackerManager.Start();
 
             GestureManager = new GestureManager();
+            GestureManager.GestureDetected += GestureManager_GestureDetected;
             GestureManager.Start();
+        }
+
+        void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
+        {
+            LastDetectedGesture = e.Gesture.ToString();
+        }
+
+        void TrackerManager_TrackGestureRecognized(object sender, string e)
+        {
+            LastDetectedPosture = e;
         }
 
         public void AddWatchFace(WatchVisual visual)
         {
             _watchFaceManager.AddFace(visual);
             Content = visual;
+            ActiveVisual = visual;
         }
 
         public void RemoveWatchFace(Guid id)

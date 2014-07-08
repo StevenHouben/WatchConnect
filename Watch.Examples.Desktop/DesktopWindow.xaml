@@ -1,8 +1,9 @@
 ﻿<Window xmlns:my="http://schemas.microsoft.com/surface/2008"  x:Class="Watch.Examples.Desktop.DesktopWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DesktopWindow" Height="300" Width="300">
+        Title="DesktopWindow" Height="351.94" Width="682.09">
     <Grid>
         <my:ScatterView x:Name="View" Background="Gray" />
+        <Label Height="150" x:Name="LblMode" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" FontSize="72" Foreground="DarkGray"></Label>
     </Grid>
 </Window>

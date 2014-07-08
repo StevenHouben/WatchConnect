@@ -1,5 +1,5 @@
 ﻿<Application x:Class="Watch.Toolkit.Utils.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="DataRecorder.xaml">
+             StartupUri="AccelerometerVisualizer.xaml">
 </Application>
