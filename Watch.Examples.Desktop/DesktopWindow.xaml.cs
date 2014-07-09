@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -36,6 +37,7 @@ namespace Watch.Examples.Desktop
         readonly Dictionary<int, ScatterViewItem> _selectedItems =
             new Dictionary<int, ScatterViewItem>();
 
+
         public DesktopWindow()
         {
             InitializeComponent();
@@ -48,25 +50,36 @@ namespace Watch.Examples.Desktop
 
             _watchWindow = new WatchWindow(_configuration);
 
-            var touchPipeline = new GestureTouchPipeline(View);
+            var touchPipeline = new GestureTouchPipeline(this);
             touchPipeline.GestureTouchDown += touchPipeline_GestureTouchDown;
             touchPipeline.GestureTouchMove += touchPipeline_GestureTouchMove;
             touchPipeline.GestureTouchUp += touchPipeline_GestureTouchUp;
 
-            WindowState = WindowState.Maximized;
+            WindowState = WindowState.Normal;
+
+            Left = 300;
+            Top = 0;
+            Height = Screen.PrimaryScreen.WorkingArea.Height;
+            Width = Screen.PrimaryScreen.WorkingArea.Width - 300;
 
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
             _watchWindow.AddWatchFace(new WatchApplication());
 
-            _watchWindow.Width = 600;
-            _watchWindow.Height = 400;
+            _watchWindow.Width = 300;
+            _watchWindow.Height = 300;
             _watchWindow.WindowStyle = WindowStyle.ToolWindow;
             _watchWindow.WindowState = WindowState.Normal;
+            _watchWindow.Left = 0;
+            _watchWindow.Top = 0;
             
             _watchWindow.Show();
         }
 
+        private bool IsSelectMode()
+        {
+           return _watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First();
+        }
         void DesktopWindow_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -86,76 +99,96 @@ namespace Watch.Examples.Desktop
 
         void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
         {
-            if (e.Gesture == Gesture.SwipeRight)
+            switch (e.Gesture)
             {
-                var toRemoveList = new List<int>();
-                foreach (var mon in _swipeGestureTrackers)
+                case Gesture.SwipeRight:
                 {
-                    Dispatcher.Invoke(() =>
+                    var toRemoveList = new List<int>();
+                    foreach (var mon in _swipeGestureTrackers)
                     {
-                        var visual = _watchWindow.GetVisual();
-
-                        _watchWindow.AddWatchFace(new WatchApplication { Background = Helper.RandomBrush() });
-
-                        var floatingItem = new ScatterViewItem
+                        Dispatcher.Invoke(() =>
                         {
-                            Background = Brushes.Transparent,
-                            Content = visual,
-                            Center = mon.Value.Data.Center,
-                            Width = 200,
-                            Height = 100,
-                            CanScale = true,
-                            CanRotate = false
-                        };
+                            var visual = _watchWindow.GetVisual();
 
-                        floatingItem.PreviewTouchDown += floatingItem_PreviewTouchDown;
-                        floatingItem.PreviewTouchUp += floatingItem_PreviewTouchUp;
+                            _watchWindow.AddWatchFace(new WatchApplication { Background = Helper.RandomBrush() });
 
-                        View.Items.Remove(mon.Value.Data);
-                        toRemoveList.Add(mon.Key);
-                        View.Items.Add(floatingItem);
-                    });
+                            var floatingItem = new ScatterViewItem
+                            {
+                                Background = Brushes.Transparent,
+                                Content = visual,
+                                Center = mon.Value.Data.Center,
+                                Width = 200,
+                                Height = 100,
+                                CanScale = true,
+                                CanRotate = false
+                            };
+
+                            floatingItem.PreviewTouchDown += floatingItem_PreviewTouchDown;
+                            floatingItem.PreviewTouchUp += floatingItem_PreviewTouchUp;
+
+                            View.Items.Remove(mon.Value.Data);
+                            toRemoveList.Add(mon.Key);
+                            View.Items.Add(floatingItem);
+                        });
+                    }
+
+                    foreach (var item in toRemoveList)
+                    {
+                        _swipeGestureTrackers.Remove(item);
+                    }
                 }
+                    break;
+                case Gesture.SwipeLeft:
+                    var toRemoveItems = new List<int>();
+                    foreach (var item in _selectedItems)
+                    {
+                        var content = item.Value.Content as WatchVisual;
+                        item.Value.Content = new Rectangle();
+                        if(content !=null)
+                            _watchWindow.AddWatchFace(content);
 
-                foreach (var item in toRemoveList)
-                {
-                    _swipeGestureTrackers.Remove(item);
-                }
+                        _watchWindow.RemoveThumbnail(item.Key);
+                        toRemoveItems.Add(item.Key);
+                        View.Items.Remove(item.Value);
+                    }
+                    foreach (var item in toRemoveItems)
+                    {
+                        _selectedItems.Remove(item);
+                    }
+                    break;
             }
-            else if (e.Gesture == Gesture.SwipeLeft)
-            {
-                foreach (var item in _selectedItems)
-                {
-                    var content = item.Value.Content as WatchVisual;
-                    item.Value.Content = new Rectangle();
-                    _watchWindow.AddWatchFace(content);
-
-                    View.Items.Remove(item.Value);
-                }
-            }
-            
         }
 
         void floatingItem_PreviewTouchUp(object sender, TouchEventArgs e)
         {
             _selectedItems.Remove(e.TouchDevice.Id);
-            _watchWindow.RemoveThumbnail();
+            _watchWindow.RemoveThumbnail(e.TouchDevice.Id);
         }
 
         void floatingItem_PreviewTouchDown(object sender, TouchEventArgs e)
         {
+            if (_selectedItems.ContainsKey(e.TouchDevice.Id))
+                _selectedItems.Remove(e.TouchDevice.Id);
+
+            if (IsSelectMode())
+                return;
+
             _selectedItems.Add(e.TouchDevice.Id,(ScatterViewItem) sender);
             _watchWindow.SendThumbnail(
                 new Rectangle
                 {
                     Fill = ((WatchVisual)((ScatterViewItem) sender).Content).Background
-                });
+                },e.TouchDevice.Id);
         }
         void touchPipeline_GestureTouchDown(object sender, GestureTouchEventArgs e)
         {
             LblMode.Content = _watchWindow.LastDetectedPosture;
-           //if (_watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First()) 
-            //    return;
+
+            if (_selectedItems.ContainsKey(e.Id))
+                return;
+
+            if (IsSelectMode())
+                return;
 
             var progress = new ProgressBar
             {
@@ -251,9 +284,9 @@ namespace Watch.Examples.Desktop
                     _touchHoldMonitors[e.Id].Stop();
                     Dispatcher.Invoke(() => View.Items.Remove(_touchHoldMonitors[e.Id].Data));
                 }
-
             }
-            if(!_swipeGestureTrackers.ContainsKey(e.Id))return;
+            if(!_swipeGestureTrackers.ContainsKey(e.Id))
+                return;
 
             _swipeGestureTrackers[e.Id].Data.Center = e.TouchPoint.Position;
         }

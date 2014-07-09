@@ -1,0 +1,10 @@
+﻿<s:TagVisualization
+    x:Class="Watch.Examples.Surface.Visualizations.FingerVisualization"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="http://schemas.microsoft.com/surface/2008"
+    Height="280" Width="440">
+    <Grid Background="LightBlue">
+        <Label Name="CameraModel" Content="Model"/>
+    </Grid>
+</s:TagVisualization>

@@ -7,6 +7,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" Background="Red">
     <Grid >
-            <Label Foreground="White" FontSize="40" Content="hello world" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"></Label>
+        <DockPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <Label Foreground="White" FontSize="40" Content="hello world" VerticalContentAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Stretch"></Label>
+        </DockPanel>
+
     </Grid>
 </interface:WatchVisual>

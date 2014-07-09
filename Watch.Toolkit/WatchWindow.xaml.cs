@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Reflection.Emit;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -113,8 +114,8 @@ namespace Watch.Toolkit
         {
             Dispatcher.Invoke(() =>
             {
-                ContentHolder.BorderBrush = Brushes.Transparent;
-                ContentHolder.BorderThickness = new Thickness(0, 0, 0, 0);
+                _thumbnails.Remove(id);
+                DrawThumbnails();
             });
         }
 
@@ -124,9 +125,44 @@ namespace Watch.Toolkit
             {
                 var rect = thumbnail as Rectangle;
                 if (rect == null) return;
-                ContentHolder.BorderBrush = rect.Fill;
-                ContentHolder.BorderThickness = new Thickness(0, 0, 20, 0);
+
+                if (_thumbnails.ContainsKey(id))
+                    return;
+                _thumbnails.Add(id,((SolidColorBrush)rect.Fill).Color);
+                DrawThumbnails();
             });
         }
+
+        private void DrawThumbnails()
+        {
+
+            if (_thumbnails.Count == 0)
+            {
+                ContentHolder.BorderBrush = OuterBorder.BorderBrush= Brushes.Transparent;
+                ContentHolder.BorderThickness = OuterBorder.BorderThickness =  new Thickness(0, 0, 0, 0);
+                return;
+            }
+            var grad = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0), 
+                EndPoint = new Point(0, 1)
+            };
+
+            var count = 0d;
+            foreach (var gs in _thumbnails.Values.Select(c => new GradientStop
+            {
+                Color = c, 
+                Offset = (1/(double)_thumbnails.Values.Count)*count++
+            }))
+            {
+                grad.GradientStops.Add(gs);
+            }
+
+            OuterBorder.BorderBrush = grad;
+            OuterBorder.BorderThickness = new Thickness(0, 0, 20, 0);
+            ContentHolder.BorderBrush = Brushes.Black;
+            ContentHolder.BorderThickness = new Thickness(0, 0, 5, 0);
+        }
+        private readonly Dictionary<int, Color> _thumbnails = new Dictionary<int, Color>();
     }
 }
