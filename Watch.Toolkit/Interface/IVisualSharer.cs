@@ -4,9 +4,7 @@
     {
         object GetVisual(int id);
         object GetThumbnail(int id);
-
         void RemoveThumbnail(int id);
         void SendThumbnail(object thumbnail,int id, double x, double y);
-        void SendVisual(object visual,int id, double x, double y);
     }
 }

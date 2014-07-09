@@ -1,0 +1,7 @@
+﻿1>------ Build started: Project: Watch.Toolkit.Utils, Configuration: Debug Any CPU ------
+2>------ Build started: Project: Watch.Examples.Desktop, Configuration: Debug Any CPU ------
+3>------ Build started: Project: Watch.Examples.HelloWorld, Configuration: Debug Any CPU ------
+2>  Watch.Examples.Desktop -> C:\Users\Steven Houben\Documents\GitHub\Watch\Watch.Examples.Desktop\bin\Debug\Watch.Examples.Desktop.exe
+3>  Watch.Examples.HelloWorld -> C:\Users\Steven Houben\Documents\GitHub\Watch\Watch.Examples.HelloWorld\bin\Debug\Watch.Examples.HelloWorld.exe
+1>C:\Users\Steven Houben\Documents\GitHub\Watch\Watch.Toolkit.Utils\DataRecorder.xaml.cs(118,21,118,28): warning CS0414: The field 'Watch.Toolkit.Utils.MainWindow.counter' is assigned but its value is never used
+1>  Watch.Toolkit.Utils -> C:\Users\Steven Houben\Documents\GitHub\Watch\Watch.Toolkit.Utils\bin\Debug\Watch.Toolkit.Utils.exe

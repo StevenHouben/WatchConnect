@@ -41,6 +41,40 @@ namespace Watch.Toolkit.Input.Touch
 
         private BevelState _bevelState = new BevelState();
 
+        public void Simulate(TouchEvents te, EventArgs e)
+        {
+            switch (te)
+            {
+                case TouchEvents.BevelDoubleTap:
+                    OnBevelDoubleTapHandler((BevelTouchEventArgs)e);
+                    break;
+                case TouchEvents.BevelDown:
+                    OnBevelTouchDownHandler((BevelTouchEventArgs)e);
+                    break;
+                case TouchEvents.BevelUp:
+                    OnBevelTouchUpHandler((BevelTouchEventArgs)e);
+                    break;
+                case TouchEvents.BevelGrab:
+                    OnBevelGrabHandler((MultiBevelTouchEventArgs) e);
+                    break;
+                case TouchEvents.DoubleTap:
+                    OnDoubleTap((SliderTouchEventArgs)e);
+                    break;
+                case TouchEvents.SlideDown:
+                    OnSlideDownHandler((SliderTouchEventArgs)e);
+                    break;
+                case TouchEvents.SlideUp:
+                    OnSlideDownHandler((SliderTouchEventArgs)e);
+                    break;
+                case TouchEvents.SliderTouchDown:
+                    OnSlideDownHandler((SliderTouchEventArgs)e);
+                    break;
+                case TouchEvents.SliderTouchUp:
+                    OnSlideDownHandler((SliderTouchEventArgs)e);
+                    break;
+            }
+        }
+
         public void Start()
         {
             _phidget = new Phidget();
@@ -177,6 +211,11 @@ namespace Watch.Toolkit.Input.Touch
             if (BevelUp != null)
                 BevelUp(this, e);
         }
+        protected void OnBevelDoubleTapHandler(BevelTouchEventArgs e)
+        {
+            if (BevelUp != null)
+                BevelUp(this, e);
+        }
 
         protected void OnRawDataHandler(RawTouchDataReceivedEventArgs e)
         {
@@ -203,6 +242,12 @@ namespace Watch.Toolkit.Input.Touch
         {
             if (SlideUp != null)
                 SlideUp(this, e);
+        }
+
+        protected void OnBevelGrabHandler(MultiBevelTouchEventArgs e)
+        {
+            if (BevelGrab != null)
+                BevelGrab(this, e);
         }
 
        

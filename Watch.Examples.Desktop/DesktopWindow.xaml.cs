@@ -2,22 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using GestureTouch;
 using Microsoft.Surface.Presentation.Controls;
 using Watch.Examples.Desktop.Design;
 using Watch.Toolkit;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Input.Gestures;
+using Watch.Toolkit.Interface;
 using Watch.Toolkit.Processing.MachineLearning;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Point = System.Windows.Point;
+using ProgressBar = System.Windows.Controls.ProgressBar;
 
 namespace Watch.Examples.Desktop
 {
     public partial class DesktopWindow
     {
-        const int TouchHoldTime = 500;              
+        const int TouchHoldTime = 100;              
         const int GestureFrameTime = 2000;
 
         private readonly WatchWindow _watchWindow;
@@ -29,9 +33,14 @@ namespace Watch.Examples.Desktop
         readonly Dictionary<int, DataEventMonitor<ScatterViewItem>> _touchHoldMonitors =
             new Dictionary<int, DataEventMonitor<ScatterViewItem>>();
 
+        readonly Dictionary<int, ScatterViewItem> _selectedItems =
+            new Dictionary<int, ScatterViewItem>();
+
         public DesktopWindow()
         {
             InitializeComponent();
+
+            KeyDown += DesktopWindow_KeyDown;
 
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
                 new List<string> {"Right Hand", "Left Hand", "Left Knuckle", "Hand"},
@@ -50,33 +59,108 @@ namespace Watch.Examples.Desktop
 
             _watchWindow.AddWatchFace(new WatchApplication());
 
-            _watchWindow.WindowState = WindowState.Minimized;
+            _watchWindow.Width = 600;
+            _watchWindow.Height = 400;
+            _watchWindow.WindowStyle = WindowStyle.ToolWindow;
+            _watchWindow.WindowState = WindowState.Normal;
+            
             _watchWindow.Show();
+        }
+
+        void DesktopWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    _watchWindow.GestureManager.SimulateEvent(
+                        GestureEvents.GestureDetected,
+                        new GestureDetectedEventArgs(Gesture.SwipeLeft));
+                    break;
+                case Key.Right:
+                    _watchWindow.GestureManager.SimulateEvent(
+                        GestureEvents.GestureDetected,
+                        new GestureDetectedEventArgs(Gesture.SwipeRight));
+                    break;
+            }
         }
 
         void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
         {
-            //TODO check if any gesture frames are open and stop them
-
-            switch (e.Gesture)
+            if (e.Gesture == Gesture.SwipeRight)
             {
-                case Gesture.HoverRight:
-                    //move information to laptop display
-                    break;
-                case Gesture.HoverLeft:
-                    //move information to watch display
-                    break;
+                var toRemoveList = new List<int>();
+                foreach (var mon in _swipeGestureTrackers)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        var visual = _watchWindow.GetVisual();
+
+                        _watchWindow.AddWatchFace(new WatchApplication { Background = Helper.RandomBrush() });
+
+                        var floatingItem = new ScatterViewItem
+                        {
+                            Background = Brushes.Transparent,
+                            Content = visual,
+                            Center = mon.Value.Data.Center,
+                            Width = 200,
+                            Height = 100,
+                            CanScale = true,
+                            CanRotate = false
+                        };
+
+                        floatingItem.PreviewTouchDown += floatingItem_PreviewTouchDown;
+                        floatingItem.PreviewTouchUp += floatingItem_PreviewTouchUp;
+
+                        View.Items.Remove(mon.Value.Data);
+                        toRemoveList.Add(mon.Key);
+                        View.Items.Add(floatingItem);
+                    });
+                }
+
+                foreach (var item in toRemoveList)
+                {
+                    _swipeGestureTrackers.Remove(item);
+                }
             }
+            else if (e.Gesture == Gesture.SwipeLeft)
+            {
+                foreach (var item in _selectedItems)
+                {
+                    var content = item.Value.Content as WatchVisual;
+                    item.Value.Content = new Rectangle();
+                    _watchWindow.AddWatchFace(content);
+
+                    View.Items.Remove(item.Value);
+                }
+            }
+            
+        }
+
+        void floatingItem_PreviewTouchUp(object sender, TouchEventArgs e)
+        {
+            _selectedItems.Remove(e.TouchDevice.Id);
+            _watchWindow.RemoveThumbnail();
+        }
+
+        void floatingItem_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            _selectedItems.Add(e.TouchDevice.Id,(ScatterViewItem) sender);
+            _watchWindow.SendThumbnail(
+                new Rectangle
+                {
+                    Fill = ((WatchVisual)((ScatterViewItem) sender).Content).Background
+                });
         }
         void touchPipeline_GestureTouchDown(object sender, GestureTouchEventArgs e)
         {
             LblMode.Content = _watchWindow.LastDetectedPosture;
-           if (_watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First()) 
-                return;
+           //if (_watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First()) 
+            //    return;
 
             var progress = new ProgressBar
             {
-                Minimum = 0, Maximum = 100, 
+                Minimum = 0,
+                Maximum = TouchHoldTime, 
                 Background = Brushes.Transparent,
                 BorderThickness = new Thickness(0),
                 Foreground = _watchWindow.ActiveVisual.Background
@@ -105,7 +189,7 @@ namespace Watch.Examples.Desktop
         void monitor_MonitorTriggered(object sender, DataTriggeredEventArgs<ScatterViewItem> e)
         {
             if (!_touchHoldMonitors.ContainsKey(e.Id)) return;
-            if (_touchHoldMonitors[e.Id].Counter == 100)
+            if (_touchHoldMonitors[e.Id].Counter == TouchHoldTime)
             {
                 _touchHoldMonitors[e.Id].Stop();
 

@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Windows.Shapes;
 
 namespace Watch.Toolkit.Interface
 {
     public interface IWatchFace
     {
-        void Suspend();
-        void Resume();
-        object Visual { get; set; }
+        WatchVisual Clone();
+        Rectangle BuildThumbnail();
+
         Guid Id { get; set; }
         string Name { get; set; }
     }

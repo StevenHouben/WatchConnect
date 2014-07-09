@@ -70,6 +70,9 @@
     <Compile Include="Input\DataEventMonitor.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Input\Gestures\GestureEvents.cs" />
+    <Compile Include="Input\Touch\TouchEvents.cs" />
+    <Compile Include="Input\Tracker\TrackerEvents.cs" />
     <Compile Include="Interface\Debug\DebugWatchWindow.xaml.cs">
       <DependentUpon>DebugWatchWindow.xaml</DependentUpon>
     </Compile>

@@ -45,6 +45,8 @@ namespace Watch.Toolkit.Input.Gestures
         private readonly List<double> _dataRight = new List<double>();
         private readonly List<double> _dataLeft = new List<double>();
 
+
+      
         private Phidget _phidget;
         public override void Start()
         {
@@ -253,8 +255,6 @@ namespace Watch.Toolkit.Input.Gestures
             //var m = _detectedGestures.Dequeue() + _detectedGestures.Dequeue();
 
             //Console.WriteLine(n < m ? _lastDetectedGesture = Gesture.SwipeRight : _lastDetectedGesture = Gesture.SwipeLeft);
-
-        
 
             OnGestureHandler(new GestureDetectedEventArgs(_lastDetectedGesture));
             

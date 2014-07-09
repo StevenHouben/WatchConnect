@@ -18,6 +18,7 @@ namespace Watch.Toolkit.Interface.DefaultFaces
             _lbl = new Label
             {
                 Content = DateTime.Now.ToLongTimeString(),
+                Background = Brushes.Red,
                 Foreground = Brushes.White,
                 FontSize = 200,
                 HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center,
@@ -37,7 +38,6 @@ namespace Watch.Toolkit.Interface.DefaultFaces
             {
                 _lbl.Content = DateTime.Now.ToLongTimeString();
             });
-
         }
 
 

@@ -17,7 +17,6 @@ namespace Watch.Toolkit.Hardware
             if (MessageReceived != null)
                 MessageReceived(sender, e);
         }
-
         protected void OnAnalogDataReceived(object sender, AnalogDataReceivedEventArgs e)
         {
             if (AnalogDataReceived != null)

@@ -1,4 +1,9 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.IO;
+using System.Windows.Controls;
+using System.Windows.Markup;
+using System.Windows.Shapes;
+using System.Xml;
 
 namespace Watch.Toolkit.Interface
 {
@@ -9,26 +14,18 @@ namespace Watch.Toolkit.Interface
     {
         public WatchVisual()
         {
+            Id = Guid.NewGuid();
         }
 
-        public WatchVisual Clone()
+        public virtual WatchVisual Clone()
         {
-            return new WatchVisual
-            {
-                Background = Background
-            };
+            return (WatchVisual)XamlReader.Load(XmlReader.Create( new StringReader(XamlWriter.Save(this))));
         }
 
-        public void Suspend()
+        public virtual Rectangle BuildThumbnail()
         {
+            return new Rectangle{Fill = Background};
         }
-
-        public void Resume()
-        {
-        }
-
-        public object Visual { get; set; }
-
         public System.Guid Id { get; set; }
     }
 }

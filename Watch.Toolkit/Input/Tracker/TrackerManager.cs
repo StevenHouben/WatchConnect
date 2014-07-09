@@ -18,7 +18,20 @@ namespace Watch.Toolkit.Input.Tracker
 
         public event EventHandler<TrackGestureEventArgs> RawTrackGestureDataUpdated= delegate { };
 
-        public event EventHandler<string> TrackGestureRecognized = delegate { }; 
+        public event EventHandler<LabelDetectedEventArgs> TrackGestureRecognized = delegate { };
+
+        public void Simulate(TrackerEvents ev, EventArgs e)
+        {
+            switch (ev)
+            {
+                case TrackerEvents.RawTrackGestureDataUpdated:
+                    RawTrackGestureDataUpdated(this, (TrackGestureEventArgs) e);
+                    break;
+                case TrackerEvents.TrackGestureRecognized:
+                    TrackGestureRecognized(this, (LabelDetectedEventArgs) e);
+                break;
+            }
+        }
 
         public TrackerManager(ClassifierConfiguration classifierConfiguration)
         {
@@ -63,7 +76,11 @@ namespace Watch.Toolkit.Input.Tracker
                        ComputedDtwCosts = result.Item2
                    });
 
-            TrackGestureRecognized(this, _treeLabel == _dtwLabel ? _treeLabel : _classifierConfiguration.Labels.First());
+            TrackGestureRecognized(this,
+                new LabelDetectedEventArgs
+                {
+                    Detection = _treeLabel == _dtwLabel ? _treeLabel : _classifierConfiguration.Labels.First()
+                });
 
 
 
@@ -75,12 +92,17 @@ namespace Watch.Toolkit.Input.Tracker
         }
     }
 
-    public class TrackGestureEventArgs
+    public class TrackGestureEventArgs:EventArgs
     {
         public string DtwLabel { get; set; }
         public string TreeLabel { get; set; }
 
         public Dictionary<string,double> ComputedDtwCosts { get; set; }
+
+    }
+    public class LabelDetectedEventArgs : EventArgs
+    {
+        public string Detection { get; set; }
 
     }
 }

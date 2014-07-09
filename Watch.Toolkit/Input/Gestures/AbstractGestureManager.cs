@@ -14,6 +14,37 @@ namespace Watch.Toolkit.Input.Gestures
         public event EventHandler<GestureDetectedEventArgs> Glance;
         public event EventHandler<GestureDetectedEventArgs> Cover;
 
+        public void SimulateEvent(GestureEvents ev, EventArgs e)
+        {
+            switch (ev)
+            {
+                case GestureEvents.Cover:
+                    OnCoverHandler((GestureDetectedEventArgs)e);
+                    break;
+                case GestureEvents.GestureDetected:
+                    OnGestureHandler((GestureDetectedEventArgs)e);
+                    break;
+                case GestureEvents.Glance:
+                    OnGlanceHandler((GestureDetectedEventArgs)e);
+                    break;
+                case GestureEvents.HoverLeft:
+                    OnHoverLeftHandler((GestureDetectedEventArgs)e);
+                    break;
+                case GestureEvents.HoverRight:
+                    OnHoverRightHandler((GestureDetectedEventArgs)e);
+                    break;
+                case GestureEvents.RawDataReceived:
+                    OnRawDataHandler((RawSensorDataReceivedEventArgs)e);
+                    break;
+                case GestureEvents.SwipeLeft:
+                    OnSwipeLeftHandler((GestureDetectedEventArgs)e);
+                    break;
+                case GestureEvents.SwipeRight:
+                    OnSwipeRightHandler((GestureDetectedEventArgs)e);
+                    break;
+            }
+        }
+
         public abstract void Start();
         public abstract void Stop();
 
