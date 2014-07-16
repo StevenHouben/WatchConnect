@@ -15,17 +15,17 @@ namespace Watch.Toolkit.Interface.DefaultFaces
         {
             InitializeComponent();
 
+            Background = Brushes.Red;
             _lbl = new Label
             {
                 Content = DateTime.Now.ToLongTimeString(),
-                Background = Brushes.Red,
                 Foreground = Brushes.White,
                 FontSize = 200,
                 HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center,
                 VerticalContentAlignment = System.Windows.VerticalAlignment.Center
             };
-
-            Grid.Children.Add(_lbl);
+            var box = new Viewbox {Child = _lbl};
+            Grid.Children.Add(box);
 
             var time = new Timer(1000);
             time.Elapsed += time_Elapsed;

@@ -13,8 +13,10 @@ using Watch.Toolkit.Interface.DefaultFaces;
 
 namespace Watch.Toolkit
 {
-    public partial class WatchWindow:IVisualSharer
+    public partial class WatchRuntime:IVisualSharer
     {
+
+        private int _peekSize;
         public TouchManager TouchManager { get; set; }
         public GestureManager GestureManager { get; set; }
         public TrackerManager TrackerManager { get; set; }
@@ -25,11 +27,18 @@ namespace Watch.Toolkit
         public string LastDetectedPosture { get; set; }
         public string LastDetectedGesture { get; set; }
 
-        public WatchWindow()
+        public WatchRuntime()
         {
             BuildWatch(WatchConfiguration.DefaultWatchConfiguration);
         }
-        public WatchWindow(WatchConfiguration watchConfiguration)
+
+        void WatchRuntime_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowManager.MaximizeToSecondaryMonitor(this);
+
+            _peekSize = Convert.ToInt32(Width*0.08);
+        }
+        public WatchRuntime(WatchConfiguration watchConfiguration)
         {
             BuildWatch(watchConfiguration);
         }
@@ -38,14 +47,8 @@ namespace Watch.Toolkit
         {
             InitializeComponent();
 
+            Loaded += WatchRuntime_Loaded;
             KeyDown += WatchWindow_KeyDown;
-            Width = watchConfiguration.DisplaySize.Width;
-            Height = watchConfiguration.DisplaySize.Height;
-
-            WindowStyle = WindowStyle.None;
-            WindowState = WindowState.Maximized;
-
-            WindowManager.MaximizeToSecondaryMonitor(this);
 
             TouchManager = new TouchManager();
             TouchManager.Start();
@@ -85,6 +88,12 @@ namespace Watch.Toolkit
         public void RemoveWatchFace(Guid id)
         {
             _watchFaceManager.RemoveFace(id);
+        }
+
+        public void NextFace()
+        {
+            ActiveVisual = _watchFaceManager.GetNext();
+
         }
 
         public object GetVisual(int id=-1)
@@ -159,9 +168,9 @@ namespace Watch.Toolkit
             }
 
             OuterBorder.BorderBrush = grad;
-            OuterBorder.BorderThickness = new Thickness(0, 0, 20, 0);
+            OuterBorder.BorderThickness = new Thickness(0, 0, _peekSize, 0);
             ContentHolder.BorderBrush = Brushes.Black;
-            ContentHolder.BorderThickness = new Thickness(0, 0, 5, 0);
+            ContentHolder.BorderThickness = new Thickness(0, 0, _peekSize/4, 0);
         }
         private readonly Dictionary<int, Color> _thumbnails = new Dictionary<int, Color>();
     }

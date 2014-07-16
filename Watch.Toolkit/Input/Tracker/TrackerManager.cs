@@ -11,7 +11,6 @@ namespace Watch.Toolkit.Input.Tracker
     {
         private readonly ClassifierConfiguration _classifierConfiguration;
         private readonly ImuParser _accelerometerParser = new ImuParser();
-
         public Imu Accelerometer { get; private set; }
         public TreeClassifier TreeClassifier { get; set; }
         public DtwClassifier DtwClassifier { get; set; }

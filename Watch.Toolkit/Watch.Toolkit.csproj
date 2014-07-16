@@ -136,8 +136,8 @@
     <Compile Include="Sensors\Vector.cs" />
     <Compile Include="WatchConfiguration.cs" />
     <Compile Include="Interface\WatchVisual.cs" />
-    <Compile Include="WatchWindow.xaml.cs">
-      <DependentUpon>WatchWindow.xaml</DependentUpon>
+    <Compile Include="WatchRuntime.xaml.cs">
+      <DependentUpon>WatchRuntime.xaml</DependentUpon>
     </Compile>
     <Compile Include="Interface\WindowManager.cs" />
   </ItemGroup>
@@ -163,7 +163,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="WatchWindow.xaml">
+    <Page Include="WatchRuntime.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

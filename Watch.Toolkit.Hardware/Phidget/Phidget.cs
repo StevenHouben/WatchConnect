@@ -21,8 +21,6 @@ namespace Watch.Toolkit.Hardware.Phidget
                 _kit.open(id);
                 _kit.waitForAttachment();
 
-                var s = _kit.sensors;
-
                 IsRunning = true;
             });
             t.Start();
@@ -38,9 +36,9 @@ namespace Watch.Toolkit.Hardware.Phidget
 
                 _kit.close();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                
+                Console.WriteLine(ex);
                 
             }
 

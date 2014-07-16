@@ -4,17 +4,11 @@ namespace Watch.Toolkit.Input.Touch
 {
     public class MultiBevelTouchEventArgs : EventArgs
     {
-        public bool BevelTop { get; set; }
-        public bool BevelRight { get; set; }
-        public bool BevelLeft { get; set; }
-        public bool BevelBottom { get; set; }
+        public BevelState BevelState { get; set; }
 
-        public MultiBevelTouchEventArgs(bool bevelTop, bool bevelRight, bool bevelLeft, bool bevelBottom)
+        public MultiBevelTouchEventArgs(BevelState bevelState)
         {
-            BevelTop = bevelTop;
-            BevelRight = bevelRight;
-            BevelLeft = bevelLeft;
-            BevelBottom = bevelBottom;
+            BevelState = bevelState;
         }
     }
 }

@@ -22,9 +22,18 @@
                 <Button FontSize="20" Content="Add" HorizontalAlignment="Stretch" VerticalAlignment="Top" Click="Button_Click"/>
             </StackPanel>
         </Border>
-
         <Controls:TouchVisualizer x:Name="TouchVisualizer" Grid.Column="1" />
         <Label Grid.Column="1" x:Name="Label" Foreground="OldLace" HorizontalContentAlignment="Center" FontSize="60" HorizontalAlignment="Stretch" VerticalAlignment="Top" Content="Null"/>
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="10" VerticalAlignment="Top">
+            <Rectangle Margin="0,0,10,0" x:Name="Rect1" Width="30" Height="30" Stroke="Gray"></Rectangle>
+            <Rectangle Margin="0,0,10,0"  x:Name="Rect2" Width="30" Height="30" Stroke="Gray"></Rectangle>
+            <Rectangle Margin="0,0,10,0"  x:Name="Rect3" Width="30" Height="30" Stroke="Gray"></Rectangle>
+            <Rectangle Margin="0,0,10,0"  x:Name="Rect4" Width="30" Height="30" Stroke="Gray"></Rectangle>
+            <Rectangle Margin="0,0,10,0"  x:Name="Rect5" Width="30" Height="30" Stroke="Gray"></Rectangle>
+            <Rectangle Margin="0,0,10,0"  x:Name="Rect6" Width="30" Height="30" Stroke="Gray"></Rectangle>
+            <Rectangle Margin="0,0,10,0"  x:Name="Rect7" Width="30" Height="30" Stroke="Gray"></Rectangle>
+            <Rectangle Margin="0,0,10,0"  x:Name="Rect8" Width="30" Height="30" Stroke="Gray"></Rectangle>
+        </StackPanel>
 
     </Grid>
 </Window>

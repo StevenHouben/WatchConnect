@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -13,6 +12,7 @@ using Watch.Toolkit;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Interface;
+using Watch.Toolkit.Interface.DefaultFaces;
 using Watch.Toolkit.Processing.MachineLearning;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Point = System.Windows.Point;
@@ -25,7 +25,7 @@ namespace Watch.Examples.Desktop
         const int TouchHoldTime = 100;              
         const int GestureFrameTime = 2000;
 
-        private readonly WatchWindow _watchWindow;
+        private readonly WatchRuntime _watchWindow;
         readonly WatchConfiguration _configuration = new WatchConfiguration();
 
         readonly Dictionary<int,DataEventMonitor<ScatterViewItem>> _swipeGestureTrackers = 
@@ -48,7 +48,7 @@ namespace Watch.Examples.Desktop
                 new List<string> {"Right Hand", "Left Hand", "Left Knuckle", "Hand"},
                 AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
 
-            _watchWindow = new WatchWindow(_configuration);
+            _watchWindow = new WatchRuntime(_configuration);
 
             var touchPipeline = new GestureTouchPipeline(this);
             touchPipeline.GestureTouchDown += touchPipeline_GestureTouchDown;
@@ -60,25 +60,27 @@ namespace Watch.Examples.Desktop
             Left = 300;
             Top = 0;
             Height = Screen.PrimaryScreen.WorkingArea.Height;
-            Width = Screen.PrimaryScreen.WorkingArea.Width - 300;
+            Width = Screen.PrimaryScreen.WorkingArea.Width - 700;
 
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
-            _watchWindow.AddWatchFace(new WatchApplication());
+            _watchWindow.AddWatchFace(new Clock());
 
-            _watchWindow.Width = 300;
-            _watchWindow.Height = 300;
-            _watchWindow.WindowStyle = WindowStyle.ToolWindow;
-            _watchWindow.WindowState = WindowState.Normal;
-            _watchWindow.Left = 0;
-            _watchWindow.Top = 0;
-            
+            //_watchWindow.Width = 300;
+            //_watchWindow.Height = 300;
+            //_watchWindow.WindowStyle = WindowStyle.ToolWindow;
+            //_watchWindow.WindowState = WindowState.Normal;
+            //_watchWindow.Left = 0;
+            //_watchWindow.Top = 0;
+
             _watchWindow.Show();
         }
 
         private bool IsSelectMode()
         {
-           return _watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First();
+            return false;
+            //Todo: this is debug code
+            //return _watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First();
         }
         void DesktopWindow_KeyDown(object sender, KeyEventArgs e)
         {
@@ -99,6 +101,7 @@ namespace Watch.Examples.Desktop
 
         void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
         {
+
             switch (e.Gesture)
             {
                 case Gesture.SwipeRight:
@@ -106,6 +109,7 @@ namespace Watch.Examples.Desktop
                     var toRemoveList = new List<int>();
                     foreach (var mon in _swipeGestureTrackers)
                     {
+                        var localMon = mon;
                         Dispatcher.Invoke(() =>
                         {
                             var visual = _watchWindow.GetVisual();
@@ -116,9 +120,9 @@ namespace Watch.Examples.Desktop
                             {
                                 Background = Brushes.Transparent,
                                 Content = visual,
-                                Center = mon.Value.Data.Center,
+                                Center = localMon.Value.Data.Center,
                                 Width = 200,
-                                Height = 100,
+                                Height = 300,
                                 CanScale = true,
                                 CanRotate = false
                             };
@@ -126,8 +130,8 @@ namespace Watch.Examples.Desktop
                             floatingItem.PreviewTouchDown += floatingItem_PreviewTouchDown;
                             floatingItem.PreviewTouchUp += floatingItem_PreviewTouchUp;
 
-                            View.Items.Remove(mon.Value.Data);
-                            toRemoveList.Add(mon.Key);
+                            View.Items.Remove(localMon.Value.Data);
+                            toRemoveList.Add(localMon.Key);
                             View.Items.Add(floatingItem);
                         });
                     }
@@ -142,14 +146,18 @@ namespace Watch.Examples.Desktop
                     var toRemoveItems = new List<int>();
                     foreach (var item in _selectedItems)
                     {
-                        var content = item.Value.Content as WatchVisual;
-                        item.Value.Content = new Rectangle();
-                        if(content !=null)
-                            _watchWindow.AddWatchFace(content);
+                        var localItem = item;
+                        Dispatcher.Invoke(() =>
+                        {
+                            var content = localItem.Value.Content as WatchVisual;
+                            localItem.Value.Content = new Rectangle();
+                            if (content != null)
+                                _watchWindow.AddWatchFace(content);
 
-                        _watchWindow.RemoveThumbnail(item.Key);
-                        toRemoveItems.Add(item.Key);
-                        View.Items.Remove(item.Value);
+                            _watchWindow.RemoveThumbnail(localItem.Key);
+                            toRemoveItems.Add(localItem.Key);
+                            View.Items.Remove(localItem.Value);
+                        });
                     }
                     foreach (var item in toRemoveItems)
                     {

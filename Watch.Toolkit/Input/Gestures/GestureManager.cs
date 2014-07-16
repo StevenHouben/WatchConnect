@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
+using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
@@ -46,7 +47,7 @@ namespace Watch.Toolkit.Input.Gestures
         private readonly List<double> _dataLeft = new List<double>();
 
 
-      
+        private Arduino _arduino;
         private Phidget _phidget;
         public override void Start()
         {
@@ -65,6 +66,24 @@ namespace Watch.Toolkit.Input.Gestures
 
             _gestureRecognizer.AddTemplate("left",data[0]);
             _gestureRecognizer.AddTemplate("right", data[1]);
+
+            _arduino = new Arduino();
+            _arduino.MessageReceived += _arduino_MessageReceived;
+            _arduino.Start();
+        }
+
+        void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
+        {
+            if (!e.Message.StartsWith("L"))
+                return;
+
+            var data = e.Message.Split(',');
+
+            if (data.Length != 2)
+                return;
+            _lightSensor.Value = Convert.ToDouble(data[1]);
+            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
+
         }
 
         public override void Stop()

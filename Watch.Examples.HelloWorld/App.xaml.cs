@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using Watch.Toolkit;
+using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Tracker;
+using Watch.Toolkit.Processing.MachineLearning;
 
 namespace Watch.Examples.HelloWorld
 {
@@ -10,54 +15,63 @@ namespace Watch.Examples.HelloWorld
     /// </summary>
     public partial class App
     {
+        readonly StackPanel _view = new StackPanel();
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            //Create new watch window, this window will automatically appear on
-            //the second monitor or watch.
-            var watchWindow = new WatchWindow();
+            //Create a new configuration
+            var configuration = new WatchConfiguration
+            {
+                DisplaySize = new Size(800, 600),
+                ClassifierConfiguration = new ClassifierConfiguration(
+                     new List<string> { "Idle", "Left Index", "Left Knuckle", "Hand" },
+                     AppDomain.CurrentDomain.BaseDirectory + "recording16.log")
+            };
 
-            //Attaching a new watchface will automatically will make it active.
-            //A watchface is a UserControl component that inherits from
-            //WatchVisual, which can be found in the toolkit
+            //Create a new instance of the WatchRuntime
+            var watchWindow = new WatchRuntime(configuration);
+
+            //Add a default Watchface to the watch
             watchWindow.AddWatchFace( new Toolkit.Interface.DefaultFaces.Clock());
 
-            //Connect to the GestureManager and listen for any gestures. These events will
-            //be triggered depending on the availability of the sensors.
-            watchWindow.GestureManager.GestureDetected += GestureManager_Detected;
-            watchWindow.GestureManager.Cover += GestureManager_Detected;
-            watchWindow.GestureManager.Glance += GestureManager_Detected;
-            watchWindow.GestureManager.HoverLeft += GestureManager_Detected;
-            watchWindow.GestureManager.HoverRight += GestureManager_Detected;
-            watchWindow.GestureManager.SwipeLeft += GestureManager_Detected;
-            watchWindow.GestureManager.SwipeRight += GestureManager_Detected;
+            //Listen for new gestures
+            watchWindow.GestureManager.GestureDetected += (sender,gestureEventArgs) =>
+            {
+                //If we detect a swipe right event
+                if (gestureEventArgs.Gesture != Gesture.SwipeRight) 
+                    return;
 
-            //Connect to the TrackerManager and listen for any posture detection, by default
-            //the tracker manager will use four postures, but by loadin a custom configuration
-            //developers can determines their own labels and training data for the machine
-            //learning component.
-            watchWindow.TrackerManager.TrackGestureRecognized += TrackerManager_TrackGestureRecognized;
-            watchWindow.TrackerManager.RawTrackGestureDataUpdated += TrackerManager_RawTrackGestureDataUpdated;
+                //Move the active visual from the watch interface
+                //to the main application
+                var view = (UIElement)watchWindow.GetVisual();
+                _view.Children.Add(view);
+            };
 
-            //Connect to the TouchManager and listen for any touch events. These events will
-            //be triggered depending on the availability of the sensors.
-            watchWindow.TouchManager.BevelDown += TouchManager_BevelDown;
-            watchWindow.TouchManager.BevelDoubleTap += TouchManager_BevelDoubleTap;
-            watchWindow.TouchManager.BevelGrab += TouchManager_BevelGrab;
-            watchWindow.TouchManager.BevelUp += TouchManager_BevelUp;
+            //Listen for new postures
+            watchWindow.TrackerManager.TrackGestureRecognized += (sender, trackEventArgs) =>
+            {
+                //if we detect a left knuckle posture
+                if (trackEventArgs.Detection != "Left Knuckle")
+                    return;
 
-            watchWindow.TouchManager.DoubleTap += TouchManager_DoubleTap;
-            watchWindow.TouchManager.SlideDown += TouchManager_SlideDown;
-            watchWindow.TouchManager.SlideUp += TouchManager_SlideUp;
-            watchWindow.TouchManager.SliderTouchDown += TouchManager_SliderTouchDown;
-            watchWindow.TouchManager.SliderTouchUp += TouchManager_SliderTouchUp;
+                //Move a thumnail of the watch face to the view
+                var thumb = (UIElement) watchWindow.GetThumbnail(0);
+                _view.Children.Add(thumb);
+
+            };
+
+            watchWindow.TouchManager.BevelGrab += (sender, touchEventArgs) =>
+            {
+                //If the user grabs the top and bottom bevel
+                if (!(touchEventArgs.BevelState.BevelTop && touchEventArgs.BevelState.BevelBottom))
+                    return;
+                
+                //Move to the next watchface
+                watchWindow.NextFace();
+            };
             
-            //Launch the window
             watchWindow.Show();
-
-            //We can access the watchface data
-            
         }
 
         static void TrackerManager_RawTrackGestureDataUpdated(object sender, Toolkit.Input.Tracker.TrackGestureEventArgs e)
@@ -108,7 +122,7 @@ namespace Watch.Examples.HelloWorld
 
         void TouchManager_BevelGrab(object sender, Toolkit.Input.Touch.MultiBevelTouchEventArgs e)
         {
-            Console.WriteLine(@"Bevel Grab on Sides: Left: {0} - Top: {1} - Right: {2} - Bottom {3} with value: {1}", e.BevelLeft, e.BevelTop, e.BevelRight, e.BevelBottom);
+            Console.WriteLine(@"Bevel Grab on Sides: Left: {0} - Top: {1} - Right: {2} - Bottom {3} with value: {1}", e.BevelState.BevelLeft, e.BevelState.BevelTop, e.BevelState.BevelRight, e.BevelState.BevelBottom);
         }
 
         void TouchManager_BevelDoubleTap(object sender, Toolkit.Input.Touch.BevelTouchEventArgs e)

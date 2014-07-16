@@ -77,10 +77,10 @@ namespace Watch.Toolkit.Input.Touch
 
         public void Start()
         {
-            _phidget = new Phidget();
-            _phidget.Start(28157);
-            _phidget.AnalogDataReceived += _manager_AnalogDataReceived;
-            _phidget.DigitalInReceived += _manager_DigitalInReceived;
+            //_phidget = new Phidget();
+            //_phidget.Start(28157);
+            //_phidget.AnalogDataReceived += _manager_AnalogDataReceived;
+            //_phidget.DigitalInReceived += _manager_DigitalInReceived;
 
             _gestureRecognizer.AddTemplate(
                 "Up",
@@ -101,21 +101,25 @@ namespace Watch.Toolkit.Input.Touch
             if (!e.Message.StartsWith("T"))
                 return;
 
-            if (e.Message.Length != 4) 
+            var data = e.Message.Split(',');
+
+            if (data.Length != 9) 
                 return;
 
             var state = new BevelState()
             {
-                BevelTop = e.Message[0] == '1',
-                BevelBottom = e.Message[1] == '1',
-                BevelRight = e.Message[2] == '1',
-                BevelLeft = e.Message[3] == '1'
+                BevelTop = data[1] == "1",
+                BevelLeft = data[2] == "1",
+                BevelBottom = data[3] == "1",
+                BevelRight = data[4] == "1"
             };
 
             CompareStates(BevelSide.TopSide, state.BevelTop, _bevelState.BevelTop);
             CompareStates(BevelSide.LeftSide, state.BevelLeft, _bevelState.BevelLeft);
             CompareStates(BevelSide.RightSide, state.BevelRight, _bevelState.BevelRight);
             CompareStates(BevelSide.BottomSide, state.BevelBottom, _bevelState.BevelBottom);
+            
+            OnBevelGrabHandler(new MultiBevelTouchEventArgs(state));
 
             _bevelState = state;
         }
@@ -131,9 +135,10 @@ namespace Watch.Toolkit.Input.Touch
 
         void CompareStates(BevelSide side, bool stateNow, bool stateOld)
         {
-            if (stateNow == stateOld) return;
+            if (stateNow == stateOld) 
+                return;
             if(stateNow)
-                OnBevelTouchDownHandler(new BevelTouchEventArgs(side,0));
+                OnBevelTouchDownHandler(new BevelTouchEventArgs(side,1));
             else
                 OnBevelTouchUpHandler(new BevelTouchEventArgs(side,0));
         }
