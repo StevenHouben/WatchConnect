@@ -36,7 +36,6 @@ namespace Watch.Toolkit.Input.Touch
         private readonly EventMonitor _wristBandDoubleTapTimer = new EventMonitor(300);
         private readonly EventMonitor _bevelMonitor = new EventMonitor(300);
 
-        private Phidget _phidget;
         private Arduino _arduino;
 
         private BevelState _bevelState = new BevelState();
@@ -77,11 +76,6 @@ namespace Watch.Toolkit.Input.Touch
 
         public void Start()
         {
-            //_phidget = new Phidget();
-            //_phidget.Start(28157);
-            //_phidget.AnalogDataReceived += _manager_AnalogDataReceived;
-            //_phidget.DigitalInReceived += _manager_DigitalInReceived;
-
             _gestureRecognizer.AddTemplate(
                 "Up",
                 new double[] { 173, 275, 409, 567, 732, 897, 1000 });
@@ -126,11 +120,9 @@ namespace Watch.Toolkit.Input.Touch
 
         public void Stop()
         {
+            if (_arduino == null) return;
             if (_arduino.IsRunning)
                 _arduino.Stop();
-
-            if(_phidget.IsRunning)
-                _phidget.Stop();
         }
 
         void CompareStates(BevelSide side, bool stateNow, bool stateOld)

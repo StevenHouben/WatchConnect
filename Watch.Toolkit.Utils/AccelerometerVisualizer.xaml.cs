@@ -9,6 +9,7 @@ using GestureTouch;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
 using Watch.Toolkit.Input.Tracker;
+using Watch.Toolkit.Interface;
 using Watch.Toolkit.Interface.DefaultFaces;
 using Watch.Toolkit.Processing.MachineLearning;
 
@@ -75,11 +76,27 @@ namespace Watch.Toolkit.Utils
 
             _watchWindow.Show();
 
+            Loaded += AccelerometerVisualizer_Loaded;
+
+        }
+
+        void AccelerometerVisualizer_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!WindowManager.HasWatchConnected())
+            {
+                WindowManager.Dock(_watchWindow,WindowManager.DockLocation.Left);
+                WindowManager.Dock(this,WindowManager.DockLocation.Right);
+            }
         }
 
         void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
         {
             _visualizer.UpdateEvents(e.Gesture.ToString());
+            _detection = e.Gesture.ToString();
+            Dispatcher.Invoke(() =>
+            {
+                Label.Content = _detection;
+            });
         }
 
         void GestureManager_RawDataReceived(object sender, Sensors.RawSensorDataReceivedEventArgs e)
@@ -109,7 +126,7 @@ namespace Watch.Toolkit.Utils
         {
             Dispatcher.Invoke(() =>
             {
-                lblRaw.Content = _trackerManager.Accelerometer.ToFormattedString();
+                lblRaw.Content = _trackerManager.Imu.ToFormattedString();
                 lblDTW.Content = "";
 
                 lblDT.Content = e.TreeLabel;
@@ -129,17 +146,20 @@ namespace Watch.Toolkit.Utils
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            _trackerManager.Stop();
+
         }
 
         void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
             {
-                foreach (string item in listGesture.Items)
-                {
-                    File.AppendAllText("log.log", item+"\n");
-                }
+                //foreach (string item in listGesture.Items)
+                //{
+                //    File.AppendAllText("log.log", item+"\n");
+                //}
+                //_trackerManager.Stop();
+                //_gestureManager.Stop();
+                //_touchManager.Stop();
                 Environment.Exit(0);
             }
 

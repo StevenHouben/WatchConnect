@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using Watch.Toolkit.Processing.MachineLearning;
 using Watch.Toolkit.Sensors;
 
@@ -10,8 +9,8 @@ namespace Watch.Toolkit.Input.Tracker
     public class TrackerManager : IInputManager
     {
         private readonly ClassifierConfiguration _classifierConfiguration;
-        private readonly ImuParser _accelerometerParser = new ImuParser();
-        public Imu Accelerometer { get; private set; }
+        private ImuParser ImuParser { get; set; }
+        public Imu Imu { get; private set; }
         public TreeClassifier TreeClassifier { get; set; }
         public DtwClassifier DtwClassifier { get; set; }
 
@@ -36,9 +35,10 @@ namespace Watch.Toolkit.Input.Tracker
         {
             _classifierConfiguration = classifierConfiguration;
 
-            Accelerometer = new Imu();
+            ImuParser = new ImuParser();
+            Imu = new Imu();
 
-            _accelerometerParser.AccelerometerDataReceived += _accelerometerParser_AccelerometerDataReceived;
+            ImuParser.AccelerometerDataReceived += _accelerometerParser_AccelerometerDataReceived;
         }
 
         public void Start()
@@ -49,7 +49,7 @@ namespace Watch.Toolkit.Input.Tracker
             DtwClassifier = new DtwClassifier(_classifierConfiguration);
             DtwClassifier.Run();
 
-            _accelerometerParser.Start();
+            ImuParser.Start();
         }
 
         private string _dtwLabel;
@@ -58,12 +58,12 @@ namespace Watch.Toolkit.Input.Tracker
         void _accelerometerParser_AccelerometerDataReceived(object sender, 
             ImuDataReceivedEventArgs e)
         {
-            Accelerometer.Update(e.Accelerometer);
+            Imu.Update(e.Accelerometer);
 
-            var result = DtwClassifier.ComputeLabelAndCosts(Accelerometer.YawPitchRollValues.RawData);
+            var result = DtwClassifier.ComputeLabelAndCosts(Imu.YawPitchRollValues.RawData);
             _dtwLabel = result.Item1;
 
-            var computedLabel = TreeClassifier.ComputeValue(Accelerometer.YawPitchRollValues.RawData);
+            var computedLabel = TreeClassifier.ComputeValue(Imu.YawPitchRollValues.RawData);
             _lastDetectedClassification = computedLabel == -1 ? _lastDetectedClassification : computedLabel;
             _treeLabel = _classifierConfiguration.GetLabel(_lastDetectedClassification);
 
@@ -80,14 +80,11 @@ namespace Watch.Toolkit.Input.Tracker
                 {
                     Detection = _treeLabel == _dtwLabel ? _treeLabel : _classifierConfiguration.Labels.First()
                 });
-
-
-
         }
 
         public void Stop()
         {
-            _accelerometerParser.Stop();
+            ImuParser.Stop();
         }
     }
 

@@ -33,7 +33,6 @@ namespace Watch.Toolkit.Hardware.Phidget
                 _kit.SensorChange -= kit_SensorChange;
                 _kit.OutputChange -= kit_OutputChange;
                 _kit.InputChange -= kit_InputChange;
-
                 _kit.close();
             }
             catch (Exception ex)

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Timers;
 using Watch.Toolkit.Hardware.Arduino;
-using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
 
@@ -10,7 +9,6 @@ namespace Watch.Toolkit.Input.Gestures
 {
     public class GestureManager:AbstractGestureManager
     {
-
         private const int InfraRedDistanceThreshold = 300;
 
         private readonly DtwRecognizer _gestureRecognizer = new DtwRecognizer();
@@ -48,12 +46,8 @@ namespace Watch.Toolkit.Input.Gestures
 
 
         private Arduino _arduino;
-        private Phidget _phidget;
         public override void Start()
         {
-            _phidget = new Phidget();
-            _phidget.Start(157002);
-            _phidget.AnalogDataReceived += _manager_AnalogDataReceived;
 
             _topLeftSensor.RangeChanged += _topLeftSensor_RangeChanged;
             _topRightSensor.RangeChanged +=_topRightSensor_RangeChanged;
@@ -74,22 +68,31 @@ namespace Watch.Toolkit.Input.Gestures
 
         void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
         {
-            if (!e.Message.StartsWith("L"))
-                return;
+            if (e.Message.StartsWith("L"))
+            {
+                var data = e.Message.Split(',');
 
-            var data = e.Message.Split(',');
+                if (data.Length != 2)
+                    return;
+                _lightSensor.Value = Convert.ToDouble(data[1]);
+            }
+            else if (e.Message.StartsWith("P"))
+            {
+                var data = e.Message.Split(',');
 
-            if (data.Length != 2)
-                return;
-            _lightSensor.Value = Convert.ToDouble(data[1]);
+                if (data.Length != 3)
+                    return;
+                _topLeftSensor.Value = Convert.ToDouble(data[1]);
+                _topRightSensor.Value = Convert.ToDouble(data[2]);
+            }
+
             OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
 
         }
 
         public override void Stop()
         {
-            if (_phidget.IsRunning)
-                _phidget.Stop();
+            _arduino.Stop();
         }
 
         void _manager_AnalogDataReceived(object sender, Hardware.AnalogDataReceivedEventArgs e)

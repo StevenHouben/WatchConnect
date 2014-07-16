@@ -3,7 +3,8 @@ int photocellReading;     // the analog reading from the sensor divider
 int LEDpin = 13;          // connect Red LED to pin 11 (PWM pin)
 int LEDbrightness;        // 
 
-
+int rightProximityPin = 1;
+int leftProximityPin = 2;
 
 #include <SPI.h>
 #include <Adafruit_CAP1188.h>
@@ -52,7 +53,8 @@ float euler[3];         // [psi, theta, phi]    Euler angle container
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
 
-boolean lightSensorFound = false;
+boolean lightSensorFound = true;
+boolean proximitySensorFound = true;
 boolean imuFound = false;
 boolean touchSensorFound = false;
 
@@ -169,8 +171,19 @@ unsigned long now,lastupdate;
 
 void loop() {
   
-  
-  
+  if(proximitySensorFound)
+  {
+      String proximity = "P";
+      int right = analogRead(rightProximityPin);
+      int left = analogRead(leftProximityPin);
+      proximity+=",";
+      proximity+=left;
+      proximity+=",";
+      proximity+=right;
+      proximity+="#";
+      Serial.print(proximity);
+  }
+
   
   if(lightSensorFound)
   {   

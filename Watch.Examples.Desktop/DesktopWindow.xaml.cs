@@ -55,12 +55,8 @@ namespace Watch.Examples.Desktop
             touchPipeline.GestureTouchMove += touchPipeline_GestureTouchMove;
             touchPipeline.GestureTouchUp += touchPipeline_GestureTouchUp;
 
-            WindowState = WindowState.Normal;
-
-            Left = 300;
-            Top = 0;
-            Height = Screen.PrimaryScreen.WorkingArea.Height;
-            Width = Screen.PrimaryScreen.WorkingArea.Width - 700;
+            WindowState = WindowState.Maximized;
+            
 
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
