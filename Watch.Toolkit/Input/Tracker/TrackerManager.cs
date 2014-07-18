@@ -9,7 +9,7 @@ namespace Watch.Toolkit.Input.Tracker
     public class TrackerManager : IInputManager
     {
         private readonly ClassifierConfiguration _classifierConfiguration;
-        private ImuParser ImuParser { get; set; }
+        public ImuParser ImuParser { get; set; }
         public Imu Imu { get; private set; }
         public TreeClassifier TreeClassifier { get; set; }
         public DtwClassifier DtwClassifier { get; set; }

@@ -37,8 +37,12 @@ namespace Watch.Toolkit.Utils
             _trackerManager.RawTrackGestureDataUpdated += _trackerManager_RawTrackGestureDataUpdated;
             _trackerManager.Start();
 
+            _trackerManager.ImuParser.EventTriggered += ImuParser_EventTriggered;
+            _trackerManager.ImuParser.AddEvent("Rotate", imu => imu.YawPitchRollValues.Z < -10);
+
             _touchManager = new TouchManager();
             _touchManager.BevelGrab += _touchManager_BevelGrab;
+            _touchManager.BevelDoubleTap += _touchManager_BevelDoubleTap;
             _touchManager.Start();
 
             _gestureManager = new GestureManager();
@@ -78,6 +82,37 @@ namespace Watch.Toolkit.Utils
 
             Loaded += AccelerometerVisualizer_Loaded;
 
+        }
+
+        void _touchManager_BevelDoubleTap(object sender, BevelTouchEventArgs e)
+        {
+            Console.WriteLine(e.BevelSide);
+            Dispatcher.Invoke(() =>
+            {
+                switch (e.BevelSide)
+                {
+                    case BevelSide.LeftTop:
+                        Rect1.Fill = Brushes.Blue;
+                        break;
+                    case BevelSide.TopTop:
+                        Rect2.Fill = Brushes.Blue;
+                        break;
+                    case BevelSide.RightTop:
+                        Rect3.Fill = Brushes.Blue;
+                        break;
+                    case BevelSide.BottomTop:
+                        Rect4.Fill = Brushes.Blue;
+                        break;
+                }
+            });
+            
+        }
+        void ImuParser_EventTriggered(object sender, string e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                Label.Content = e;
+            });
         }
 
         void AccelerometerVisualizer_Loaded(object sender, RoutedEventArgs e)

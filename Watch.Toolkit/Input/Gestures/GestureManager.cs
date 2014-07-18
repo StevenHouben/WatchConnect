@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
+using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
@@ -44,7 +45,6 @@ namespace Watch.Toolkit.Input.Gestures
         private readonly List<double> _dataRight = new List<double>();
         private readonly List<double> _dataLeft = new List<double>();
 
-
         private Arduino _arduino;
         public override void Start()
         {
@@ -62,58 +62,48 @@ namespace Watch.Toolkit.Input.Gestures
             _gestureRecognizer.AddTemplate("right", data[1]);
 
             _arduino = new Arduino();
-            _arduino.MessageReceived += _arduino_MessageReceived;
+            _arduino.DataPacketReceived += _arduino_DataPacketReceived;
+
+            _arduino.AddPacketListener("Light", 
+                ( message) =>
+                {
+                    if (message.StartsWith("L"))
+                        return message.Split(',').Length == 2;
+                    return false;
+                },
+                (message) => new DataPacket(message.Split(',')));
+
+            _arduino.AddPacketListener("Proximity",
+                (message) =>
+                {
+                    if (message.StartsWith("P"))
+                        return message.Split(',').Length == 3;
+                    return false;
+                },
+                (message) => new DataPacket(message.Split(',')));
+
+           // _arduino.MessageReceived += _arduino_MessageReceived;
             _arduino.Start();
         }
 
-        void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
+        void _arduino_DataPacketReceived(object sender, DataPacketReceivedEventArgs e)
         {
-            if (e.Message.StartsWith("L"))
+            switch (e.DataPacket.Header)
             {
-                var data = e.Message.Split(',');
-
-                if (data.Length != 2)
-                    return;
-                _lightSensor.Value = Convert.ToDouble(data[1]);
+                case "L":
+                    _lightSensor.Value = Convert.ToDouble(e.DataPacket.Body[0]);
+                    break;
+                case "P":
+                    _topLeftSensor.Value = Convert.ToDouble(e.DataPacket.Body[0]);
+                    _topRightSensor.Value = Convert.ToDouble(e.DataPacket.Body[1]);
+                    break;
             }
-            else if (e.Message.StartsWith("P"))
-            {
-                var data = e.Message.Split(',');
-
-                if (data.Length != 3)
-                    return;
-                _topLeftSensor.Value = Convert.ToDouble(data[1]);
-                _topRightSensor.Value = Convert.ToDouble(data[2]);
-            }
-
             OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
-
         }
 
         public override void Stop()
         {
             _arduino.Stop();
-        }
-
-        void _manager_AnalogDataReceived(object sender, Hardware.AnalogDataReceivedEventArgs e)
-        {
-            switch (e.Id)
-            {
-                case 0:
-                    _frontSensor.Value = e.Value;
-                    break;
-                case 1:
-                    _topLeftSensor.Value = e.Value;
-                    break;
-                case 2:
-                    _lightSensor.Value = e.Value;
-                    break;
-                case 3:
-                    _topRightSensor.Value = e.Value;
-                    break;
-            }
-
-            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
         }
 
         void _lightSensor_RangeChanged(object sender, RangeChangedEventArgs e)

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
+using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Hardware.Arduino;
-using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
 
@@ -22,7 +22,7 @@ namespace Watch.Toolkit.Input.Touch
 
         public event EventHandler<BevelTouchEventArgs> BevelDown;
         public event EventHandler<BevelTouchEventArgs> BevelUp;
-        public event EventHandler<BevelTouchEventArgs> BevelDoubleTap; 
+        public event EventHandler<BevelTouchEventArgs> BevelDoubleTap;  //Todo: implement
 
         public event EventHandler<MultiBevelTouchEventArgs> BevelGrab;
 
@@ -34,7 +34,10 @@ namespace Watch.Toolkit.Input.Touch
         private readonly DtwRecognizer _gestureRecognizer = new DtwRecognizer();
 
         private readonly EventMonitor _wristBandDoubleTapTimer = new EventMonitor(300);
-        private readonly EventMonitor _bevelMonitor = new EventMonitor(300);
+
+        private readonly Dictionary<BevelSide, DataEventMonitor<BevelSide>> _bevelDoubleTapTimers
+            = new Dictionary<BevelSide, DataEventMonitor<BevelSide>>(); 
+
 
         private Arduino _arduino;
 
@@ -86,37 +89,54 @@ namespace Watch.Toolkit.Input.Touch
 
 
             _arduino = new Arduino();
+
+            _arduino.AddPacketListener("Capacitive Touch",
+                (message) =>
+                {
+                    if (message.StartsWith("T"))
+                        return message.Split(',').Length == 9;
+                    return false;
+                },
+                (message) => new DataPacket(message.Split(',')));
+
+            _arduino.AddPacketListener("Slider Touch",
+                (message) =>
+                {
+                    if (message.StartsWith("S"))
+                        return message.Split(',').Length == 2;
+                    return false;
+                },
+                (message) => new DataPacket(message.Split(',')));
+
+            _arduino.DataPacketReceived += _arduino_DataPacketReceived;
+
             _arduino.Start();
-            _arduino.MessageReceived += _arduino_MessageReceived;
         }
 
-        void _arduino_MessageReceived(object sender, Hardware.MessagesReceivedEventArgs e)
+        void _arduino_DataPacketReceived(object sender, Hardware.DataPacketReceivedEventArgs e)
         {
-            if (!e.Message.StartsWith("T"))
-                return;
-
-            var data = e.Message.Split(',');
-
-            if (data.Length != 9) 
-                return;
-
-            var state = new BevelState()
+            switch (e.DataPacket.Header)
             {
-                BevelTop = data[1] == "1",
-                BevelLeft = data[2] == "1",
-                BevelBottom = data[3] == "1",
-                BevelRight = data[4] == "1"
-            };
+                case "T":
+                     var state = new BevelState()
+                    {
+                        BevelTop = e.DataPacket.Body[1] == "1",
+                        BevelLeft = e.DataPacket.Body[2] == "1",
+                        BevelBottom = e.DataPacket.Body[3] == "1",
+                        BevelRight = e.DataPacket.Body[4] == "1"
+                    };
 
-            CompareStates(BevelSide.TopSide, state.BevelTop, _bevelState.BevelTop);
-            CompareStates(BevelSide.LeftSide, state.BevelLeft, _bevelState.BevelLeft);
-            CompareStates(BevelSide.RightSide, state.BevelRight, _bevelState.BevelRight);
-            CompareStates(BevelSide.BottomSide, state.BevelBottom, _bevelState.BevelBottom);
-            
-            OnBevelGrabHandler(new MultiBevelTouchEventArgs(state));
+                    HandleTouchStates(BevelSide.TopSide, state.BevelTop, _bevelState.BevelTop);
+                    HandleTouchStates(BevelSide.LeftSide, state.BevelLeft, _bevelState.BevelLeft);
+                    HandleTouchStates(BevelSide.RightSide, state.BevelRight, _bevelState.BevelRight);
+                    HandleTouchStates(BevelSide.BottomSide, state.BevelBottom, _bevelState.BevelBottom);
+                    OnBevelGrabHandler(new MultiBevelTouchEventArgs(state));
 
-            _bevelState = state;
+                    _bevelState = state;
+                    break;
+            }
         }
+
 
         public void Stop()
         {
@@ -125,14 +145,38 @@ namespace Watch.Toolkit.Input.Touch
                 _arduino.Stop();
         }
 
-        void CompareStates(BevelSide side, bool stateNow, bool stateOld)
+        void HandleTouchStates(BevelSide side, bool stateNow, bool stateOld)
         {
             if (stateNow == stateOld) 
                 return;
-            if(stateNow)
-                OnBevelTouchDownHandler(new BevelTouchEventArgs(side,1));
+            if (stateNow)
+            {
+                OnBevelTouchDownHandler(new BevelTouchEventArgs(side, 1));
+                if (_bevelDoubleTapTimers.ContainsKey(side))
+                {
+                    if (!_bevelDoubleTapTimers[side].Trigger || !_bevelDoubleTapTimers[side].Enabled) return;
+                    OnBevelDoubleTapHandler(new BevelTouchEventArgs(side,2));
+                }
+                else
+                {
+                    var em = new DataEventMonitor<BevelSide>(300, (int)side, side);
+                    em.MonitorTriggered += em_MonitorTriggered;
+                    em.Trigger = true;
+                    em.Start();
+                    _bevelDoubleTapTimers.Add(side,em);
+                }
+            }
             else
-                OnBevelTouchUpHandler(new BevelTouchEventArgs(side,0));
+            {
+                OnBevelTouchUpHandler(new BevelTouchEventArgs(side, 0));
+            }
+
+        }
+
+        void em_MonitorTriggered(object sender, DataTriggeredEventArgs<BevelSide> e)
+        {
+             _bevelDoubleTapTimers[e.Data].Stop();
+            _bevelDoubleTapTimers.Remove(e.Data);
         }
 
         void _manager_DigitalInReceived(object sender, Hardware.DigitalDataReivedHandler e)
@@ -180,6 +224,7 @@ namespace Watch.Toolkit.Input.Touch
                 case 0:
                     _linearTouch.Value = e.Value;
                     if (_recording)
+
                     {
                         _pipeline.Enqueue(e.Value);
 
@@ -210,8 +255,8 @@ namespace Watch.Toolkit.Input.Touch
         }
         protected void OnBevelDoubleTapHandler(BevelTouchEventArgs e)
         {
-            if (BevelUp != null)
-                BevelUp(this, e);
+            if (BevelDoubleTap != null)
+                BevelDoubleTap(this, e);
         }
 
         protected void OnRawDataHandler(RawTouchDataReceivedEventArgs e)

@@ -8,7 +8,7 @@ namespace Watch.Toolkit.Hardware.Arduino
         public string Port { get; private set; }
         public string ReadData { get; private set; }
 
-        private const int BaudRate = 115200;
+        private const int BaudRate = 38400;
 
         private SafeSerialPort _serialPort;
         private string _output;

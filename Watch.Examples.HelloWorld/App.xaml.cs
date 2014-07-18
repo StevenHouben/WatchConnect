@@ -7,6 +7,7 @@ using Watch.Toolkit;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Tracker;
 using Watch.Toolkit.Processing.MachineLearning;
+using Watch.Toolkit.Sensors;
 
 namespace Watch.Examples.HelloWorld
 {
@@ -72,6 +73,7 @@ namespace Watch.Examples.HelloWorld
             };
             
             watchWindow.Show();
+
         }
 
         static void TrackerManager_RawTrackGestureDataUpdated(object sender, Toolkit.Input.Tracker.TrackGestureEventArgs e)

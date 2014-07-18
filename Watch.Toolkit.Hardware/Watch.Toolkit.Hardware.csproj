@@ -52,6 +52,8 @@
     <Compile Include="Arduino\SafeSerial.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DataPacket.cs" />
+    <Compile Include="DataPacketReceivedEventArgs.cs" />
     <Compile Include="DigitalDataReceivedEventArgs.cs" />
     <Compile Include="AnalogDataReceivedEventArgs.cs" />
     <Compile Include="MessagesReceivedEventArgs.cs" />

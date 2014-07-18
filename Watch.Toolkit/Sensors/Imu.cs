@@ -1,6 +1,6 @@
 ﻿namespace Watch.Toolkit.Sensors
 {
-    public class Imu:ISimpleSensor
+    public class Imu : ISimpleSensor
     {
         private Vector _storedValues;
         public Vector RawGyroValue { get; set; }

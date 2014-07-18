@@ -7,7 +7,7 @@
         public static ArduinoDriver Arduino 
         {
             //Todo -> move the port name to configuration class
-            get { return _instance ?? (_instance = new ArduinoDriver("COM4")); }
+            get { return _instance ?? (_instance = new ArduinoDriver("COM7")); }
         }
     }
 }

@@ -10,12 +10,18 @@ namespace Watch.Toolkit.Hardware
         public event EventHandler<DigitalDataReivedHandler> DigitalInReceived = delegate { };
         public event EventHandler<DigitalDataReivedHandler> DigitalOutReceived = delegate { };
         public event EventHandler<MessagesReceivedEventArgs> MessageReceived = delegate { };
-
+        public event EventHandler<DataPacketReceivedEventArgs> DataPacketReceived = delegate { };
 
         protected void OnMessageReceived(object sender, MessagesReceivedEventArgs e)
         {
             if (MessageReceived != null)
                 MessageReceived(sender, e);
+        }
+
+        protected void OnDataPacketReceived(object sender, DataPacketReceivedEventArgs e)
+        {
+            if (DataPacketReceived != null)
+                DataPacketReceived(sender, e);
         }
         protected void OnAnalogDataReceived(object sender, AnalogDataReceivedEventArgs e)
         {
