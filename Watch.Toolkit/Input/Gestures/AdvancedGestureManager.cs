@@ -36,8 +36,8 @@ namespace Watch.Toolkit.Input.Gestures
         private readonly List<double> _dataLightSensor = new List<double>();
 
         private bool _recording;
-        private int _frameSize = 6;
-        private int _counter = 0;
+        private const int FrameSize = 6;
+        private int _counter;
 
         private readonly DtwRecognizer _leftMatcher = new DtwRecognizer();
         private readonly DtwRecognizer _rightMatcher = new DtwRecognizer();
@@ -50,8 +50,8 @@ namespace Watch.Toolkit.Input.Gestures
 
         public override void Start()
         {
-            _manager = new Phidget();
-            _manager.Start(157002);
+            _manager = new Phidget(157002);
+            _manager.Start();
 
             _manager.AnalogDataReceived += _manager_AnalogDataReceived;
 
@@ -121,7 +121,7 @@ namespace Watch.Toolkit.Input.Gestures
                 _recording = !_recording;
             }
 
-            if (_recording && _counter < _frameSize)
+            if (_recording && _counter < FrameSize)
             {
                 _dataFrontSensor.Add(_frontSensor.Value);
                 _dataLeftSensor.Add(_topLeftSensor.Value);
@@ -129,7 +129,7 @@ namespace Watch.Toolkit.Input.Gestures
                 _dataLightSensor.Add(_lightSensor.Value);
                 _counter++;
             }
-            if(_recording && _counter==_frameSize)
+            if(_recording && _counter==FrameSize)
             {
                 if (_dataFrontSensor.Count > 0)
                 {

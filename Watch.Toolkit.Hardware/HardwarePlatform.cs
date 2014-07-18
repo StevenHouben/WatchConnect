@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Watch.Toolkit.Hardware
 {
-    public abstract class AbstractHardwarePlatform
+    public abstract class HardwarePlatform
     {
         public bool IsRunning { get; set; }
 
@@ -11,6 +13,44 @@ namespace Watch.Toolkit.Hardware
         public event EventHandler<DigitalDataReivedHandler> DigitalOutReceived = delegate { };
         public event EventHandler<MessagesReceivedEventArgs> MessageReceived = delegate { };
         public event EventHandler<DataPacketReceivedEventArgs> DataPacketReceived = delegate { };
+
+        private readonly Dictionary<Guid, Func<string, bool>> _events
+            = new Dictionary<Guid, Func<string, bool>>();
+        private readonly Dictionary<Guid, Func<string, DataPacket>> _callbacks
+            = new Dictionary<Guid, Func<string, DataPacket>>();
+
+
+        public abstract void Start();
+        public abstract void Stop();
+
+        protected HardwarePlatform()
+        {
+            MessageReceived += AbstractHardwarePlatform_MessageReceived;
+        }
+
+        void AbstractHardwarePlatform_MessageReceived(object sender, MessagesReceivedEventArgs e)
+        {
+            foreach (var ev in _events.ToList().Where(ev => ev.Value(e.Message)))
+            {
+                OnDataPacketReceived(this,
+                    new DataPacketReceivedEventArgs(e.Id, _callbacks[ev.Key](e.Message)));
+            }
+        }
+
+        public Guid AddPacketListener(string name, Func<string, bool> predicate, Func<string, DataPacket> callback)
+        {
+            var id = Guid.NewGuid();
+            _events.Add(id, predicate);
+            _callbacks.Add(id, callback);
+
+            return id;
+        }
+
+        public void RemoveEvent(Guid id)
+        {
+            _events.Remove(id);
+            _callbacks.Remove(id);
+        }
 
         protected void OnMessageReceived(object sender, MessagesReceivedEventArgs e)
         {

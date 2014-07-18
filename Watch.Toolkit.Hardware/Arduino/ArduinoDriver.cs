@@ -3,7 +3,7 @@ using System.IO.Ports;
 
 namespace Watch.Toolkit.Hardware.Arduino
 {
-    internal class ArduinoDriver:AbstractHardwarePlatform
+    internal class ArduinoDriver:HardwarePlatform
     {
         public string Port { get; private set; }
         public string ReadData { get; private set; }
@@ -13,11 +13,19 @@ namespace Watch.Toolkit.Hardware.Arduino
         private SafeSerialPort _serialPort;
         private string _output;
 
+        private readonly string _port;
+
         public ArduinoDriver(string port)
         {
-            ConnectToDevice(port);
+            _port = port;
         }
-        public void Stop()
+        public override void Start()
+        {
+            if (IsRunning) return;
+            ConnectToDevice(_port);
+            IsRunning = true;
+        }
+        public override void Stop()
         {
             _serialPort.Close();
         }

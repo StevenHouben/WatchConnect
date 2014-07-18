@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Timers;
 using Microsoft.Win32;
+using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Sensors;
 using Timer = System.Timers.Timer;
 
@@ -13,7 +14,7 @@ namespace Watch.Toolkit.Utils
     {
         private readonly StringBuilder _logger = new StringBuilder();
         private readonly Imu _accelerometer = new Imu();
-        private readonly ImuParser _accelerometerParser = new ImuParser();
+        private readonly ImuParser _accelerometerParser = new ImuParser(new Arduino());
         private Timer _recorder = new Timer(500);
 
         public DataType RecordingDatatype;

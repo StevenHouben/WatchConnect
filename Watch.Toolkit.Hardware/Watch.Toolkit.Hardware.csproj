@@ -59,7 +59,7 @@
     <Compile Include="MessagesReceivedEventArgs.cs" />
     <Compile Include="Phidget\Phidget.cs" />
     <Compile Include="Phidget\PhidgetManager.cs" />
-    <Compile Include="AbstractHardwarePlatform.cs" />
+    <Compile Include="HardwarePlatform.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

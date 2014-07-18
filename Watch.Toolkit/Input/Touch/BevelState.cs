@@ -13,16 +13,16 @@ namespace Watch.Toolkit.Input.Touch
         {
             switch (side)
             {
-                case BevelSide.TopSide:
+                case BevelSide.Top:
                     BevelTop = state;
                     break;
-                case BevelSide.LeftSide:
+                case BevelSide.Left:
                     BevelLeft = state;
                     break;
-                case BevelSide.RightSide:
+                case BevelSide.Right:
                     BevelRight = state;
                     break;
-                case BevelSide.BottomSide:
+                case BevelSide.Bottom:
                     BevelBottom = state;
                     break;
 

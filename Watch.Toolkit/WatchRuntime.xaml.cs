@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
 using Watch.Toolkit.Input.Tracker;
@@ -15,7 +16,6 @@ namespace Watch.Toolkit
 {
     public partial class WatchRuntime:IVisualSharer
     {
-
         private int _peekSize;
         public TouchManager TouchManager { get; set; }
         public GestureManager GestureManager { get; set; }
@@ -31,16 +31,16 @@ namespace Watch.Toolkit
         {
             BuildWatch(WatchConfiguration.DefaultWatchConfiguration);
         }
+        public WatchRuntime(WatchConfiguration watchConfiguration)
+        {
+            BuildWatch(watchConfiguration);
+        }
 
         void WatchRuntime_Loaded(object sender, RoutedEventArgs e)
         {
             WindowManager.MaximizeToSecondaryMonitor(this);
 
             _peekSize = Convert.ToInt32(Width*0.08);
-        }
-        public WatchRuntime(WatchConfiguration watchConfiguration)
-        {
-            BuildWatch(watchConfiguration);
         }
 
         private void BuildWatch(WatchConfiguration watchConfiguration)
@@ -50,14 +50,14 @@ namespace Watch.Toolkit
             Loaded += WatchRuntime_Loaded;
             KeyDown += WatchWindow_KeyDown;
 
-            TouchManager = new TouchManager();
+            TouchManager = new TouchManager(watchConfiguration.Hardware);
             TouchManager.Start();
 
-            TrackerManager = new TrackerManager(watchConfiguration.ClassifierConfiguration);
+            TrackerManager = new TrackerManager(watchConfiguration.Hardware,watchConfiguration.ClassifierConfiguration);
             TrackerManager.TrackGestureRecognized += TrackerManager_TrackGestureRecognized;
             TrackerManager.Start();
 
-            GestureManager = new GestureManager();
+            GestureManager = new GestureManager(watchConfiguration.Hardware);
             GestureManager.GestureDetected += GestureManager_GestureDetected;
             GestureManager.Start();
         }

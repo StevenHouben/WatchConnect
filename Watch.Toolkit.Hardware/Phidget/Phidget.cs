@@ -4,11 +4,16 @@ using Phidgets;
 
 namespace Watch.Toolkit.Hardware.Phidget
 {
-    public class Phidget:AbstractHardwarePlatform
+    public class Phidget:HardwarePlatform
     {
         private InterfaceKit _kit;
 
-        public void Start(int id)
+        private int _id;
+        public Phidget(int id)
+        {
+            _id = id;
+        }
+        public override void Start()
         {
             var t = new Thread(() =>
             {
@@ -18,7 +23,7 @@ namespace Watch.Toolkit.Hardware.Phidget
                 _kit.InputChange += kit_InputChange;
 
 
-                _kit.open(id);
+                _kit.open(_id);
                 _kit.waitForAttachment();
 
                 IsRunning = true;
@@ -26,7 +31,7 @@ namespace Watch.Toolkit.Hardware.Phidget
             t.Start();
         }
 
-        public void Stop()
+        public override void Stop()
         {
             try
             {

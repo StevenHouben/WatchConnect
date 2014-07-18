@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Timers;
 using Watch.Toolkit.Hardware;
-using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
 
@@ -14,22 +13,10 @@ namespace Watch.Toolkit.Input.Gestures
 
         private readonly DtwRecognizer _gestureRecognizer = new DtwRecognizer();
 
-        private readonly ProximitySensor _frontSensor = new InfraredSensor(0, InfraRedDistanceThreshold)
-        {
-            Name = "front-sensor"
-        };
-
-        private readonly ProximitySensor _topLeftSensor = new InfraredSensor(1, InfraRedDistanceThreshold)
-        {
-            Name = "top-left-sensor"
-        };
-
-        private readonly ProximitySensor _topRightSensor = new InfraredSensor(2, InfraRedDistanceThreshold)
-        {
-            Name = "top-right-sensor"
-        };
-
-        private readonly ProximitySensor _lightSensor = new LightSensor(3) {Name = "light-sensor"};
+        public InfraredSensor FrontProximitySensor { get; private set; }
+        public InfraredSensor LeftProximitySensor { get; private set; }
+        public InfraredSensor RightProximitySensor { get; private set; }
+        public LightSensor LightSensor { get; set; }
 
         private Gesture _lastDetectedGesture;
 
@@ -45,14 +32,24 @@ namespace Watch.Toolkit.Input.Gestures
         private readonly List<double> _dataRight = new List<double>();
         private readonly List<double> _dataLeft = new List<double>();
 
-        private Arduino _arduino;
+        public HardwarePlatform Hardware { get; private set;}
+
+        public GestureManager(HardwarePlatform hardware)
+        {
+            Hardware = hardware;
+        }
+
         public override void Start()
         {
+            FrontProximitySensor = new InfraredSensor(0, InfraRedDistanceThreshold);
+            LeftProximitySensor = new InfraredSensor(1, InfraRedDistanceThreshold);
+            RightProximitySensor = new InfraredSensor(2, InfraRedDistanceThreshold);
+            LightSensor = new LightSensor(3);
 
-            _topLeftSensor.RangeChanged += _topLeftSensor_RangeChanged;
-            _topRightSensor.RangeChanged +=_topRightSensor_RangeChanged;
-            _frontSensor.RangeChanged += _frontSensor_RangeChanged;
-            _lightSensor.RangeChanged += _lightSensor_RangeChanged;
+            LeftProximitySensor.RangeChanged += _topLeftSensor_RangeChanged;
+            RightProximitySensor.RangeChanged +=_topRightSensor_RangeChanged;
+            FrontProximitySensor.RangeChanged += _frontSensor_RangeChanged;
+            LightSensor.RangeChanged += _lightSensor_RangeChanged;
 
             var data = new double[2][];
             data[0] = new double[] { 46, 49, 353, 101 };
@@ -61,10 +58,9 @@ namespace Watch.Toolkit.Input.Gestures
             _gestureRecognizer.AddTemplate("left",data[0]);
             _gestureRecognizer.AddTemplate("right", data[1]);
 
-            _arduino = new Arduino();
-            _arduino.DataPacketReceived += _arduino_DataPacketReceived;
+            Hardware.DataPacketReceived += _arduino_DataPacketReceived;
 
-            _arduino.AddPacketListener("Light", 
+            Hardware.AddPacketListener("Light", 
                 ( message) =>
                 {
                     if (message.StartsWith("L"))
@@ -73,7 +69,7 @@ namespace Watch.Toolkit.Input.Gestures
                 },
                 (message) => new DataPacket(message.Split(',')));
 
-            _arduino.AddPacketListener("Proximity",
+            Hardware.AddPacketListener("Proximity",
                 (message) =>
                 {
                     if (message.StartsWith("P"))
@@ -82,8 +78,7 @@ namespace Watch.Toolkit.Input.Gestures
                 },
                 (message) => new DataPacket(message.Split(',')));
 
-           // _arduino.MessageReceived += _arduino_MessageReceived;
-            _arduino.Start();
+            Hardware.Start();
         }
 
         void _arduino_DataPacketReceived(object sender, DataPacketReceivedEventArgs e)
@@ -91,19 +86,19 @@ namespace Watch.Toolkit.Input.Gestures
             switch (e.DataPacket.Header)
             {
                 case "L":
-                    _lightSensor.Value = Convert.ToDouble(e.DataPacket.Body[0]);
+                    LightSensor.Value = Convert.ToDouble(e.DataPacket.Body[0]);
                     break;
                 case "P":
-                    _topLeftSensor.Value = Convert.ToDouble(e.DataPacket.Body[0]);
-                    _topRightSensor.Value = Convert.ToDouble(e.DataPacket.Body[1]);
+                    LeftProximitySensor.Value = Convert.ToDouble(e.DataPacket.Body[0]);
+                    RightProximitySensor.Value = Convert.ToDouble(e.DataPacket.Body[1]);
                     break;
             }
-            OnRawDataHandler(new RawSensorDataReceivedEventArgs(_frontSensor, _topLeftSensor, _topRightSensor, _lightSensor));
+            OnRawDataHandler(new RawSensorDataReceivedEventArgs(FrontProximitySensor, LeftProximitySensor, RightProximitySensor, LightSensor));
         }
 
         public override void Stop()
         {
-            _arduino.Stop();
+            Hardware.Stop();
         }
 
         void _lightSensor_RangeChanged(object sender, RangeChangedEventArgs e)
@@ -187,8 +182,8 @@ namespace Watch.Toolkit.Input.Gestures
                 _swipeSideTimer.Start();
             }
             
-            _dataRight.Add(_topRightSensor.Value);
-            _dataLeft.Add(_topLeftSensor.Value);
+            _dataRight.Add(RightProximitySensor.Value);
+            _dataLeft.Add(LeftProximitySensor.Value);
             _detectedSideGestures.Enqueue(e.InRange ? 3 : 4);
             CheckDetection();
         }
@@ -227,8 +222,8 @@ namespace Watch.Toolkit.Input.Gestures
                 _swipeSideTimer.Start();
             }
             _detectedSideGestures.Enqueue(e.InRange ? 1 : 2);
-            _dataRight.Add(_topRightSensor.Value);
-            _dataLeft.Add(_topLeftSensor.Value);
+            _dataRight.Add(RightProximitySensor.Value);
+            _dataLeft.Add(LeftProximitySensor.Value);
             CheckDetection();
         }
 
@@ -239,20 +234,10 @@ namespace Watch.Toolkit.Input.Gestures
             OnHoverLeftHandler(new GestureDetectedEventArgs(_lastDetectedGesture));
             _topRightTimer.Stop();
         }
-
-        static void PrintRow(double[] row)
-        {
-            foreach (var t in row)
-                Console.Write(t + @",");
-            Console.WriteLine("");
-        }
         void CheckDetection()
         {
             if (_detectedSideGestures.Count != 4) return;
             _swipeSideTimer.Stop();
-
-            //PrintRow(_dataLeft.ToArray());
-            //PrintRow(_dataRight.ToArray());
 
             var output = _gestureRecognizer.ComputeClosestLabel(_dataLeft.ToArray());
 
@@ -262,11 +247,6 @@ namespace Watch.Toolkit.Input.Gestures
 
             _dataLeft.Clear();
             _dataRight.Clear();
-
-            //var n = _detectedGestures.Dequeue() + _detectedGestures.Dequeue();
-            //var m = _detectedGestures.Dequeue() + _detectedGestures.Dequeue();
-
-            //Console.WriteLine(n < m ? _lastDetectedGesture = Gesture.SwipeRight : _lastDetectedGesture = Gesture.SwipeLeft);
 
             OnGestureHandler(new GestureDetectedEventArgs(_lastDetectedGesture));
             

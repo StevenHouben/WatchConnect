@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Processing.MachineLearning;
 using Watch.Toolkit.Sensors;
 
@@ -9,7 +10,7 @@ namespace Watch.Toolkit.Input.Tracker
     public class TrackerManager : IInputManager
     {
         private readonly ClassifierConfiguration _classifierConfiguration;
-        public ImuParser ImuParser { get; set; }
+        internal ImuParser ImuParser { get; set; }
         public Imu Imu { get; private set; }
         public TreeClassifier TreeClassifier { get; set; }
         public DtwClassifier DtwClassifier { get; set; }
@@ -31,11 +32,11 @@ namespace Watch.Toolkit.Input.Tracker
             }
         }
 
-        public TrackerManager(ClassifierConfiguration classifierConfiguration)
+        public TrackerManager(HardwarePlatform hardware, ClassifierConfiguration classifierConfiguration)
         {
             _classifierConfiguration = classifierConfiguration;
 
-            ImuParser = new ImuParser();
+            ImuParser = new ImuParser(hardware);
             Imu = new Imu();
 
             ImuParser.AccelerometerDataReceived += _accelerometerParser_AccelerometerDataReceived;

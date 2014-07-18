@@ -1,32 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Watch.Toolkit.Hardware;
-using Watch.Toolkit.Hardware.Arduino;
 
 namespace Watch.Toolkit.Sensors
 {
     public class ImuParser
     {
         public event EventHandler<ImuDataReceivedEventArgs> AccelerometerDataReceived = delegate { };
-        public event EventHandler<String> EventTriggered = delegate { };
-
-        private readonly Dictionary<string,Func<Imu, bool>> _events = new Dictionary<string, Func<Imu, bool>>();
-
+        
         private Imu _imu;
-        public void AddEvent(string name, Func<Imu, bool> condition)
-        {
-            _events.Add(name,condition);
 
+        public ImuParser(HardwarePlatform hardware)
+        {
+            Hardware = hardware;
         }
 
-        private Arduino _arduino;
+        public HardwarePlatform Hardware { get; private set; }
         public void Start()
         {
-            _arduino = new Arduino();
-            _arduino.DataPacketReceived += _arduino_DataPacketReceived;    
-            _arduino.AddPacketListener("IMU",
+            Hardware.DataPacketReceived += _arduino_DataPacketReceived;
+            Hardware.AddPacketListener("IMU",
                 (message) =>
                 {
                     if (message.StartsWith("A"))
@@ -34,7 +27,7 @@ namespace Watch.Toolkit.Sensors
                     return false;
                 },
                 (message) => new DataPacket(message.Split(',')));
-            _arduino.Start();
+            Hardware.Start();
 
             _imu = new Imu();
         }
@@ -62,18 +55,13 @@ namespace Watch.Toolkit.Sensors
                             Convert.ToDouble(e.DataPacket.Body[11], CultureInfo.InvariantCulture)));
 
                     AccelerometerDataReceived(this, new ImuDataReceivedEventArgs(_imu));
-
-                    foreach (var ev in _events.Where(ev => ev.Value(_imu)).Where(ev => EventTriggered != null))
-                    {
-                        EventTriggered(_imu, ev.Key);
-                    }
                     break;
             }
         }
 
         public void Stop()
         {
-            _arduino.Stop();
+            Hardware.Stop();
         }
     }
 }

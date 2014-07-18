@@ -5,20 +5,19 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using GestureTouch;
+using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
 using Watch.Toolkit.Input.Tracker;
 using Watch.Toolkit.Interface;
 using Watch.Toolkit.Interface.DefaultFaces;
 using Watch.Toolkit.Processing.MachineLearning;
+using Watch.Toolkit.Sensors;
 
 namespace Watch.Toolkit.Utils
 {
     public partial class AccelerometerVisualizer
     {
-        private readonly TrackerManager _trackerManager;
-        private readonly TouchManager _touchManager;
-        private readonly GestureManager _gestureManager;
         private string _detection;
 
         private readonly WatchRuntime _watchWindow;
@@ -29,39 +28,10 @@ namespace Watch.Toolkit.Utils
         {
             InitializeComponent();
 
-             var classifierConfiguration = new ClassifierConfiguration(
-                 new List<string> {"Normal Mode", "Left Index", "Left Knuckle", "Hand"}, AppDomain.CurrentDomain.BaseDirectory + "recording17.log");
-
-            _trackerManager = new TrackerManager(classifierConfiguration);
-            _trackerManager.RawTrackGestureDataUpdated += _trackerManager_RawTrackGestureDataUpdated;
-            _trackerManager.Start();
-
-            _trackerManager.ImuParser.EventTriggered += ImuParser_EventTriggered;
-            _trackerManager.ImuParser.AddEvent("Rotate", imu => imu.YawPitchRollValues.Z < -10);
-
-            _touchManager = new TouchManager();
-            _touchManager.BevelGrab += _touchManager_BevelGrab;
-            _touchManager.BevelDoubleTap += _touchManager_BevelDoubleTap;
-            _touchManager.SlideDown += _touchManager_SlideDown;
-            _touchManager.SlideUp += _touchManager_SlideUp;
-            _touchManager.SliderTouchDown += _touchManager_SliderTouchDown;
-            _touchManager.SliderTouchUp += _touchManager_SliderTouchUp;
-            _touchManager.SliderDoubleTap += _touchManager_DoubleTap;
-            _touchManager.Start();
-
-            _gestureManager = new GestureManager();
-            _gestureManager.RawDataReceived += _gestureManager_RawDataReceived;
-            _gestureManager.Start();
-
-        
-            foreach (var template in _trackerManager.DtwClassifier.GetTemplates())
-            {
-                listGesture.Items.Add(template.Key + " - " + String.Join(",", template.Value.Select(p => p.ToString()).ToArray()));
-            }
-
             WindowState = WindowState.Maximized;
             WindowStyle = WindowStyle.None;
 
+            Loaded += AccelerometerVisualizer_Loaded;
             Closing += MainWindow_Closing;
 
             TouchVisualizer.GestureTouchUp += MainWindow_GestureTouchUp;
@@ -75,17 +45,38 @@ namespace Watch.Toolkit.Utils
 
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
                 new List<string> { "Right Hand", "Left Hand", "Left Knuckle", "Hand" },
-                AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
+                AppDomain.CurrentDomain.BaseDirectory + "recording17.log");
+
+            _configuration.Hardware = new Arduino();
 
             _watchWindow = new WatchRuntime(_configuration);
             _watchWindow.AddWatchFace(_visualizer);
             _watchWindow.GestureManager.RawDataReceived += GestureManager_RawDataReceived;
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
+            _watchWindow.TrackerManager = new TrackerManager(_configuration.Hardware, _configuration.ClassifierConfiguration);
+            _watchWindow.TrackerManager.RawTrackGestureDataUpdated += _trackerManager_RawTrackGestureDataUpdated;
+            _watchWindow.TrackerManager.Start();
+
+            _watchWindow.TrackerManager.Imu.EventTriggered += ImuParser_EventTriggered;
+            _watchWindow.TrackerManager.Imu.AddEvent("Rotate", imu => imu.YawPitchRollValues.Z < -10);
+           
+            _watchWindow.TouchManager.BevelGrab += _touchManager_BevelGrab;
+            _watchWindow.TouchManager.BevelDoubleTap += _touchManager_BevelDoubleTap;
+            _watchWindow.TouchManager.SlideDown += _touchManager_SlideDown;
+            _watchWindow.TouchManager.SlideUp += _touchManager_SlideUp;
+            _watchWindow.TouchManager.SliderTouchDown += _touchManager_SliderTouchDown;
+            _watchWindow.TouchManager.SliderTouchUp += _touchManager_SliderTouchUp;
+            _watchWindow.TouchManager.SliderDoubleTap += _touchManager_DoubleTap;
+
+            _watchWindow.GestureManager = new GestureManager(_configuration.Hardware);
+
+            foreach (var template in _watchWindow.TrackerManager.DtwClassifier.GetTemplates())
+            {
+                listGesture.Items.Add(template.Key + " - " + String.Join(",", template.Value.Select(p => p.ToString()).ToArray()));
+            }
+
             _watchWindow.Show();
-
-            Loaded += AccelerometerVisualizer_Loaded;
-
         }
 
         void _touchManager_DoubleTap(object sender, SliderTouchEventArgs e)
@@ -128,16 +119,16 @@ namespace Watch.Toolkit.Utils
             {
                 switch (e.BevelSide)
                 {
-                    case BevelSide.LeftTop:
+                    case BevelSide.Left:
                         Rect1.Fill = Brushes.Blue;
                         break;
-                    case BevelSide.TopTop:
+                    case BevelSide.Top:
                         Rect2.Fill = Brushes.Blue;
                         break;
-                    case BevelSide.RightTop:
+                    case BevelSide.Right:
                         Rect3.Fill = Brushes.Blue;
                         break;
-                    case BevelSide.BottomTop:
+                    case BevelSide.Bottom:
                         Rect4.Fill = Brushes.Blue;
                         break;
                 }
@@ -154,11 +145,9 @@ namespace Watch.Toolkit.Utils
 
         void AccelerometerVisualizer_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!WindowManager.HasWatchConnected())
-            {
-                WindowManager.Dock(_watchWindow,WindowManager.DockLocation.Left);
-                WindowManager.Dock(this,WindowManager.DockLocation.Right);
-            }
+            if (WindowManager.HasWatchConnected()) return;
+            WindowManager.Dock(_watchWindow,WindowManager.DockLocation.Left);
+            WindowManager.Dock(this,WindowManager.DockLocation.Right);
         }
 
         void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
@@ -191,14 +180,13 @@ namespace Watch.Toolkit.Utils
 
                 _visualizer.UpdateBevels(e.BevelState);
             });
-
         }
 
         void _trackerManager_RawTrackGestureDataUpdated(object sender, TrackGestureEventArgs e)
         {
             Dispatcher.Invoke(() =>
             {
-                lblRaw.Content = _trackerManager.Imu.ToFormattedString();
+                lblRaw.Content = _watchWindow.TrackerManager.Imu.ToFormattedString();
                 lblDTW.Content = "";
 
                 lblDT.Content = e.TreeLabel;

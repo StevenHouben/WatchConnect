@@ -11,7 +11,7 @@ namespace Watch.Toolkit.Sensors
             Treshold = treshold;
         }
 
-        public double CalculateDistance()
+        public double CalculateDistanceCm()
         {
             if ((Value < 500) && (Value > 80))
             {

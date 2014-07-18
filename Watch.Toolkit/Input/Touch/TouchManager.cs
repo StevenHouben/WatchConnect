@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 using Watch.Toolkit.Hardware;
-using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
 
@@ -22,24 +21,21 @@ namespace Watch.Toolkit.Input.Touch
         public event EventHandler<BevelTouchEventArgs> BevelDown;
         public event EventHandler<BevelTouchEventArgs> BevelUp;
         public event EventHandler<BevelTouchEventArgs> BevelDoubleTap;
-
         public event EventHandler<MultiBevelTouchEventArgs> BevelGrab;
-
-        readonly TouchSensor _linearTouch = new LinearTouchSensor();
 
         private readonly Queue<double> _pipeline = new Queue<double>();
         private bool _recording;
 
         private readonly DtwRecognizer _gestureRecognizer = new DtwRecognizer();
-
         private readonly EventMonitor _wristBandDoubleTapTimer = new EventMonitor(300);
 
         private readonly Dictionary<BevelSide, DataEventMonitor<BevelSide>> _bevelDoubleTapTimers
-            = new Dictionary<BevelSide, DataEventMonitor<BevelSide>>(); 
+            = new Dictionary<BevelSide, DataEventMonitor<BevelSide>>(8);
 
-        private Arduino _arduino;
+        public HardwarePlatform Hardware { get; private set; }
 
-        private BevelState _bevelState = new BevelState();
+        public BevelTouchSensor BevelTouchSensor{ get; private set; }
+        public TouchSensor SlideSensor { get; private set; }
 
         public void Simulate(TouchEvents te, EventArgs e)
         {
@@ -75,8 +71,16 @@ namespace Watch.Toolkit.Input.Touch
             }
         }
 
+        public TouchManager(HardwarePlatform hardware)
+        {
+            Hardware = hardware;
+        }
+
         public void Start()
         {
+            SlideSensor =new LinearTouchSensor();
+            BevelTouchSensor = new BevelTouchSensor();
+
             _gestureRecognizer.AddTemplate(
                 "Up",
                 new double[] { 173, 275, 409, 567, 732, 897, 1000 });
@@ -85,10 +89,7 @@ namespace Watch.Toolkit.Input.Touch
                 "Down",
                 new double[] { 1000, 857, 723, 576, 276, 289, 120 });
 
-
-            _arduino = new Arduino();
-
-            _arduino.AddPacketListener("Capacitive Touch",
+            Hardware.AddPacketListener("Capacitive Touch",
                 (message) =>
                 {
                     if (message.StartsWith("T"))
@@ -97,7 +98,7 @@ namespace Watch.Toolkit.Input.Touch
                 },
                 (message) => new DataPacket(message.Split(',')));
 
-            _arduino.AddPacketListener("Slider Touch",
+            Hardware.AddPacketListener("Slider Touch",
                 (message) =>
                 {
                     if (message.StartsWith("S"))
@@ -106,12 +107,11 @@ namespace Watch.Toolkit.Input.Touch
                 },
                 (message) => new DataPacket(message.Split(',')));
 
-            _arduino.DataPacketReceived += _arduino_DataPacketReceived;
-
-            _arduino.Start();
+            Hardware.DataPacketReceived += _arduino_DataPacketReceived;
+            Hardware.Start();
         }
 
-        void _arduino_DataPacketReceived(object sender, Hardware.DataPacketReceivedEventArgs e)
+        void _arduino_DataPacketReceived(object sender, DataPacketReceivedEventArgs e)
         {
             switch (e.DataPacket.Header)
             {
@@ -124,23 +124,23 @@ namespace Watch.Toolkit.Input.Touch
                         BevelRight = e.DataPacket.Body[4] == "1"
                     };
 
-                    HandleTouchStates(BevelSide.TopSide, state.BevelTop, _bevelState.BevelTop);
-                    HandleTouchStates(BevelSide.LeftSide, state.BevelLeft, _bevelState.BevelLeft);
-                    HandleTouchStates(BevelSide.RightSide, state.BevelRight, _bevelState.BevelRight);
-                    HandleTouchStates(BevelSide.BottomSide, state.BevelBottom, _bevelState.BevelBottom);
+                     HandleTouchStates(BevelSide.Top, state.BevelTop, BevelTouchSensor.TouchStates.BevelTop);
+                     HandleTouchStates(BevelSide.Left, state.BevelLeft, BevelTouchSensor.TouchStates.BevelLeft);
+                     HandleTouchStates(BevelSide.Right, state.BevelRight, BevelTouchSensor.TouchStates.BevelRight);
+                     HandleTouchStates(BevelSide.Bottom, state.BevelBottom, BevelTouchSensor.TouchStates.BevelBottom);
                     OnBevelGrabHandler(new MultiBevelTouchEventArgs(state));
 
-                    _bevelState = state;
+                    BevelTouchSensor.TouchStates = state;
                     break;
                 case "S":
-                    _linearTouch.Value = Convert.ToDouble(e.DataPacket.Body[0]);
+                    SlideSensor.Value = Convert.ToDouble(e.DataPacket.Body[0]);
 
                      if (_recording)
-                        _pipeline.Enqueue(_linearTouch.Value);
-                     if (_linearTouch.Down)
+                        _pipeline.Enqueue(SlideSensor.Value);
+                     if (SlideSensor.Down)
                      {
-                         OnRawDataHandler(new RawTouchDataReceivedEventArgs(_linearTouch));
-                         OnSliderTouchDownHandler(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
+                         OnRawDataHandler(new RawTouchDataReceivedEventArgs(SlideSensor));
+                         OnSliderTouchDownHandler(new SliderTouchEventArgs(SlideSensor, SlideSensor.Value));
                          _recording = true;
                          if (!_wristBandDoubleTapTimer.Enabled)
                          {
@@ -151,13 +151,11 @@ namespace Watch.Toolkit.Input.Touch
                      }
                      else
                      {
-                         OnSliderTouchUpHandler(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
+                         OnSliderTouchUpHandler(new SliderTouchEventArgs(SlideSensor, SlideSensor.Value));
                          if (_wristBandDoubleTapTimer.Trigger && _wristBandDoubleTapTimer.Enabled)
                          {
                              _wristBandDoubleTapTimer.Trigger = false;
-                             OnSliderDoubleTap(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
-                             _wristBandDoubleTapTimer.Stop();
-
+                             OnSliderDoubleTap(new SliderTouchEventArgs(SlideSensor, SlideSensor.Value));
                          }
                          else if (_recording)
                          {
@@ -172,9 +170,9 @@ namespace Watch.Toolkit.Input.Touch
 
         public void Stop()
         {
-            if (_arduino == null) return;
-            if (_arduino.IsRunning)
-                _arduino.Stop();
+            if (Hardware == null) return;
+            if (Hardware.IsRunning)
+                Hardware.Stop();
         }
 
         void HandleTouchStates(BevelSide side, bool stateNow, bool stateOld)
@@ -265,29 +263,19 @@ namespace Watch.Toolkit.Input.Touch
             if (BevelGrab != null)
                 BevelGrab(this, e);
         }
-
-       
-
         void _doubleTapTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             _wristBandDoubleTapTimer.Stop();
         }
-        public void PrintCollection<T>(IEnumerable<T> col)
-        {
-            foreach (var item in col)
-                Console.Write(item + @","); // Replace this with your version of printing
-            Console.Write(@"\n");
-        }
-
         private void AnalyseData()
         {
             if (_pipeline.ToArray().Count() <= 1) return;
             var output = _gestureRecognizer.ComputeClosestLabel(_pipeline.ToArray());
 
             if (output == "Up")
-                OnSlideUpHandler(new SliderTouchEventArgs(_linearTouch, -1));
+                OnSlideUpHandler(new SliderTouchEventArgs(SlideSensor, -1));
             else
-                OnSlideDownHandler(new SliderTouchEventArgs(_linearTouch, -1));
+                OnSlideDownHandler(new SliderTouchEventArgs(SlideSensor, -1));
             _pipeline.Clear();
         }
     }

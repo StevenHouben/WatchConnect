@@ -1,6 +1,6 @@
 ﻿namespace Watch.Toolkit.Hardware.Arduino
 {
-    class ArduinoManager:AbstractHardwarePlatform
+    class ArduinoManager
     {
         private static ArduinoDriver _instance;
 

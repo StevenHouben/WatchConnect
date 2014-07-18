@@ -94,6 +94,7 @@
     <Compile Include="Interface\DefaultFaces\SensorVisualizer.xaml.cs">
       <DependentUpon>SensorVisualizer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Sensors\BevelTouchSensor.cs" />
     <Compile Include="Sensors\ImuDataReceivedEventArgs.cs" />
     <Compile Include="Input\Tracker\TrackerApproach.cs" />
     <Compile Include="Input\Tracker\TrackerManager.cs" />
@@ -122,7 +123,7 @@
     <Compile Include="Processing\Dtw\SeriesVariable.cs" />
     <Compile Include="Processing\Filters\Kalman.cs" />
     <Compile Include="Sensors\InfraredSensor.cs" />
-    <Compile Include="Sensors\ISimpleSensor.cs" />
+    <Compile Include="Sensors\Sensor.cs" />
     <Compile Include="Sensors\LightSensor.cs" />
     <Compile Include="Sensors\LinearTouchSensor.cs" />
     <Compile Include="Sensors\ProximitySensor.cs" />

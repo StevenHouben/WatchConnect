@@ -1,33 +1,49 @@
-﻿namespace Watch.Toolkit.Sensors
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Watch.Toolkit.Sensors
 {
-    public class Imu : ISimpleSensor
+    public class Imu : ISensor
     {
-        private Vector _storedValues;
+        public event EventHandler<String> EventTriggered = delegate { };
+        private readonly Dictionary<string, Func<Imu, bool>> _events = new Dictionary<string, Func<Imu, bool>>();
+        public void AddEvent(string name, Func<Imu, bool> condition)
+        {
+            _events.Add(name, condition);
+        }
+
+        public void RemoveEvent(string name)
+        {
+            _events.Remove(name);
+        }
+        
         public Vector RawGyroValue { get; set; }
         public Vector RawAccelerometerValues{ get; set; }
         public Vector RealWorldAccelerationValues { get; set; }
         public Vector YawPitchRollValues { get; set; }
         public Vector RawMagnetometerValues { get; set; }
 
-        public bool Update(Imu acc)
-        {
-            RawAccelerometerValues = acc.RawAccelerometerValues;
-            RawGyroValue = acc.RawGyroValue;
-            YawPitchRollValues = acc.YawPitchRollValues;
-            RealWorldAccelerationValues = acc.RealWorldAccelerationValues;
+        public event EventHandler ImuUpdated = delegate { }; 
 
-            return true;
+        public void Update(Imu acc)
+        {
+            Update(acc.RawAccelerometerValues, acc.RawGyroValue, acc.RawGyroValue, acc.RealWorldAccelerationValues);
         }
-        public bool Update(Vector rawAccData, Vector rawGyroData, Vector yawPitchRoll, Vector worldAcceleration)
+        public void Update(Vector rawAccData, Vector rawGyroData, Vector yawPitchRoll, Vector worldAcceleration)
         {
             RawAccelerometerValues = rawAccData;
             RawGyroValue = rawGyroData;
             YawPitchRollValues = yawPitchRoll;
             RealWorldAccelerationValues = worldAcceleration;
-            return true;
+
+            ImuUpdated(this, new EventArgs());
+            
+            foreach (var ev in _events.ToList().Where(ev => ev.Value(this)).Where(ev => EventTriggered != null))
+            {
+                EventTriggered(this, ev.Key);
+            }
         }
-
-
         public string ToFormattedString()
         {
             return "Yaw: " + YawPitchRollValues.X +

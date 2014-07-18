@@ -2,13 +2,9 @@
 {
     public enum BevelSide
     {
-        LeftSide,
-        LeftTop,
-        RightSide,
-        RightTop,
-        BottomSide,
-        BottomTop,
-        TopSide,
-        TopTop
+        Left,
+        Right,
+        Bottom,
+        Top
     }
 }

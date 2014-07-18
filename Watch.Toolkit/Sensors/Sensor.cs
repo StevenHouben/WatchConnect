@@ -1,6 +1,6 @@
 ﻿namespace Watch.Toolkit.Sensors
 {
-    public interface ISimpleSensor
+    public interface ISensor
     {
         string Name { get; set; }
         int Id { get; set; }
