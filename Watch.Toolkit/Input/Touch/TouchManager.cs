@@ -11,18 +11,17 @@ namespace Watch.Toolkit.Input.Touch
 {
     public class TouchManager:IInputManager
     {
-        public const int Id = 28157;
         public event EventHandler<RawTouchDataReceivedEventArgs> RawDataReceived;
 
         public event EventHandler<SliderTouchEventArgs> SliderTouchDown;
         public event EventHandler<SliderTouchEventArgs> SliderTouchUp;
         public event EventHandler<SliderTouchEventArgs> SlideDown;
         public event EventHandler<SliderTouchEventArgs> SlideUp;
-        public event EventHandler<SliderTouchEventArgs> DoubleTap;
+        public event EventHandler<SliderTouchEventArgs> SliderDoubleTap;
 
         public event EventHandler<BevelTouchEventArgs> BevelDown;
         public event EventHandler<BevelTouchEventArgs> BevelUp;
-        public event EventHandler<BevelTouchEventArgs> BevelDoubleTap;  //Todo: implement
+        public event EventHandler<BevelTouchEventArgs> BevelDoubleTap;
 
         public event EventHandler<MultiBevelTouchEventArgs> BevelGrab;
 
@@ -37,7 +36,6 @@ namespace Watch.Toolkit.Input.Touch
 
         private readonly Dictionary<BevelSide, DataEventMonitor<BevelSide>> _bevelDoubleTapTimers
             = new Dictionary<BevelSide, DataEventMonitor<BevelSide>>(); 
-
 
         private Arduino _arduino;
 
@@ -59,8 +57,8 @@ namespace Watch.Toolkit.Input.Touch
                 case TouchEvents.BevelGrab:
                     OnBevelGrabHandler((MultiBevelTouchEventArgs) e);
                     break;
-                case TouchEvents.DoubleTap:
-                    OnDoubleTap((SliderTouchEventArgs)e);
+                case TouchEvents.SliderDoubleTap:
+                    OnSliderDoubleTap((SliderTouchEventArgs)e);
                     break;
                 case TouchEvents.SlideDown:
                     OnSlideDownHandler((SliderTouchEventArgs)e);
@@ -134,6 +132,40 @@ namespace Watch.Toolkit.Input.Touch
 
                     _bevelState = state;
                     break;
+                case "S":
+                    _linearTouch.Value = Convert.ToDouble(e.DataPacket.Body[0]);
+
+                     if (_recording)
+                        _pipeline.Enqueue(_linearTouch.Value);
+                     if (_linearTouch.Down)
+                     {
+                         OnRawDataHandler(new RawTouchDataReceivedEventArgs(_linearTouch));
+                         OnSliderTouchDownHandler(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
+                         _recording = true;
+                         if (!_wristBandDoubleTapTimer.Enabled)
+                         {
+                             _wristBandDoubleTapTimer.Elapsed += _doubleTapTimer_Elapsed;
+                             _wristBandDoubleTapTimer.Start();
+                             _wristBandDoubleTapTimer.Trigger = true;
+                         }
+                     }
+                     else
+                     {
+                         OnSliderTouchUpHandler(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
+                         if (_wristBandDoubleTapTimer.Trigger && _wristBandDoubleTapTimer.Enabled)
+                         {
+                             _wristBandDoubleTapTimer.Trigger = false;
+                             OnSliderDoubleTap(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
+                             _wristBandDoubleTapTimer.Stop();
+
+                         }
+                         else if (_recording)
+                         {
+                             _recording = false;
+                             AnalyseData();
+                         }
+                     }
+                    break;
             }
         }
 
@@ -179,68 +211,10 @@ namespace Watch.Toolkit.Input.Touch
             _bevelDoubleTapTimers.Remove(e.Data);
         }
 
-        void _manager_DigitalInReceived(object sender, Hardware.DigitalDataReivedHandler e)
+        protected void OnSliderDoubleTap(SliderTouchEventArgs e)
         {
-            switch (e.Id)
-            {
-                case 0:
-                    _linearTouch.Down = e.Value;
-                    if (_linearTouch.Down)
-                    {
-                        OnSliderTouchDownHandler(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
-                        _recording = true;
-                        if (!_wristBandDoubleTapTimer.Enabled)
-                        {
-                            _wristBandDoubleTapTimer.Elapsed += _doubleTapTimer_Elapsed;
-                            _wristBandDoubleTapTimer.Start();
-                            _wristBandDoubleTapTimer.Trigger = true;
-                        }
-                    }
-                    else
-                    {
-                        OnSliderTouchUpHandler(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
-                        if (_wristBandDoubleTapTimer.Trigger && _wristBandDoubleTapTimer.Enabled)
-                        {
-                            _wristBandDoubleTapTimer.Trigger = false;
-                            OnDoubleTap(new SliderTouchEventArgs(_linearTouch, _linearTouch.Value));
-                            _wristBandDoubleTapTimer.Stop();
-
-                        }
-                        else if (_recording)
-                        {
-                            _recording = false;
-                            AnalyseData();
-                        }
-                    }
-                    break;
-            }
-        }
-
-      
-        void _manager_AnalogDataReceived(object sender, Hardware.AnalogDataReceivedEventArgs e)
-        {
-            switch (e.Id)
-            {
-                case 0:
-                    _linearTouch.Value = e.Value;
-                    if (_recording)
-
-                    {
-                        _pipeline.Enqueue(e.Value);
-
-                    }
-                    break;
-            }
-            if (_linearTouch.Down)
-                OnRawDataHandler(new RawTouchDataReceivedEventArgs(_linearTouch));
-        }
-
-
-    
-        protected void OnDoubleTap(SliderTouchEventArgs e)
-        {
-            if(DoubleTap != null)
-                DoubleTap(this,e);
+            if(SliderDoubleTap != null)
+                SliderDoubleTap(this,e);
         }
         protected void OnBevelTouchDownHandler(BevelTouchEventArgs e)
         {

@@ -6,7 +6,13 @@ namespace Watch.Toolkit.Sensors
     {
         protected override void ProcessSensorData()
         {
-           
+            if (Value < 120)
+            {
+                Down = false;
+                _value = 0;
+            }
+            else Down = true;
+
         }
     }
 }

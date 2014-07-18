@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -43,6 +42,11 @@ namespace Watch.Toolkit.Utils
             _touchManager = new TouchManager();
             _touchManager.BevelGrab += _touchManager_BevelGrab;
             _touchManager.BevelDoubleTap += _touchManager_BevelDoubleTap;
+            _touchManager.SlideDown += _touchManager_SlideDown;
+            _touchManager.SlideUp += _touchManager_SlideUp;
+            _touchManager.SliderTouchDown += _touchManager_SliderTouchDown;
+            _touchManager.SliderTouchUp += _touchManager_SliderTouchUp;
+            _touchManager.SliderDoubleTap += _touchManager_DoubleTap;
             _touchManager.Start();
 
             _gestureManager = new GestureManager();
@@ -84,9 +88,42 @@ namespace Watch.Toolkit.Utils
 
         }
 
+        void _touchManager_DoubleTap(object sender, SliderTouchEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                Label.Content = "Slider Double Tap";
+            });
+        }
+
+        void _touchManager_SliderTouchUp(object sender, SliderTouchEventArgs e)
+        {
+            _visualizer.UpdateLinearTouch(e.Sensor);
+        }
+
+        void _touchManager_SliderTouchDown(object sender, SliderTouchEventArgs e)
+        {
+            _visualizer.UpdateLinearTouch(e.Sensor);
+        }
+
+        void _touchManager_SlideUp(object sender, SliderTouchEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                Label.Content = "Slide Up";
+            });
+        }
+
+        void _touchManager_SlideDown(object sender, SliderTouchEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                Label.Content = "Slide Down";
+            });
+        }
+
         void _touchManager_BevelDoubleTap(object sender, BevelTouchEventArgs e)
         {
-            Console.WriteLine(e.BevelSide);
             Dispatcher.Invoke(() =>
             {
                 switch (e.BevelSide)

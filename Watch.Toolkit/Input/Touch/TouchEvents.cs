@@ -7,7 +7,7 @@ namespace Watch.Toolkit.Input.Touch
         SliderTouchUp,
         SlideDown,
         SlideUp,
-        DoubleTap,
+        SliderDoubleTap,
         BevelDown,
         BevelUp,
         BevelDoubleTap,

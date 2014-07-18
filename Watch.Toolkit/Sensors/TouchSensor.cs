@@ -8,7 +8,7 @@ namespace Watch.Toolkit.Sensors
 
         public int Id { get; set; }
 
-        private double _value;
+        protected double _value;
 
         public double Value
         {
@@ -21,6 +21,8 @@ namespace Watch.Toolkit.Sensors
         }
 
         public bool Down { get; set; }
+
         protected abstract void ProcessSensorData();
+
     }
 }

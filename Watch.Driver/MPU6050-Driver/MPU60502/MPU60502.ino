@@ -15,8 +15,7 @@ int potPin = A3;
 //---------------------------------------------------------------------------
 // LightSensor
 //---------------------------------------------------------------------------
-int photocellPin = A0;    
-int photocellReading;     
+int photocellPin = A0;       
 
 //---------------------------------------------------------------------------
 // Proximity Sensor
@@ -91,9 +90,6 @@ void StartIMU()
         Fastwire::setup(400, true);
     #endif
 
-    Serial.begin(38400);
-    while (!Serial);
-
     mpu.initialize();
     devStatus = mpu.dmpInitialize();
     
@@ -135,6 +131,8 @@ void StartIMU()
 }
 void setup() {
   
+    Serial.begin(115200);
+    while (!Serial);
     StartCapactiveSensor();
     StartIMU();
 }
@@ -165,10 +163,8 @@ void ReadProximity()
 void ReadLight()
 {
       String light = "L";
-      photocellReading = analogRead(photocellPin);  
-
       light+=",";
-      light+=photocellReading;
+      light+=analogRead(A0);
       light+="#";
      
       Serial.print(light);   
@@ -179,7 +175,6 @@ void ReadTouches()
     uint8_t touched = cap.touched();
 
      String touches = "T";
-     String accData = "A";
      touches+=",";
      for (uint8_t i=0; i<8; i++) {
     
@@ -204,32 +199,22 @@ void ReadTouches()
 void ReadPotPin()
 {
       String slider = "S";
-      light+=",";
-      light+=analogRead(photocellPin);
-      light+="#";
+      
+      int value= 0;
+      for (int i=0; i< 16; i++) value += analogRead(A3);
+        value /= 16;
+      
+      if(value <90) value = 0;
+      slider+=",";
+      slider+=analogRead(value);
+      slider+="#";
      
       Serial.print(slider);
 }
 
-void loop() {
-  
-  if(proximitySensorFound)
-  {
-      ReadProximity();
-  }
-
-  
-  if(lightSensorFound)
-  {   
-      ReadLight();
-  }
-
-  if(touchSensorFound)
-  {
-      ReadTouches();
-  }
-  
-    // if programming failed, don't try to do anything
+void ReadImu()
+{
+   // if programming failed, don't try to do anything
     if (!dmpReady) return;
 
     // reset interrupt flag and get INT_STATUS byte
@@ -297,4 +282,13 @@ void loop() {
             Serial.print(aaWorld.z);
             Serial.print("#");
     }
+}
+void loop() {
+  
+  ReadProximity(); 
+  ReadLight();
+  ReadTouches();
+  ReadPotPin();
+  ReadImu();
+   
 }

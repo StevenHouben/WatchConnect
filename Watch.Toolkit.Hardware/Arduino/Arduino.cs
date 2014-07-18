@@ -16,9 +16,9 @@ namespace Watch.Toolkit.Hardware.Arduino
         private readonly Dictionary<string, Func<string, DataPacket>> _callbacks
             = new Dictionary<string, Func<string, DataPacket>>();
 
-        public void AddPacketListener(string name, Func<string, bool> condition,Func<string,DataPacket> callback )
+        public void AddPacketListener(string name, Func<string, bool> predicate, Func<string, DataPacket> callback)
         {
-            _events.Add(name, condition);
+            _events.Add(name, predicate);
             _callbacks.Add(name,callback);
         }
 
