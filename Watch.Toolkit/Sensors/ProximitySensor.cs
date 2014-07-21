@@ -11,9 +11,10 @@ namespace Watch.Toolkit.Sensors
         public event EventHandler<String> EventTriggered = delegate { };
         private readonly Dictionary<string, Func<ProximitySensor, bool>> _events = new Dictionary<string, Func<ProximitySensor, bool>>();
 
-        public void AddEvent(string name, Func<ProximitySensor, bool> condition)
+        public ProximitySensor AddEvent(string name, Func<ProximitySensor, bool> condition)
         {
             _events.Add(name, condition);
+            return this;
         }
 
         public void RemoveEvent(string name)

@@ -14,7 +14,7 @@ namespace Watch.Toolkit.Utils
     {
         private readonly StringBuilder _logger = new StringBuilder();
         private readonly Imu _accelerometer = new Imu();
-        private readonly ImuParser _accelerometerParser = new ImuParser(new Arduino());
+        private readonly ImuParser _accelerometerParser = new ImuParser(new Arduino("COM4"));
         private Timer _recorder = new Timer(500);
 
         public DataType RecordingDatatype;

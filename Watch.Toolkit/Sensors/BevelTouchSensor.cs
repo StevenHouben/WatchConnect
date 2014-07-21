@@ -30,9 +30,10 @@ namespace Watch.Toolkit.Sensors
         public event EventHandler<String> EventTriggered = delegate { };
         private readonly Dictionary<string, Func<BevelTouchSensor, bool>> _events = new Dictionary<string, Func<BevelTouchSensor, bool>>();
 
-        public void AddEvent(string name, Func<BevelTouchSensor, bool> predicate)
+        public BevelTouchSensor AddEvent(string name, Func<BevelTouchSensor, bool> predicate)
         {
             _events.Add(name, predicate);
+            return this;
         }
 
         public void RemoveEvent(string name)

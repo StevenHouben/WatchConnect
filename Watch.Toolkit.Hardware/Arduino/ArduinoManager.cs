@@ -4,10 +4,9 @@
     {
         private static ArduinoDriver _instance;
 
-        public static ArduinoDriver Arduino 
+        public static ArduinoDriver GetArduinoDriver(string port)
         {
-            //Todo -> move the port name to configuration class
-            get { return _instance ?? (_instance = new ArduinoDriver("COM7")); }
+            return _instance ?? (_instance = new ArduinoDriver(port));
         }
     }
 }

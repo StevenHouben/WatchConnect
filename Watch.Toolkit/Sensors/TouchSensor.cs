@@ -10,9 +10,10 @@ namespace Watch.Toolkit.Sensors
         public event EventHandler<String> EventTriggered = delegate { };
         private readonly Dictionary<string, Func<TouchSensor, bool>> _events = new Dictionary<string, Func<TouchSensor, bool>>();
 
-        public void AddEvent(string name, Func<TouchSensor, bool> condition)
+        public TouchSensor AddEvent(string name, Func<TouchSensor, bool> condition)
         {
             _events.Add(name, condition);
+            return this;
         }
 
         public void RemoveEvent(string name)

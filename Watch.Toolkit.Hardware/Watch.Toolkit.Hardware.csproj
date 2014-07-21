@@ -56,6 +56,7 @@
     <Compile Include="DataPacketReceivedEventArgs.cs" />
     <Compile Include="DigitalDataReceivedEventArgs.cs" />
     <Compile Include="AnalogDataReceivedEventArgs.cs" />
+    <Compile Include="HardwareSimulator.cs" />
     <Compile Include="MessagesReceivedEventArgs.cs" />
     <Compile Include="Phidget\Phidget.cs" />
     <Compile Include="Phidget\PhidgetManager.cs" />

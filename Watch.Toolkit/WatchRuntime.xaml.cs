@@ -5,7 +5,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
 using Watch.Toolkit.Input.Tracker;

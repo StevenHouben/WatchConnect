@@ -19,7 +19,6 @@ namespace Watch.Toolkit.Hardware
         private readonly Dictionary<Guid, Func<string, DataPacket>> _callbacks
             = new Dictionary<Guid, Func<string, DataPacket>>();
 
-
         public abstract void Start();
         public abstract void Stop();
 

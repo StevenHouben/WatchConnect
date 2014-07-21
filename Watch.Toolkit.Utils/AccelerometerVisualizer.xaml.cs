@@ -6,7 +6,9 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using GestureTouch;
+using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Hardware.Arduino;
+using Watch.Toolkit.Hardware.Phidget;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
 using Watch.Toolkit.Input.Tracker;
@@ -47,7 +49,7 @@ namespace Watch.Toolkit.Utils
                 new List<string> { "Right Hand", "Left Hand", "Left Knuckle", "Hand" },
                 AppDomain.CurrentDomain.BaseDirectory + "recording17.log");
 
-            _configuration.Hardware = new Arduino();
+            _configuration.Hardware = new Arduino("COM7");
 
             _watchRuntime = new WatchRuntime(_configuration);
             _watchRuntime.AddWatchFace(_visualizer);
@@ -69,7 +71,6 @@ namespace Watch.Toolkit.Utils
             _watchRuntime.TouchManager.SliderTouchUp += _touchManager_SliderTouchUp;
             _watchRuntime.TouchManager.SliderDoubleTap += _touchManager_DoubleTap;
 
-
             _watchRuntime.GestureManager = new GestureManager(_configuration.Hardware);
 
             foreach (var template in _watchRuntime.TrackerManager.DtwClassifier.GetTemplates())
@@ -81,9 +82,19 @@ namespace Watch.Toolkit.Utils
 
             var imuSensor = _watchRuntime.TrackerManager.Imu;
 
-            imuSensor.AddEvent("IMUTilted",
+            imuSensor.AddEvent("ImuTilted",
                 (imu) => imu.YawPitchRollValues.Z > 10
                 ).EventTriggered  += (sender, e) => Console.WriteLine("");
+
+            var touchSensor = _watchRuntime.TouchManager.BevelTouchSensor;
+
+            touchSensor.AddEvent("SideGrab",
+                (touch) => touch.TouchStates.BevelLeft && touch.TouchStates.BevelRight
+                ).EventTriggered += (sender, e) =>
+                {
+                    if(e == "SideGrab")
+                        Console.WriteLine(@"{0} detected",e);
+                };
 
         }
 

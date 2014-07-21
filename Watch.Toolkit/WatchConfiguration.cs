@@ -19,7 +19,7 @@ namespace Watch.Toolkit
             {
                 return new WatchConfiguration
                 {
-                    Hardware = new Arduino(),
+                    Hardware = new Arduino("COM4"),
                     DisplaySize = new Size(800,600),
                     ClassifierConfiguration = new ClassifierConfiguration(
                          new List<string> { "Normal Mode", "Left Index", "Left Knuckle", "Hand" }, AppDomain.CurrentDomain.BaseDirectory + "recording16.log")
