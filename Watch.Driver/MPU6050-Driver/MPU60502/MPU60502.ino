@@ -103,35 +103,12 @@ void StartIMU()
     mpu.setXGyroOffset(50);    
     mpu.setYGyroOffset(-34);    
     mpu.setZGyroOffset(6);   
-
-    // make sure it worked (returns 0 if so)
-    if (devStatus == 0) {
-        // turn on the DMP, now that it's ready
-       Serial.println(F("Enabling DMP..."));
-        mpu.setDMPEnabled(true);
-
-        // enable Arduino interrupt detection
-        Serial.println(F("Enabling interrupt detection (Arduino external interrupt 0)..."));
-        attachInterrupt(0, dmpDataReady, RISING);
-        mpuIntStatus = mpu.getIntStatus();
-
-        // set our DMP Ready flag so the main loop() function knows it's okay to use it
-        Serial.println(F("DMP ready! Waiting for first interrupt..."));
-        dmpReady = true;
-        
-        imuFound = true;
-
-        // get expected DMP packet size for later comparison
-        packetSize = mpu.dmpGetFIFOPacketSize();
-    } else {
-        // ERROR!
-        // 1 = initial memory load failed
-        // 2 = DMP configuration updates failed
-        // (if it's going to break, usually the code will be 1)
-        Serial.print(F("DMP Initialization failed (code "));
-        Serial.print(devStatus);
-        Serial.println(F(")"));
-    }
+    
+    mpu.setDMPEnabled(true);
+    
+    mpuIntStatus = mpu.getIntStatus();
+    
+     packetSize = mpu.dmpGetFIFOPacketSize();
 }
 void setup() {
     StartIMU();
@@ -212,14 +189,8 @@ void ReadPotPin()
 
 void ReadImu()
 {
-   // if programming failed, don't try to do anything
-    if (!dmpReady) return;
-
-    // reset interrupt flag and get INT_STATUS byte
-    mpuInterrupt = false;
     mpuIntStatus = mpu.getIntStatus();
 
-    // get current FIFO count
     fifoCount = mpu.getFIFOCount();
 
     // check for overflow (this should never happen unless our code is too inefficient)
@@ -248,6 +219,7 @@ void ReadImu()
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
             mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+            
             Serial.print("A");
             Serial.print(",");
             Serial.print(ax);

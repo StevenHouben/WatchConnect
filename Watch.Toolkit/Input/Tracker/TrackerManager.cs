@@ -93,13 +93,10 @@ namespace Watch.Toolkit.Input.Tracker
     {
         public string DtwLabel { get; set; }
         public string TreeLabel { get; set; }
-
         public Dictionary<string,double> ComputedDtwCosts { get; set; }
-
     }
     public class LabelDetectedEventArgs : EventArgs
     {
         public string Detection { get; set; }
-
     }
 }
