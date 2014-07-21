@@ -41,13 +41,14 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 
 
 Quaternion q;           // [w, x, y, z]         quaternion container
-int32_t gy[3];          // [x, y, z]            gyro sensor measurements
+int32_t gyro[3];          // [x, y, z]            gyro sensor measurements
 VectorInt16 aa;         // [x, y, z]            accel sensor measurements
 VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
 VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
 VectorFloat gravity;    // [x, y, z]            gravity vector
 float euler[3];         // [psi, theta, phi]    Euler angle container
 float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+int16_t ax,ay,az,gx,gy,gz;
 
 //---------------------------------------------------------------------------
 // Lists connected sensors
@@ -90,15 +91,18 @@ void StartIMU()
         Fastwire::setup(400, true);
     #endif
 
+  
+    Serial.begin(115200);
+    
     mpu.initialize();
     devStatus = mpu.dmpInitialize();
     
-    mpu.setXAccelOffset(-1428); 
-    mpu.setYAccelOffset(740);
-    mpu.setZAccelOffset(970);
-    mpu.setXGyroOffset(95);    
+    mpu.setXAccelOffset(-772.5); 
+    mpu.setYAccelOffset(455);
+    mpu.setZAccelOffset(1454);
+    mpu.setXGyroOffset(50);    
     mpu.setYGyroOffset(-34);    
-    mpu.setZGyroOffset(36.2);   
+    mpu.setZGyroOffset(6);   
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -130,11 +134,8 @@ void StartIMU()
     }
 }
 void setup() {
-  
-    Serial.begin(115200);
-    while (!Serial);
-    StartCapactiveSensor();
     StartIMU();
+    StartCapactiveSensor();
 }
 
 void ReadProximity()
@@ -200,13 +201,10 @@ void ReadPotPin()
 {
       String slider = "S";
       
-      int value= 0;
-      for (int i=0; i< 16; i++) value += analogRead(A3);
-        value /= 16;
-      
+      int value = analogRead(A3);
       if(value <90) value = 0;
       slider+=",";
-      slider+=analogRead(value);
+      slider+=value;
       slider+="#";
      
       Serial.print(slider);
@@ -242,9 +240,6 @@ void ReadImu()
         // (this lets us immediately read more without waiting for an interrupt)
         fifoCount -= packetSize;
         
-        //mpu.getMotion6(&ax,&ay,&az,&gx,&gy,&gz);
-        
-            int16_t ax,ay,az,gx,gy,gz;
             mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
             mpu.dmpGetAccel(&aa, fifoBuffer);
 
@@ -267,13 +262,11 @@ void ReadImu()
             Serial.print(",");
             Serial.print(gz);
             Serial.print(",");
-            
             Serial.print(ypr[0] * 180/M_PI);
             Serial.print(",");
             Serial.print(ypr[1] * 180/M_PI);
             Serial.print(",");
-            Serial.print(ypr[2] * 180/M_PI);
-            
+            Serial.print(ypr[2] * 180/M_PI);     
             Serial.print(",");
             Serial.print(aaWorld.x);
             Serial.print(",");
@@ -285,10 +278,10 @@ void ReadImu()
 }
 void loop() {
   
+   ReadImu();
   ReadProximity(); 
   ReadLight();
   ReadTouches();
   ReadPotPin();
-  ReadImu();
    
 }

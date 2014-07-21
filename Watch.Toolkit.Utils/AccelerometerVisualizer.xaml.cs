@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using GestureTouch;
-using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Touch;
@@ -79,6 +78,13 @@ namespace Watch.Toolkit.Utils
             }
 
             _watchRuntime.Show();
+
+            var imuSensor = _watchRuntime.TrackerManager.Imu;
+
+            imuSensor.AddEvent("IMUTilted",
+                (imu) => imu.YawPitchRollValues.Z > 10
+                ).EventTriggered  += (sender, e) => Console.WriteLine("");
+
         }
 
         void _touchManager_DoubleTap(object sender, SliderTouchEventArgs e)

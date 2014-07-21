@@ -8,9 +8,10 @@ namespace Watch.Toolkit.Sensors
     {
         public event EventHandler<String> EventTriggered = delegate { };
         private readonly Dictionary<string, Func<Imu, bool>> _events = new Dictionary<string, Func<Imu, bool>>();
-        public void AddEvent(string name, Func<Imu, bool> condition)
+        public Imu AddEvent(string name, Func<Imu, bool> condition)
         {
             _events.Add(name, condition);
+            return this;
         }
 
         public void RemoveEvent(string name)
@@ -28,7 +29,7 @@ namespace Watch.Toolkit.Sensors
 
         public void Update(Imu acc)
         {
-            Update(acc.RawAccelerometerValues, acc.RawGyroValue, acc.RawGyroValue, acc.RealWorldAccelerationValues);
+            Update(acc.RawAccelerometerValues, acc.RawGyroValue, acc.YawPitchRollValues, acc.RealWorldAccelerationValues);
         }
         public void Update(Vector rawAccData, Vector rawGyroData, Vector yawPitchRoll, Vector worldAcceleration)
         {

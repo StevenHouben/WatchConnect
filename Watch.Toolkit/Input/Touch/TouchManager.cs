@@ -30,7 +30,7 @@ namespace Watch.Toolkit.Input.Touch
         private readonly EventMonitor _wristBandDoubleTapTimer = new EventMonitor(300);
 
         private readonly Dictionary<BevelSide, DataEventMonitor<BevelSide>> _bevelDoubleTapTimers
-            = new Dictionary<BevelSide, DataEventMonitor<BevelSide>>(8);
+            = new Dictionary<BevelSide, DataEventMonitor<BevelSide>>(14);
 
         public HardwarePlatform Hardware { get; private set; }
 
