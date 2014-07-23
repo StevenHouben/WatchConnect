@@ -80,9 +80,15 @@ namespace Watch.Toolkit.Hardware.Arduino
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            _output += _serialPort.ReadTo("#");
+            _output += _serialPort.ReadLine();
+            _output = _output.Replace("\r\n", "").Replace("\r", "").Replace("\n", "");
+            if (_output.EndsWith("#"))
+            {
+                _output = _output.Replace("#", "");
+                OnMessageReceived(this, new MessagesReceivedEventArgs(-1, _output));
+            }
 
-            OnMessageReceived(this, new MessagesReceivedEventArgs(-1,_output));
+
             _output = "";
         }
     }

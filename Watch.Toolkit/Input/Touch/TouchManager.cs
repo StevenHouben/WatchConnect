@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
+using System.Windows.Forms;
 using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;
@@ -29,8 +31,8 @@ namespace Watch.Toolkit.Input.Touch
         private readonly DtwRecognizer _gestureRecognizer = new DtwRecognizer();
         private readonly EventMonitor _wristBandDoubleTapTimer = new EventMonitor(300);
 
-        private readonly Dictionary<BevelSide, DataEventMonitor<BevelSide>> _bevelDoubleTapTimers
-            = new Dictionary<BevelSide, DataEventMonitor<BevelSide>>(14);
+        private readonly ConcurrentDictionary<BevelSide, DataEventMonitor<BevelSide>> _bevelDoubleTapTimers
+            = new ConcurrentDictionary<BevelSide, DataEventMonitor<BevelSide>>();
 
         public HardwarePlatform Hardware { get; private set; }
 
@@ -193,7 +195,7 @@ namespace Watch.Toolkit.Input.Touch
                     em.MonitorTriggered += em_MonitorTriggered;
                     em.Trigger = true;
                     em.Start();
-                    _bevelDoubleTapTimers.Add(side,em);
+                    _bevelDoubleTapTimers.TryAdd(side, em);   
                 }
             }
             else
@@ -206,7 +208,8 @@ namespace Watch.Toolkit.Input.Touch
         void em_MonitorTriggered(object sender, DataTriggeredEventArgs<BevelSide> e)
         {
              _bevelDoubleTapTimers[e.Data].Stop();
-            _bevelDoubleTapTimers.Remove(e.Data);
+            DataEventMonitor<BevelSide> dummyOut;
+            _bevelDoubleTapTimers.TryRemove(e.Data, out dummyOut);
         }
 
         protected void OnSliderDoubleTap(SliderTouchEventArgs e)

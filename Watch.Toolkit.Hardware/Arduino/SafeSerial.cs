@@ -15,6 +15,7 @@ namespace Watch.Toolkit.Hardware.Arduino
         {
             try
             {
+                
                 base.Open();
                 _theBaseStream = BaseStream;
                 GC.SuppressFinalize(BaseStream);
