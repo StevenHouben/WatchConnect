@@ -91,8 +91,7 @@ void StartIMU()
         Fastwire::setup(400, true);
     #endif
 
- 
-    
+
     mpu.initialize();
     devStatus = mpu.dmpInitialize();
     
@@ -133,10 +132,9 @@ void StartIMU()
     }
 }
 void setup() {
-  
-      Serial.begin(115200);
+    Serial.begin(115200);
+        StartCapactiveSensor();
     StartIMU();
-    StartCapactiveSensor();
 }
 
 void ReadProximity()
@@ -159,7 +157,7 @@ void ReadProximity()
       proximity+=",";
       proximity+=distance[1];
       proximity+="#";
-      Serial.print(F(proximity));
+      Serial.println(proximity);
 }
 
 void ReadLight()
@@ -169,7 +167,7 @@ void ReadLight()
       light+=analogRead(A0);
       light+="#";
      
-      Serial.print(F(light));   
+      Serial.println(light);   
 }
 
 void ReadTouches()
@@ -194,7 +192,7 @@ void ReadTouches()
     }
   }
   touches+="#";
-  Serial.print(F(touches));
+  Serial.println(touches);
 
 }
 
@@ -208,7 +206,7 @@ void ReadPotPin()
       slider+=value;
       slider+="#";
      
-      Serial.print(F(slider));
+      Serial.println(slider);
 }
 
 void ReadImu()
@@ -274,15 +272,13 @@ void ReadImu()
             Serial.print(aaWorld.y);
             Serial.print(",");
             Serial.print(aaWorld.z);
-            Serial.print("#");
+            Serial.println("#");
     }
 }
 void loop() {
-  
  ReadImu();
-  ReadProximity(); 
+ ReadProximity(); 
   ReadLight();
-  ReadTouches();
-  ReadPotPin();
+ ReadTouches();
    
 }

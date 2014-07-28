@@ -9,7 +9,7 @@ namespace Watch.Toolkit.Input.Gestures
 {
     public class GestureManager:AbstractGestureManager
     {
-        private const int InfraRedDistanceThreshold = 300;
+        private const int InfraRedDistanceThreshold = 400;
 
         private readonly DtwRecognizer _gestureRecognizer = new DtwRecognizer();
 

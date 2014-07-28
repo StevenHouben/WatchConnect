@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
-using System.Windows.Forms;
 using Watch.Toolkit.Hardware;
 using Watch.Toolkit.Processing.Recognizers;
 using Watch.Toolkit.Sensors;

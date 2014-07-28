@@ -11,7 +11,6 @@ namespace Watch.Toolkit.Interface
         {
             _faces.Add(face.Id,face);
         }
-
         public WatchVisual GetNext()
         {
             return _faces.Values.First();

@@ -9,6 +9,7 @@ using GestureTouch;
 using Microsoft.Surface.Presentation.Controls;
 using Watch.Examples.Desktop.Design;
 using Watch.Toolkit;
+using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Interface;
@@ -44,6 +45,7 @@ namespace Watch.Examples.Desktop
 
             KeyDown += DesktopWindow_KeyDown;
 
+            _configuration.Hardware = new Arduino("COM7");
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
                 new List<string> {"Right Hand", "Left Hand", "Left Knuckle", "Hand"},
                 AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
@@ -56,7 +58,6 @@ namespace Watch.Examples.Desktop
             touchPipeline.GestureTouchUp += touchPipeline_GestureTouchUp;
 
             WindowState = WindowState.Maximized;
-            
 
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
@@ -97,7 +98,7 @@ namespace Watch.Examples.Desktop
 
         void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
         {
-
+            Console.WriteLine(e.Gesture);
             switch (e.Gesture)
             {
                 case Gesture.SwipeRight:

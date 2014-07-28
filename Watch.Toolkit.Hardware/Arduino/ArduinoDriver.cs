@@ -6,7 +6,6 @@ namespace Watch.Toolkit.Hardware.Arduino
     internal class ArduinoDriver:HardwarePlatform
     {
         public string Port { get; private set; }
-        public string ReadData { get; private set; }
 
         private const int BaudRate = 115200;
 
@@ -87,8 +86,6 @@ namespace Watch.Toolkit.Hardware.Arduino
                 _output = _output.Replace("#", "");
                 OnMessageReceived(this, new MessagesReceivedEventArgs(-1, _output));
             }
-
-
             _output = "";
         }
     }
