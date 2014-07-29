@@ -45,7 +45,7 @@ namespace Watch.Examples.Desktop
 
             KeyDown += DesktopWindow_KeyDown;
 
-            _configuration.Hardware = new Arduino("COM7");
+            _configuration.Hardware = new Arduino("COM4");
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
                 new List<string> {"Right Hand", "Left Hand", "Left Knuckle", "Hand"},
                 AppDomain.CurrentDomain.BaseDirectory + "recording16.log");

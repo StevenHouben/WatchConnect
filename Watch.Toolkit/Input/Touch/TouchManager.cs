@@ -119,10 +119,10 @@ namespace Watch.Toolkit.Input.Touch
                 case "T":
                      var state = new BevelState()
                     {
-                        BevelTop = e.DataPacket.Body[1] == "1",
-                        BevelLeft = e.DataPacket.Body[2] == "1",
-                        BevelBottom = e.DataPacket.Body[3] == "1",
-                        BevelRight = e.DataPacket.Body[4] == "1"
+                        BevelTop = e.DataPacket.Body[4] == "1",
+                        BevelLeft = e.DataPacket.Body[5] == "1",
+                        BevelBottom = e.DataPacket.Body[6] == "1",
+                        BevelRight = e.DataPacket.Body[7] == "1"
                     };
 
                      HandleTouchStates(BevelSide.Top, state.BevelTop, BevelTouchSensor.TouchStates.BevelTop);

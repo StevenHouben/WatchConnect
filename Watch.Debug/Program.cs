@@ -7,7 +7,7 @@ namespace Watch.Debug
     {
         static void Main(string[] args)
         {
-            var ard = new Arduino("COM7");
+            var ard = new Arduino("COM4");
             ard.MessageReceived += ard_MessageReceived;
             ard.Start();
 

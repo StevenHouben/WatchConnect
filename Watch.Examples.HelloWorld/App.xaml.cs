@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using Watch.Toolkit;
+using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Tracker;
 using Watch.Toolkit.Processing.MachineLearning;
@@ -24,6 +25,7 @@ namespace Watch.Examples.HelloWorld
             var configuration = new WatchConfiguration
             {
                 DisplaySize = new Size(800, 600),
+                Hardware =  new Arduino("COM4"),
                 ClassifierConfiguration = new ClassifierConfiguration(
                      new List<string> { "Idle", "Left Index", "Left Knuckle", "Hand" },
                      AppDomain.CurrentDomain.BaseDirectory + "recording16.log")

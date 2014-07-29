@@ -98,9 +98,9 @@ void StartIMU()
     mpu.setXAccelOffset(-772.5); 
     mpu.setYAccelOffset(455);
     mpu.setZAccelOffset(1454);
-    mpu.setXGyroOffset(50);    
-    mpu.setYGyroOffset(-34);    
-    mpu.setZGyroOffset(6);   
+//    mpu.setXGyroOffset(50);    
+//    mpu.setYGyroOffset(-34);    
+//    mpu.setZGyroOffset(6);   
 
     // make sure it worked (returns 0 if so)
     if (devStatus == 0) {
@@ -133,8 +133,9 @@ void StartIMU()
 }
 void setup() {
     Serial.begin(115200);
+        StartIMU();
         StartCapactiveSensor();
-    StartIMU();
+
 }
 
 void ReadProximity()
@@ -276,9 +277,9 @@ void ReadImu()
     }
 }
 void loop() {
- ReadImu();
+  ReadImu();
  ReadProximity(); 
-  ReadLight();
+ ReadLight();
  ReadTouches();
-   
+  
 }

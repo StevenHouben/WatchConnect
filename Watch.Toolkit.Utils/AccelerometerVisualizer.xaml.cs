@@ -41,27 +41,28 @@ namespace Watch.Toolkit.Utils
             TouchVisualizer.GestureTouchDown += TouchVisualizer_GestureTouchDown;
 
             cbGestureList.ItemsSource = 
-                new List<string> { "None", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
+                new List<string> { "None", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle"};
             cbGestureList.SelectedIndex = 0;
             KeyDown += MainWindow_KeyDown;
 
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
-                new List<string> { "Right Hand", "Left Hand", "Left Knuckle", "Hand" },
-                AppDomain.CurrentDomain.BaseDirectory + "recording17.log");
+                new List<string> { "Right Hand", "Left Hand", "Left Knuckle", " Flat Hand" },
+                AppDomain.CurrentDomain.BaseDirectory + "recording19.log");
 
-            _configuration.Hardware = new Arduino("COM7");
+            _configuration.Hardware = new Arduino("COM4");
 
             _watchRuntime = new WatchRuntime(_configuration);
             _watchRuntime.AddWatchFace(_visualizer);
             _watchRuntime.GestureManager.RawDataReceived += GestureManager_RawDataReceived;
             _watchRuntime.GestureManager.GestureDetected += GestureManager_GestureDetected;
+            _watchRuntime.GestureManager.Cover += GestureManager_Cover;
 
             _watchRuntime.TrackerManager = new TrackerManager(_configuration.Hardware, _configuration.ClassifierConfiguration);
             _watchRuntime.TrackerManager.RawTrackGestureDataUpdated += _trackerManager_RawTrackGestureDataUpdated;
             _watchRuntime.TrackerManager.Start();
 
-            _watchRuntime.TrackerManager.Imu.EventTriggered += ImuParser_EventTriggered;
-            _watchRuntime.TrackerManager.Imu.AddEvent("Rotate", imu => imu.YawPitchRollValues.Z < -10);
+            //_watchRuntime.TrackerManager.Imu.EventTriggered += ImuParser_EventTriggered;
+            //_watchRuntime.TrackerManager.Imu.AddEvent("Rotate", imu => imu.YawPitchRollValues.Z < -10);
            
             _watchRuntime.TouchManager.BevelGrab += _touchManager_BevelGrab;
             _watchRuntime.TouchManager.BevelDoubleTap += _touchManager_BevelDoubleTap;
@@ -80,22 +81,30 @@ namespace Watch.Toolkit.Utils
 
             _watchRuntime.Show();
 
-            var imuSensor = _watchRuntime.TrackerManager.Imu;
+            //var imuSensor = _watchRuntime.TrackerManager.Imu;
 
-            imuSensor.AddEvent("ImuTilted",
-                (imu) => imu.YawPitchRollValues.Z > 10
-                ).EventTriggered  += (sender, e) => Console.WriteLine("");
+            //imuSensor.AddEvent("ImuTilted",
+            //    (imu) => imu.YawPitchRollValues.Z > 10
+            //    ).EventTriggered  += (sender, e) => Console.WriteLine("");
 
-            var touchSensor = _watchRuntime.TouchManager.BevelTouchSensor;
+            //var touchSensor = _watchRuntime.TouchManager.BevelTouchSensor;
 
-            touchSensor.AddEvent("SideGrab",
-                (touch) => touch.TouchStates.BevelLeft && touch.TouchStates.BevelRight
-                ).EventTriggered += (sender, e) =>
-                {
-                    if(e == "SideGrab")
-                        Console.WriteLine(@"{0} detected",e);
-                };
+            //touchSensor.AddEvent("SideGrab",
+            //    (touch) => touch.TouchStates.BevelLeft && touch.TouchStates.BevelRight
+            //    ).EventTriggered += (sender, e) =>
+            //    {
+            //        if(e == "SideGrab")
+            //            Console.WriteLine(@"{0} detected",e);
+            //    };
 
+        }
+
+        void GestureManager_Cover(object sender, GestureDetectedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                Label.Content = "Covered";
+            });
         }
 
         void _touchManager_DoubleTap(object sender, SliderTouchEventArgs e)

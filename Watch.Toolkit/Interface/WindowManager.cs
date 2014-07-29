@@ -16,6 +16,7 @@ namespace Watch.Toolkit.Interface
             if (!window.IsLoaded)
                 window.WindowStartupLocation = WindowStartupLocation.Manual;
 
+            window.WindowStyle = WindowStyle.None;
             var workingArea = secondaryScreen.WorkingArea;
             window.Left = workingArea.Left;
             window.Top = workingArea.Top;
@@ -64,8 +65,6 @@ namespace Watch.Toolkit.Interface
                 case DockLocation.Fill:
                     window.WindowState = WindowState.Maximized;
                     break;
-
-
             }
             
         }
