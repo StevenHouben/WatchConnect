@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -38,7 +38,6 @@ namespace Watch.Examples.Desktop
         readonly Dictionary<int, ScatterViewItem> _selectedItems =
             new Dictionary<int, ScatterViewItem>();
 
-
         public DesktopWindow()
         {
             InitializeComponent();
@@ -48,7 +47,7 @@ namespace Watch.Examples.Desktop
             _configuration.Hardware = new Arduino("COM4");
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
                 new List<string> {"Right Hand", "Left Hand", "Left Knuckle", "Hand"},
-                AppDomain.CurrentDomain.BaseDirectory + "recording16.log");
+                AppDomain.CurrentDomain.BaseDirectory + "recording19.log");
 
             _watchWindow = new WatchRuntime(_configuration);
 
@@ -63,21 +62,12 @@ namespace Watch.Examples.Desktop
 
             _watchWindow.AddWatchFace(new Clock());
 
-            //_watchWindow.Width = 300;
-            //_watchWindow.Height = 300;
-            //_watchWindow.WindowStyle = WindowStyle.ToolWindow;
-            //_watchWindow.WindowState = WindowState.Normal;
-            //_watchWindow.Left = 0;
-            //_watchWindow.Top = 0;
-
             _watchWindow.Show();
         }
 
         private bool IsSelectMode()
         {
-            return false;
-            //Todo: this is debug code
-            //return _watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First();
+            return _watchWindow.LastDetectedPosture == _configuration.ClassifierConfiguration.Labels.First();
         }
         void DesktopWindow_KeyDown(object sender, KeyEventArgs e)
         {

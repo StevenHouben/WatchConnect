@@ -7,7 +7,6 @@ using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Input.Tracker;
 using Watch.Toolkit.Processing.MachineLearning;
-using Watch.Toolkit.Sensors;
 
 namespace Watch.Examples.HelloWorld
 {
@@ -72,7 +71,7 @@ namespace Watch.Examples.HelloWorld
                 //Move to the next watchface
                 watchWindow.NextFace();
             };
-            
+
             watchWindow.Show();
 
         }

@@ -1,26 +1,20 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows.Controls;
-using Watch.Toolkit.Interface;
 using Watch.Toolkit.Sensors;
 
 namespace Watch.Examples.GyroVisualizer
 {
-    /// <summary>
-    /// Interaction logic for GyroBall.xaml
-    /// </summary>
     public partial class GyroBall
     {
-
         private static double[] _xValues;
         private static double[] _yValues;
-        private int _counter = 0;
-        private bool _initialized = false;
+        private int _counter;
+        private bool _initialized;
         public GyroBall()
         {
             InitializeComponent();
-            _xValues = new double[4];
-            _yValues = new double[4];
+            _xValues = new double[100];
+            _yValues = new double[100];
 
             Canvas.SetLeft(Ball, Width/2);
             Canvas.SetTop(Ball, Height/2);
@@ -57,16 +51,14 @@ namespace Watch.Examples.GyroVisualizer
                         sumX += _xValues[i];
                         sumY += _yValues[i];
                     }
-                    double avgX = sumX / _xValues.Length;
-                    double avgY = sumY / _yValues.Length;
+                    var avgX = sumX / _xValues.Length;
+                    var avgY = sumY / _yValues.Length;
                     Canvas.SetLeft(Ball, avgX);
                     Canvas.SetTop(Ball, avgY);
                 }
                 _counter++;
                 if (_counter == _xValues.Length)
                     _counter = 0;
-
-
             });
         }
 

@@ -26,6 +26,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Debug", "Watch.Debug\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Examples.GyroVisualizer", "Watch.Examples.GyroVisualizer\Watch.Examples.GyroVisualizer.csproj", "{ED9A9F8D-9183-469A-979A-3D08D36DC32B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Examples.Map", "Watch.Examples.Map\Watch.Examples.Map.csproj", "{E6E09120-BD83-469B-9E24-8155F98536CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,6 +128,16 @@ Global
 		{ED9A9F8D-9183-469A-979A-3D08D36DC32B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{ED9A9F8D-9183-469A-979A-3D08D36DC32B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{ED9A9F8D-9183-469A-979A-3D08D36DC32B}.Release|Win32.ActiveCfg = Release|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E6E09120-BD83-469B-9E24-8155F98536CD}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

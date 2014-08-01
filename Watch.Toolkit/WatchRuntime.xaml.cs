@@ -33,6 +33,14 @@ namespace Watch.Toolkit
         public WatchRuntime(WatchConfiguration watchConfiguration)
         {
             BuildWatch(watchConfiguration);
+
+            KeyDown += WatchRuntime_KeyDown;
+        }
+
+        void WatchRuntime_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if(e.Key == Key.Escape)
+                Environment.Exit(0);
         }
 
         void WatchRuntime_Loaded(object sender, RoutedEventArgs e)
