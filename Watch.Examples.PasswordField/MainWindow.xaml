@@ -1,0 +1,22 @@
+﻿<Window x:Class="Watch.Examples.PasswordField.MainWindow"
+        xmlns:my="http://schemas.microsoft.com/surface/2008"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <Canvas Margin="-106,10,105.6,-10.4">
+            <my:SurfaceButton  Background="Gray"
+            Margin="0" 
+            x:Name="Button"
+            FontSize="35"
+            HorizontalContentAlignment="Center"
+            Content="Verify Data" Canvas.Left="596" Canvas.Top="298" Width="630"/>
+            <my:SurfacePasswordBox  x:Name="PasswordBox" PasswordChar="*" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
+                                    FontSize="40"  Width="630"  Height="71" Canvas.Left="596" Canvas.Top="130" PreviewTouchDown="PasswordBox_OnPreviewTouchDown"  Margin="0"/>
+            <my:SurfaceTextBox x:Name="Box" Visibility="Hidden"  HorizontalAlignment="Left" FontSize="40"  Width="630"  Height="71" Canvas.Left="596" Canvas.Top="130" PreviewTouchDown="PasswordBox_OnPreviewTouchDown" Margin="0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+            <Label FontSize="30" Content="Please enter your password to log in" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Top" Width="630" Height="68" Canvas.Left="596"/>
+            <Label x:Name="Output" Foreground="Gray" FontSize="30" Content="" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Top" Width="886" Canvas.Top="243" Canvas.Left="486"/>
+        </Canvas>
+
+    </Grid>
+</Window>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using GestureTouch;
 using Microsoft.Surface.Presentation.Controls;
@@ -13,7 +14,6 @@ using Watch.Toolkit.Hardware.Arduino;
 using Watch.Toolkit.Input;
 using Watch.Toolkit.Input.Gestures;
 using Watch.Toolkit.Interface;
-using Watch.Toolkit.Interface.DefaultFaces;
 using Watch.Toolkit.Processing.MachineLearning;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using Point = System.Windows.Point;
@@ -38,6 +38,16 @@ namespace Watch.Examples.Desktop
         readonly Dictionary<int, ScatterViewItem> _selectedItems =
             new Dictionary<int, ScatterViewItem>();
 
+        private List<string> _images = new List<string>()
+        {
+            "duet.png",
+            "edgetouch.png",
+            "galaxy.png",
+            "mechanical.png",
+            "pebbles.png",
+            "sony.png"
+        };
+
         public DesktopWindow()
         {
             InitializeComponent();
@@ -60,7 +70,8 @@ namespace Watch.Examples.Desktop
 
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
-            _watchWindow.AddWatchFace(new Clock());
+            _watchWindow.AddWatchFace(new WatchApplication(RandomPick(_images)) { Background = Helper.RandomBrush() });
+
 
             _watchWindow.Show();
         }
@@ -101,7 +112,7 @@ namespace Watch.Examples.Desktop
                         {
                             var visual = _watchWindow.GetVisual();
 
-                            _watchWindow.AddWatchFace(new WatchApplication { Background = Helper.RandomBrush() });
+                            _watchWindow.AddWatchFace(new WatchApplication(RandomPick(_images)) { Background = Helper.RandomBrush() });
 
                             var floatingItem = new ScatterViewItem
                             {
@@ -152,6 +163,23 @@ namespace Watch.Examples.Desktop
                     }
                     break;
             }
+        }
+
+        readonly Random _random = new Random();
+        BitmapImage RandomPick(List<string> strings)
+        {
+            if (strings.Count == 0)
+                return null;
+            var pos = _random.Next(strings.Count);
+            var file =  strings[pos];
+            strings.RemoveAt(pos);
+
+            var url = "pack://application:,,,/Watch.Examples.Desktop;component/Design/" + file;
+            var logo = new BitmapImage();
+            logo.BeginInit();
+            logo.UriSource = new Uri(url);
+            logo.EndInit();
+            return logo;
         }
 
         void floatingItem_PreviewTouchUp(object sender, TouchEventArgs e)

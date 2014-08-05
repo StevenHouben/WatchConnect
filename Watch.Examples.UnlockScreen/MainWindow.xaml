@@ -1,0 +1,8 @@
+﻿<Window x:Class="Watch.Examples.UnlockScreen.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525" Background="#014051">
+    <Grid>
+        <Image x:Name="Image" Source="Login-Screen.jpg" Stretch="Uniform"></Image>
+    </Grid>
+</Window>
