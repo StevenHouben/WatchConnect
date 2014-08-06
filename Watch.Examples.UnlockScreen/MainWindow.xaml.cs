@@ -14,6 +14,7 @@ namespace Watch.Examples.UnlockScreen
 
         private WatchRuntime _watchWindow;
         private WatchConfiguration _watchConfiguration;
+        private WatchFaceExample _feedback;
         private bool _down;
 
         public MainWindow()
@@ -34,8 +35,9 @@ namespace Watch.Examples.UnlockScreen
                     AppDomain.CurrentDomain.BaseDirectory + "recording19.log")
             };
 
+            _feedback =  new WatchFaceExample();
             _watchWindow = new WatchRuntime(_watchConfiguration);
-            _watchWindow.AddWatchFace(new WatchFaceExample());
+            _watchWindow.AddWatchFace(_feedback);
             _watchWindow.Show();
 
             TouchDown += MainWindow_TouchDown;
@@ -48,6 +50,7 @@ namespace Watch.Examples.UnlockScreen
                     {
                         Dispatcher.Invoke(() =>
                         {
+                            _feedback.SetColor(Brushes.DarkOliveGreen);
                             Background = Brushes.Transparent;
                             Image.Opacity = 0;
                         });
@@ -60,6 +63,7 @@ namespace Watch.Examples.UnlockScreen
         void MainWindow_TouchDown(object sender, TouchEventArgs e)
         {
             _down = true;
+            _feedback.SetColor(Brushes.DarkRed);
         }
 
         void MainWindow_KeyDown(object sender, KeyEventArgs e)

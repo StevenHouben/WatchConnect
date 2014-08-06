@@ -99,7 +99,6 @@ namespace Watch.Examples.Desktop
 
         void GestureManager_GestureDetected(object sender, GestureDetectedEventArgs e)
         {
-            Console.WriteLine(e.Gesture);
             switch (e.Gesture)
             {
                 case Gesture.SwipeRight:

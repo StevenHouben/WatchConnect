@@ -45,9 +45,13 @@ namespace Watch.Toolkit.Utils
             cbGestureList.SelectedIndex = 0;
             KeyDown += MainWindow_KeyDown;
 
+            //_configuration.ClassifierConfiguration = new ClassifierConfiguration(
+            //    new List<string> { "Right Hand", "Left Hand", "Left Knuckle", " Flat Hand" },
+            //    AppDomain.CurrentDomain.BaseDirectory + "recording19.log");
+
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
-                new List<string> { "Right Hand", "Left Hand", "Left Knuckle", " Flat Hand" },
-                AppDomain.CurrentDomain.BaseDirectory + "recording19.log");
+                new List<string> {"Neutral", "Left", "Top", "Right", "Down" },
+                AppDomain.CurrentDomain.BaseDirectory + "recording20.log");
 
             _configuration.Hardware = new Arduino("COM4");
 
@@ -72,7 +76,6 @@ namespace Watch.Toolkit.Utils
             _watchRuntime.TouchManager.SliderTouchUp += _touchManager_SliderTouchUp;
             _watchRuntime.TouchManager.SliderDoubleTap += _touchManager_DoubleTap;
 
-            _watchRuntime.GestureManager = new GestureManager(_configuration.Hardware);
 
             foreach (var template in _watchRuntime.TrackerManager.DtwClassifier.GetTemplates())
             {

@@ -27,6 +27,8 @@ namespace Watch.Examples.Reading
         {
             InitializeComponent();
 
+            WindowState = WindowState.Maximized;
+
             KeyDown += MainWindow_KeyDown;
 
             SurfaceColors.SetDefaultApplicationPalette(new LightSurfacePalette());

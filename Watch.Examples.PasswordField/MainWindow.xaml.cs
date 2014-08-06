@@ -39,6 +39,8 @@ namespace Watch.Examples.PasswordField
 
             PreviewTouchDown += MainWindow_PreviewTouchDown;
             PreviewTouchUp += MainWindow_PreviewTouchUp;
+
+            WindowState = WindowState.Maximized;
         }
 
         void MainWindow_PreviewTouchUp(object sender, TouchEventArgs e)
@@ -53,6 +55,22 @@ namespace Watch.Examples.PasswordField
         }
 
         void MainWindow_PreviewTouchDown(object sender, TouchEventArgs e)
+        {
+           
+        }
+
+        void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+                Environment.Exit(0);
+        }
+
+        private void PasswordBox_OnPreviewTouchDown(object sender, TouchEventArgs e)
+        {
+            Process.Start(@"C:\Program Files\Common Files\Microsoft Shared\ink\TabTip.exe");
+        }
+
+        private void Button_OnPreviewTouchDown(object sender, TouchEventArgs e)
         {
             Title = _watchWindow.LastDetectedPosture;
             if (_watchWindow.LastDetectedPosture == "Hand")
@@ -89,17 +107,6 @@ namespace Watch.Examples.PasswordField
                     Output.Content = "Password Accepted";
                 }
             }
-        }
-
-        void MainWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-                Environment.Exit(0);
-        }
-
-        private void PasswordBox_OnPreviewTouchDown(object sender, TouchEventArgs e)
-        {
-            Process.Start(@"C:\Program Files\Common Files\Microsoft Shared\ink\TabTip.exe");
         }
     }
 }

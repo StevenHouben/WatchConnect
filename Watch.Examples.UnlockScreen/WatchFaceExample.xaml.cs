@@ -1,4 +1,6 @@
 ﻿
+using System.Windows.Media;
+
 namespace Watch.Examples.UnlockScreen
 {
     public partial class WatchFaceExample
@@ -6,6 +8,11 @@ namespace Watch.Examples.UnlockScreen
         public WatchFaceExample()
         {
             InitializeComponent();
+        }
+
+        public void SetColor(Brush color)
+        {
+            Background = color;
         }
     }
 }
