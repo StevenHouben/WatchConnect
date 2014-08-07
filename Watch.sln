@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Examples.PasswordFiel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Examples.UnlockScreen", "Watch.Examples.UnlockScreen\Watch.Examples.UnlockScreen.csproj", "{EBE58185-D468-48F2-8D41-0F8A64A391DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Watch.Examples.PrivateZone", "Watch.Examples.PrivateZone\Watch.Examples.PrivateZone.csproj", "{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +188,16 @@ Global
 		{EBE58185-D468-48F2-8D41-0F8A64A391DD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EBE58185-D468-48F2-8D41-0F8A64A391DD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EBE58185-D468-48F2-8D41-0F8A64A391DD}.Release|Win32.ActiveCfg = Release|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EB84186E-88C3-4EC5-AA80-1CD5B9AA70E4}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

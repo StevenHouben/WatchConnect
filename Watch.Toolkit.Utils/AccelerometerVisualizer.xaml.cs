@@ -40,18 +40,18 @@ namespace Watch.Toolkit.Utils
             TouchVisualizer.GestureTouchMove += TouchVisualizer_GestureTouchMove;
             TouchVisualizer.GestureTouchDown += TouchVisualizer_GestureTouchDown;
 
-            cbGestureList.ItemsSource = 
-                new List<string> { "None", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle"};
+            cbGestureList.ItemsSource =
+                new List<string> { "None", "Left Index ", "Left Middle", "Left Pinky", "Left Knuckle" };
             cbGestureList.SelectedIndex = 0;
             KeyDown += MainWindow_KeyDown;
 
-            //_configuration.ClassifierConfiguration = new ClassifierConfiguration(
-            //    new List<string> { "Right Hand", "Left Hand", "Left Knuckle", " Flat Hand" },
-            //    AppDomain.CurrentDomain.BaseDirectory + "recording19.log");
-
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
-                new List<string> {"Neutral", "Left", "Top", "Right", "Down" },
-                AppDomain.CurrentDomain.BaseDirectory + "recording20.log");
+                new List<string> { "Right Hand", "Left Hand", "Left Knuckle", " Flat Hand" },
+                AppDomain.CurrentDomain.BaseDirectory + "recording19.log");
+
+            //_configuration.ClassifierConfiguration = new ClassifierConfiguration(
+            //    new List<string> {"Neutral", "Left", "Top", "Right", "Down" },
+            //    AppDomain.CurrentDomain.BaseDirectory + "recording20.log");
 
             _configuration.Hardware = new Arduino("COM4");
 

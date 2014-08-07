@@ -57,7 +57,6 @@ namespace Watch.Examples.UnlockScreen
 
                     }
                 };
-
         }
 
         void MainWindow_TouchDown(object sender, TouchEventArgs e)
