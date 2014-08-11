@@ -21,9 +21,11 @@ namespace Watch.Toolkit.Interface
             window.Left = workingArea.Left;
             window.Top = workingArea.Top;
             window.Width = workingArea.Width;
-            window.Height = workingArea.Height;
+            window.Height = workingArea.Height +50;
             if ( window.IsLoaded )
                 window.WindowState = WindowState.Maximized;
+
+            window.Topmost = true;
         }
 
         public static  bool HasWatchConnected()

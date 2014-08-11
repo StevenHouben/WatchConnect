@@ -38,7 +38,7 @@ namespace Watch.Examples.PrivateZone
               //Label for the classifier
               new List<string> { "Right Hand", "Left Hand", "Left Knuckle", "Hand" },
               //Path to training data
-              "recording.data")
+              "recording19.log")
       });
             _vis = new Visualizer();
             _watchWindow.AddWatchFace(_vis);

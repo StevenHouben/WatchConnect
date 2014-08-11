@@ -57,7 +57,7 @@ namespace Watch.Examples.Desktop
             _configuration.Hardware = new Arduino("COM4");
             _configuration.ClassifierConfiguration = new ClassifierConfiguration(
                 new List<string> {"Right Hand", "Left Hand", "Left Knuckle", "Hand"},
-                AppDomain.CurrentDomain.BaseDirectory + "recording19.log");
+                AppDomain.CurrentDomain.BaseDirectory + "Recording19.log");
 
             _watchWindow = new WatchRuntime(_configuration);
 
@@ -67,6 +67,7 @@ namespace Watch.Examples.Desktop
             touchPipeline.GestureTouchUp += touchPipeline_GestureTouchUp;
 
             WindowState = WindowState.Maximized;
+            WindowStyle = WindowStyle.None;
 
             _watchWindow.GestureManager.GestureDetected += GestureManager_GestureDetected;
 
